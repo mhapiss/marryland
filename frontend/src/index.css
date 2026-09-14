@@ -1,0 +1,75 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+
+  ::selection {
+    background-color: rgba(191, 160, 106, 0.25);
+    color: #2A2420;
+  }
+}
+
+@layer components {
+  /* Pill button - primary */
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-primary text-white px-8 py-3 rounded-full font-medium
+           transition-all duration-300 hover:bg-primary-500 hover:shadow-glow active:scale-[0.98];
+  }
+
+  /* Pill button - outline */
+  .btn-outline {
+    @apply inline-flex items-center justify-center border-2 border-primary text-primary px-8 py-3 rounded-full font-medium
+           transition-all duration-300 hover:bg-primary hover:text-white active:scale-[0.98];
+  }
+
+  /* Card style */
+  .card {
+    @apply bg-white rounded-2xl border border-primary-100/50 shadow-soft transition-all duration-300 hover:shadow-card;
+  }
+
+  /* Input style */
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-primary-100 bg-white text-sm
+           focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all duration-200;
+  }
+
+  /* Label style */
+  .label {
+    @apply block text-[11px] font-bold text-muted uppercase tracking-wider mb-1.5;
+  }
+
+  /* Badge */
+  .badge-required {
+    @apply text-primary bg-primary-100 px-1.5 py-0.5 rounded text-[10px] font-bold ml-1;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(191, 160, 106, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(191, 160, 106, 0.5);
+}
