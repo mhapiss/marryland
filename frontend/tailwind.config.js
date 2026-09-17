@@ -48,6 +48,7 @@ module.exports = {
         'fade-in': 'fadeIn 0.6s ease-out',
         'slide-up': 'slideUp 0.6s ease-out',
         'float': 'float 6s ease-in-out infinite',
+        'image-pan': 'imagePan 30s alternate infinite ease-in-out',
       },
       keyframes: {
         fadeIn: {
@@ -62,7 +63,11 @@ module.exports = {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
         },
-      },
+        imagePan: {
+          '0%': { transform: 'scale(1.05) translate(0, 0)' },
+          '100%': { transform: 'scale(1.15) translate(-1%, -1%)' },
+        }
+      }
     },
   },
   plugins: [],
