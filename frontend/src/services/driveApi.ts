@@ -14,31 +14,28 @@ export interface DriveFile {
  * Folder di Google Drive HARUS diatur ke "Anyone with the link can view".
  */
 export async function fetchDriveFolderContents(folderId: string): Promise<DriveFile[]> {
-  const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+  // Kita menggunakan Google Apps Script Web App untuk membypass batasan OAuth2 Google
+  const scriptUrl = import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL;
   
-  if (!apiKey) {
-    throw new Error("Google API Key belum dikonfigurasi di .env.local (VITE_GOOGLE_API_KEY).");
+  if (!scriptUrl) {
+    throw new Error("URL Google Apps Script belum dikonfigurasi di .env.local (VITE_GOOGLE_APPS_SCRIPT_URL).");
   }
 
   try {
-    // 1. Fetch file list dari Google Drive v3 API
-    // Kita filter hanya tipe gambar (image/)
-    const query = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
-    const fields = 'files(id, name, mimeType)';
-    
-    // Pagination (max 1000 file sekali ambil)
-    const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=${encodeURIComponent(fields)}&pageSize=1000&key=${apiKey}`;
+    const url = `${scriptUrl}?id=${folderId}`;
     
     const response = await fetch(url);
     
     if (!response.ok) {
-      const errData = await response.json();
-      console.error("Drive API Error:", errData);
-      throw new Error(errData.error?.message || "Gagal mengambil data dari Google Drive. Pastikan folder publik.");
+      throw new Error("Gagal menghubungi server Apps Script.");
     }
     
     const data = await response.json();
     
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
     if (!data.files || data.files.length === 0) {
       return [];
     }
