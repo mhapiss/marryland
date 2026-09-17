@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 import type { Gallery } from '../pages/Dashboard';
-import { fetchDriveFolderContents } from '../services/driveApi';
 
 interface Props {
   onGalleryCreated: (gallery: Gallery) => void;
-}
-
-function extractFolderId(url: string): string | null {
-  const match = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
-  return match ? match[1] : null;
 }
 
 function slugify(text: string): string {
@@ -25,10 +19,11 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [syncStatus, setSyncStatus] = useState(''); // Text indikator loading
+  const [syncStatus, setSyncStatus] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const [form, setForm] = useState({
-    gdrive_folder_url: '',
+    client_name: '',
     max_photos_selectable: 100,
     deadline_date: '',
     highlight_description: '',
@@ -45,10 +40,17 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFiles(Array.from(e.target.files));
+    }
+  };
+
   const isValid =
-    form.gdrive_folder_url.trim() !== '' &&
+    form.client_name.trim() !== '' &&
     form.client_whatsapp.trim() !== '' &&
-    form.max_photos_selectable > 0;
+    form.max_photos_selectable > 0 &&
+    selectedFiles.length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,38 +58,21 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
 
     setIsLoading(true);
     setError('');
-    setSyncStatus('Memvalidasi link folder...');
-
-    const folderId = extractFolderId(form.gdrive_folder_url);
-    if (!folderId) {
-      setError('Link folder Google Drive tidak valid. Pastikan format URL URL /folders/...');
-      setIsLoading(false);
-      return;
-    }
-
+    
     try {
-      // 1. Fetch file dari Google Drive
-      setSyncStatus('Mengambil daftar foto dari Google Drive...');
-      const driveFiles = await fetchDriveFolderContents(folderId);
-
-      if (driveFiles.length === 0) {
-        throw new Error('Tidak ada file gambar ditemukan di folder Drive tersebut, atau folder tidak publik.');
-      }
-
-      // 2. Buat Galeri Baru di DB
+      // 1. Buat Galeri Baru di DB
       setSyncStatus('Menyimpan informasi galeri...');
-      const clientName = 'Klien Baru';
-      const clientSlug = slugify(clientName) + '-' + Date.now().toString(36).slice(-4);
+      const clientSlug = slugify(form.client_name) + '-' + Date.now().toString(36).slice(-4);
       const cleanWa = form.client_whatsapp.replace(/[\s\-\(\)]/g, '');
 
       const { data: gallery, error: insertError } = await supabase
         .from('galleries')
         .insert({
           user_id: user.id,
-          client_name: clientName,
+          client_name: form.client_name,
           client_slug: clientSlug,
-          gdrive_folder_url: form.gdrive_folder_url.trim(),
-          gdrive_folder_id: folderId,
+          gdrive_folder_url: '-', // tidak dipakai lagi
+          gdrive_folder_id: '-', // tidak dipakai lagi
           max_photos_selectable: form.max_photos_selectable,
           deadline_date: form.deadline_date || null,
           highlight_description: form.highlight_description || null,
@@ -102,18 +87,36 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
       if (insertError) throw insertError;
       if (!gallery) throw new Error("Gagal membuat galeri");
 
-      // 3. Simpan foto-foto ke gallery_photos
-      setSyncStatus(`Menyinkronkan ${driveFiles.length} foto ke database...`);
+      // 2. Upload File ke Supabase Storage & Simpan URL
+      setSyncStatus(`Mengunggah ${selectedFiles.length} foto... Jangan tutup halaman ini.`);
       
-      const photosToInsert = driveFiles.map((file, index) => ({
-        gallery_id: gallery.id,
-        gdrive_file_id: file.id,
-        filename: file.name,
-        thumbnail_url: file.thumbnailUrl,
-        order_index: index + 1,
-      }));
+      const photosToInsert = [];
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${user.id}/${gallery.id}/${Date.now()}-${i}.${fileExt}`;
+        
+        // Upload
+        const { error: uploadError } = await supabase.storage
+          .from('galleries')
+          .upload(filePath, file);
 
-      // Insert bulk
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage.from('galleries').getPublicUrl(filePath);
+
+        photosToInsert.push({
+          gallery_id: gallery.id,
+          gdrive_file_id: filePath, // kita simpan pathnya di sini
+          filename: file.name,
+          thumbnail_url: publicUrl,
+          order_index: i + 1,
+        });
+      }
+
+      // 3. Insert ke database
+      setSyncStatus('Menyelesaikan galeri...');
       const { error: photosError } = await supabase
         .from('gallery_photos')
         .insert(photosToInsert);
@@ -123,7 +126,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
       // Sukses!
       onGalleryCreated(gallery);
       setForm({
-        gdrive_folder_url: '',
+        client_name: '',
         max_photos_selectable: 100,
         deadline_date: '',
         highlight_description: '',
@@ -131,6 +134,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
         client_whatsapp: '',
         allow_download: false,
       });
+      setSelectedFiles([]);
       setIsExpanded(false);
 
     } catch (err: any) {
@@ -143,7 +147,6 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
 
   return (
     <div className="card overflow-hidden">
-      {/* Header */}
       <button
         className="w-full flex items-center justify-between p-6 text-left hover:bg-primary-50/50 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -154,7 +157,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
           </div>
-          <span className="font-serif text-lg font-bold text-text">Buat Galeri Baru</span>
+          <span className="font-serif text-lg font-bold text-text">Buat Galeri Baru (Upload Langsung)</span>
         </div>
         <svg
           className={`w-5 h-5 text-muted transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
@@ -164,44 +167,52 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
         </svg>
       </button>
 
-      {/* Form Body */}
-      <div className={`transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div className={`transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-5 border-t border-primary-100/30 pt-5">
           {error && (
             <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3">{error}</div>
           )}
 
-          {/* Google Drive Link */}
+          {/* Nama Klien */}
           <div>
             <label className="label">
-              Link Folder Google Drive{' '}
+              Nama Klien / Acara{' '}
               <span className="badge-required">WAJIB</span>
             </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-              </div>
-              <input
-                name="gdrive_folder_url"
-                type="url"
-                placeholder="https://drive.google.com/drive/folders/..."
-                value={form.gdrive_folder_url}
-                onChange={handleChange}
-                className="input pl-10"
-              />
-            </div>
-            <p className="mt-1.5 text-[11px] text-muted">
-              Nama klien otomatis diambil dari nama folder. Pastikan folder di-share "Anyone with the link".
-            </p>
+            <input
+              name="client_name"
+              type="text"
+              placeholder="Contoh: Budi & Ani Wedding"
+              value={form.client_name}
+              onChange={handleChange}
+              className="input"
+            />
           </div>
 
-          {/* Two columns: max photos + deadline */}
+          {/* File Upload */}
+          <div>
+            <label className="label">
+              Pilih Foto Galeri{' '}
+              <span className="badge-required">WAJIB</span>
+            </label>
+            <div className="border-2 border-dashed border-primary-200 rounded-xl p-6 text-center hover:bg-primary-50/50 transition-colors relative">
+              <input 
+                type="file" 
+                multiple 
+                accept="image/*"
+                onChange={handleFileChange}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <svg className="w-8 h-8 text-primary/60 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+              <p className="text-sm font-medium text-text">Klik atau seret foto ke sini</p>
+              <p className="text-xs text-muted mt-1">{selectedFiles.length > 0 ? `${selectedFiles.length} foto terpilih` : 'Mendukung format JPG, PNG (maksimal 5MB/foto untuk demo)'}</p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="label">
-                Batas Maksimal Foto{' '}
+                Batas Maksimal Pilih{' '}
                 <span className="badge-required">WAJIB</span>
               </label>
               <input
@@ -225,7 +236,6 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
             </div>
           </div>
 
-          {/* Highlight description */}
           <div>
             <label className="label">Deskripsi Highlight</label>
             <textarea
@@ -238,7 +248,6 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
             />
           </div>
 
-          {/* Two columns: email + whatsapp */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="label">Email Klien</label>
@@ -267,7 +276,6 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
             </div>
           </div>
 
-          {/* Allow download checkbox */}
           <label className="flex items-center gap-3 cursor-pointer group w-max">
             <div className="relative flex items-center justify-center">
               <input
@@ -282,7 +290,6 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
             <span className="text-sm font-medium text-text group-hover:text-primary transition-colors">Izinkan klien mengunduh foto</span>
           </label>
 
-          {/* Submit */}
           <div className="flex justify-end pt-4">
             <button
               type="submit"
