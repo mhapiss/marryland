@@ -24,8 +24,8 @@ const AdminDashboard: React.FC = () => {
 
   if (!user) return <Navigate to="/login" replace />;
 
-  // Proteksi Halaman Admin: Hanya email ini yang diizinkan masuk
-  if (user.email !== 'admin@marryland.com') {
+  // Proteksi Halaman Admin: Hanya user dengan role 'superadmin' yang diizinkan masuk
+  if (user.user_metadata?.role !== 'superadmin') {
     return (
       <div className="min-h-screen bg-[#0E0E11] text-white flex flex-col items-center justify-center font-sans">
         <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-6">

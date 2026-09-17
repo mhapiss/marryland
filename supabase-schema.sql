@@ -99,6 +99,32 @@ CREATE POLICY "Fotografer bisa update foto di galerinya" ON gallery_photos FOR U
 CREATE POLICY "Fotografer bisa hapus foto di galerinya" ON gallery_photos FOR DELETE USING (EXISTS (SELECT 1 FROM galleries WHERE galleries.id = gallery_photos.gallery_id AND galleries.user_id = auth.uid()));
 
 CREATE POLICY "Fotografer bisa melihat seleksi foto" ON photo_selections FOR SELECT USING (EXISTS (SELECT 1 FROM galleries WHERE galleries.id = photo_selections.gallery_id AND galleries.user_id = auth.uid()));
+CREATE POLICY "Users can delete their own photo selections" ON photo_selections
+    FOR DELETE USING (
+        EXISTS (
+            SELECT 1 FROM galleries
+            WHERE galleries.id = photo_selections.gallery_id
+            AND galleries.user_id = auth.uid()
+        )
+    );
+
+-- SUPERADMIN POLICIES (Role-based Access Control)
+-- This allows any user with 'role': 'superadmin' in their user_metadata to view all data.
+
+CREATE POLICY "Superadmin can view all galleries" ON galleries
+    FOR SELECT USING (
+        auth.jwt() -> 'user_metadata' ->> 'role' = 'superadmin'
+    );
+
+CREATE POLICY "Superadmin can view all photos" ON gallery_photos
+    FOR SELECT USING (
+        auth.jwt() -> 'user_metadata' ->> 'role' = 'superadmin'
+    );
+
+CREATE POLICY "Superadmin can view all photo selections" ON photo_selections
+    FOR SELECT USING (
+        auth.jwt() -> 'user_metadata' ->> 'role' = 'superadmin'
+    );
 
 -- Policies untuk Public (Klien tanpa login)
 -- Klien butuh akses BACA ke galleries, gallery_photos berdasarkan gallery_id, serta INSERT/DELETE ke photo_selections

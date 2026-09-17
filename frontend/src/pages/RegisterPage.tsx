@@ -114,7 +114,11 @@ const PhotographerRegistration: React.FC = () => {
 
       if (error) throw error;
       
-      navigate('/login?message=Cek email kamu untuk verifikasi akun.');
+      if (data.session) {
+        navigate('/dashboard');
+      } else {
+        navigate('/login?message=Cek email kamu untuk verifikasi akun.');
+      }
       
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan saat mendaftar.');

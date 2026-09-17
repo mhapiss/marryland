@@ -37,8 +37,13 @@ const Dashboard: React.FC = () => {
   const [showPhotosModal, setShowPhotosModal] = useState(false);
 
   useEffect(() => {
+    // Jika yang masuk adalah admin (berdasarkan Role), langsung tendang ke halaman /admin
+    if (user?.user_metadata?.role === 'superadmin') {
+      navigate('/admin');
+      return;
+    }
     fetchGalleries();
-  }, [user]);
+  }, [user, navigate]);
 
   const fetchGalleries = async () => {
     if (!user) return;
