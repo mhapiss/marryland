@@ -148,14 +148,15 @@ const PhotographerRegistration: React.FC = () => {
           <h1 className="font-serif text-3xl font-bold text-center">Buat Akun</h1>
         </div>
 
-        <button 
+        {/* Google Login (Disabled temporarily for MVP) */}
+        {/* <button 
           type="button"
           onClick={signInWithGoogle}
           className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-xl py-3 px-4 font-medium hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow mb-8"
         >
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
           Daftar dengan Google
-        </button>
+        </button> */}
 
         <div className="flex items-center gap-4 mb-8">
           <div className="flex-1 h-px bg-gray-200"></div>
