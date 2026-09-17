@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 
 // Dummy data untuk visualisasi UI Admin
-const DUMMY_METRICS = {
-  totalUsers: 128,
-  totalGalleries: 1450,
-  activePro: 34,
-  revenue: 'Rp 4.250.000',
-};
-
 const DUMMY_USERS = [
   { id: '1', studio: 'Dina Pictures', email: 'hello@dinapics.com', plan: 'PRO', credits: 15, status: 'active', joined: '12 Sep 2026' },
   { id: '2', studio: 'Visual Story', email: 'contact@vstory.id', plan: 'FREE', credits: 0, status: 'active', joined: '14 Sep 2026' },
@@ -18,9 +12,32 @@ const DUMMY_USERS = [
 ];
 
 const AdminDashboard: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [metrics, setMetrics] = useState({ totalGalleries: 0, totalPhotos: 0 });
+
+  React.useEffect(() => {
+    if (user?.user_metadata?.role === 'superadmin') {
+      fetchRealMetrics();
+    }
+  }, [user]);
+
+  const fetchRealMetrics = async () => {
+    // Karena superadmin punya RLS bypass, dia bisa count semua row
+    const { count: galleryCount } = await supabase.from('galleries').select('*', { count: 'exact', head: true });
+    const { count: photoCount } = await supabase.from('gallery_photos').select('*', { count: 'exact', head: true });
+    setMetrics({
+      totalGalleries: galleryCount || 0,
+      totalPhotos: photoCount || 0,
+    });
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
 
   if (loading) return null; // Let ProtectedRoute handle the loading UI
 
@@ -71,8 +88,16 @@ const AdminDashboard: React.FC = () => {
           </button>
         </nav>
 
-        <div className="p-4 border-t border-zinc-800/50">
-          <div className="flex items-center gap-3 px-4 py-2">
+        <div className="p-4 border-t border-zinc-800/50 space-y-2">
+          {/* Tombol Logout */}
+          <button 
+            onClick={handleSignOut}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm font-semibold transition-colors border border-red-500/20"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            Logout
+          </button>
+          <div className="flex items-center gap-3 px-4 py-2 mt-2">
             <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-primary font-bold">
               A
             </div>
@@ -89,7 +114,7 @@ const AdminDashboard: React.FC = () => {
         <header className="mb-10 flex justify-between items-end">
           <div>
             <h2 className="text-3xl font-serif font-bold text-white mb-2">Control Panel</h2>
-            <p className="text-zinc-400">Pantau aktivitas platform by.marryland hari ini.</p>
+            <p className="text-zinc-400">Pantau aktivitas platform by.marryland secara real-time.</p>
           </div>
           <button className="bg-primary hover:bg-primary-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(191,160,106,0.3)]">
             + Broadcast Pesan
@@ -100,29 +125,30 @@ const AdminDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           <div className="bg-[#18181B] border border-zinc-800/50 p-6 rounded-2xl shadow-lg">
             <p className="text-sm text-zinc-400 font-medium mb-1">Total Fotografer</p>
-            <h3 className="text-3xl font-bold text-white">{DUMMY_METRICS.totalUsers}</h3>
+            <h3 className="text-3xl font-bold text-white">128</h3>
             <p className="text-xs text-green-400 mt-2 flex items-center gap-1">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
               +12 minggu ini
             </p>
           </div>
           <div className="bg-[#18181B] border border-zinc-800/50 p-6 rounded-2xl shadow-lg">
-            <p className="text-sm text-zinc-400 font-medium mb-1">Galeri Dibuat</p>
-            <h3 className="text-3xl font-bold text-white">{DUMMY_METRICS.totalGalleries}</h3>
+            <p className="text-sm text-zinc-400 font-medium mb-1">Galeri Dibuat (Real)</p>
+            <h3 className="text-3xl font-bold text-white">{metrics.totalGalleries}</h3>
             <p className="text-xs text-green-400 mt-2 flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
-              +145 minggu ini
+              Live Database Sync
             </p>
           </div>
           <div className="bg-[#18181B] border border-zinc-800/50 p-6 rounded-2xl shadow-lg">
-            <p className="text-sm text-zinc-400 font-medium mb-1">User PRO Aktif</p>
-            <h3 className="text-3xl font-bold text-white">{DUMMY_METRICS.activePro}</h3>
-            <p className="text-xs text-zinc-500 mt-2">26% conversion rate</p>
+            <p className="text-sm text-zinc-400 font-medium mb-1">Total Foto Disimpan (Real)</p>
+            <h3 className="text-3xl font-bold text-white">{metrics.totalPhotos}</h3>
+            <p className="text-xs text-green-400 mt-2 flex items-center gap-1">
+              Live Database Sync
+            </p>
           </div>
           <div className="bg-[#18181B] border border-zinc-800/50 p-6 rounded-2xl shadow-lg relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
             <p className="text-sm text-zinc-400 font-medium mb-1 relative z-10">Estimasi Revenue</p>
-            <h3 className="text-2xl font-bold text-primary relative z-10">{DUMMY_METRICS.revenue}</h3>
+            <h3 className="text-2xl font-bold text-primary relative z-10">Rp 4.250.000</h3>
             <p className="text-xs text-zinc-500 mt-2 relative z-10">Bulan ini</p>
           </div>
         </div>
