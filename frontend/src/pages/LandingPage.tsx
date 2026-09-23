@@ -271,30 +271,30 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Horizontal Auto-scrolling Portfolio */}
-        <div className="relative w-full">
+        {/* Horizontal Auto-scrolling Portfolio (Infinite Marquee) */}
+        <div className="relative w-full overflow-hidden py-4 group">
           {portfolioPhotos.length > 0 ? (
-            <div className="flex gap-4 px-6 md:px-12 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {portfolioPhotos
-                .filter(p => activeCategory === 'semua' || p.category === activeCategory)
-                .map((photo, i) => (
-                  <div 
-                    key={photo.id} 
-                    className="flex-none w-[280px] md:w-[400px] h-[350px] md:h-[500px] rounded-2xl overflow-hidden relative group snap-center"
-                  >
-                    <img 
-                      src={photo.image_url} 
-                      alt={photo.caption || `Portfolio ${i}`} 
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                      <p className="text-white font-medium text-sm md:text-base transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        {photo.caption || <span className="capitalize">{photo.category}</span>}
-                      </p>
-                    </div>
+            <div className="flex w-max gap-4 px-4 animate-carousel-scroll group-hover:[animation-play-state:paused]">
+              {/* Duplicate the list to create the seamless infinite scroll effect */}
+              {[...portfolioPhotos.filter(p => activeCategory === 'semua' || p.category === activeCategory), 
+                ...portfolioPhotos.filter(p => activeCategory === 'semua' || p.category === activeCategory)].map((photo, i) => (
+                <div 
+                  key={`${photo.id}-${i}`} 
+                  className="flex-none h-[350px] md:h-[500px] rounded-2xl overflow-hidden relative group"
+                >
+                  <img 
+                    src={photo.image_url} 
+                    alt={photo.caption || `Portfolio ${i}`} 
+                    className="w-auto h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                    <p className="text-white font-medium text-sm md:text-base transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                      {photo.caption || <span className="capitalize">{photo.category}</span>}
+                    </p>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           ) : (
             <div className="text-center text-muted py-12">
