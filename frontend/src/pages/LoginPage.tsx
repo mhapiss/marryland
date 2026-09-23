@@ -30,7 +30,22 @@ export default function LoginPage() {
         throw error;
       }
       
-      navigate('/dashboard');
+      // Check role and redirect accordingly
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profile?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: any) {
       setError(err.message || 'Email atau password salah.');
     } finally {
@@ -39,8 +54,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-sans text-text">
-      <div className="w-full max-w-[420px] card p-10 animate-fade-in">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-sans text-text ambient-bg">
+      {/* ─────── Decorative Elements ─────── */}
+      <div className="deco-float w-64 h-64 bg-primary-100 top-10 -left-20 blur-3xl"></div>
+      <div className="deco-float-reverse w-96 h-96 bg-primary-200/50 bottom-10 -right-32 blur-[100px]"></div>
+
+      <div className="w-full max-w-[420px] card p-10 animate-fade-in relative z-10">
         
         {/* Header */}
         <div className="flex flex-col items-center mb-10">
@@ -59,14 +78,15 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Google Login (Disabled temporarily for MVP) */}
-        {/* <button 
+        {/* Google Login */}
+        <button 
+          type="button"
           onClick={signInWithGoogle}
           className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-xl py-3 px-4 font-medium hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow mb-8"
         >
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
           Masuk dengan Google
-        </button> */}
+        </button>
 
         <div className="flex items-center gap-4 mb-8">
           <div className="flex-1 h-px bg-gray-200"></div>

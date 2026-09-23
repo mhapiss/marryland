@@ -22,7 +22,10 @@ const RegisterTypeSelection: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-sans text-text">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-sans text-text ambient-bg">
+      {/* ─────── Decorative Elements ─────── */}
+      <div className="deco-float w-64 h-64 bg-primary-100 top-10 -left-20 blur-3xl"></div>
+      <div className="deco-float-reverse w-96 h-96 bg-primary-200/50 bottom-10 -right-32 blur-[100px]"></div>
       <div className="w-full max-w-4xl flex flex-col items-center animate-fade-in">
         <div className="w-full flex justify-between items-center mb-12">
           <button 
@@ -128,7 +131,10 @@ const PhotographerRegistration: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center p-6 font-sans text-text">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-sans text-text ambient-bg">
+      {/* ─────── Decorative Elements ─────── */}
+      <div className="deco-float w-64 h-64 bg-primary-100 top-10 -left-20 blur-3xl"></div>
+      <div className="deco-float-reverse w-96 h-96 bg-primary-200/50 bottom-10 -right-32 blur-[100px]"></div>
       <div className="w-full max-w-[440px] mt-8 card p-10 animate-fade-in">
         <div className="flex flex-col items-center mb-8">
           <div className="w-full flex justify-between items-center mb-8">
@@ -148,15 +154,15 @@ const PhotographerRegistration: React.FC = () => {
           <h1 className="font-serif text-3xl font-bold text-center">Buat Akun</h1>
         </div>
 
-        {/* Google Login (Disabled temporarily for MVP) */}
-        {/* <button 
+        {/* Google Login */}
+        <button 
           type="button"
           onClick={signInWithGoogle}
           className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-xl py-3 px-4 font-medium hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow mb-8"
         >
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
           Daftar dengan Google
-        </button> */}
+        </button>
 
         <div className="flex items-center gap-4 mb-8">
           <div className="flex-1 h-px bg-gray-200"></div>

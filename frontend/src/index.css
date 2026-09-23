@@ -16,8 +16,8 @@
   }
 
   ::selection {
-    background-color: rgba(191, 160, 106, 0.25);
-    color: #2A2420;
+    background-color: rgba(107, 143, 113, 0.25);
+    color: #1E2D21;
   }
 }
 
@@ -54,6 +54,32 @@
   .badge-required {
     @apply text-primary bg-primary-100 px-1.5 py-0.5 rounded text-[10px] font-bold ml-1;
   }
+
+  /* ─── Ambient decorative elements ─── */
+  .ambient-bg {
+    @apply relative overflow-hidden;
+  }
+
+  .ambient-bg::before {
+    content: '';
+    @apply absolute -top-1/2 -left-1/2 w-[200%] h-[200%] opacity-[0.03] pointer-events-none;
+    background: radial-gradient(ellipse at 20% 50%, #6B8F71 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, #8FB996 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 80%, #B3D1B7 0%, transparent 50%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
+  }
+
+  /* Floating decorative dots */
+  .deco-float {
+    @apply absolute rounded-full opacity-20 pointer-events-none;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .deco-float-reverse {
+    @apply absolute rounded-full opacity-15 pointer-events-none;
+    animation: floatReverse 7s ease-in-out infinite;
+  }
 }
 
 /* Custom scrollbar */
@@ -66,10 +92,32 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(191, 160, 106, 0.3);
+  background: rgba(107, 143, 113, 0.3);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(191, 160, 106, 0.5);
+  background: rgba(107, 143, 113, 0.5);
+}
+
+/* ─── Ambient gradient keyframes (referenced by Tailwind animation) ─── */
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ─── Portfolio carousel ─── */
+.portfolio-carousel {
+  display: flex;
+  gap: 1rem;
+  animation: carouselScroll 30s linear infinite;
+}
+
+.portfolio-carousel:hover {
+  animation-play-state: paused;
+}
+
+@keyframes carouselScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }

@@ -19,7 +19,7 @@ interface Props {
 const SelectedPhotosModal: React.FC<Props> = ({ gallery, onClose }) => {
   const [photos, setPhotos] = useState<PhotoSelection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<false | 'newline' | 'comma'>(false);
 
   useEffect(() => {
     fetchSelectedPhotos();
@@ -53,16 +53,18 @@ const SelectedPhotosModal: React.FC<Props> = ({ gallery, onClose }) => {
     setLoading(false);
   };
 
-  const fileList = photos.map((p) => p.filename.replace(/\.[^/.]+$/, '')).join('\n');
+  const fileListNewline = photos.map((p) => p.filename).join('\n');
+  const fileListComma = photos.map((p) => p.filename.replace(/\.[^/.]+$/, '')).join(', ');
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(fileList);
-    setCopied(true);
+  const handleCopy = (type: 'newline' | 'comma') => {
+    const textToCopy = type === 'comma' ? fileListComma : fileListNewline;
+    navigator.clipboard.writeText(textToCopy);
+    setCopied(type);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownloadTxt = () => {
-    const blob = new Blob([fileList], { type: 'text/plain' });
+    const blob = new Blob([fileListNewline], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -114,10 +116,10 @@ const SelectedPhotosModal: React.FC<Props> = ({ gallery, onClose }) => {
         {/* Footer actions */}
         <div className="p-6 border-t border-gray-100 flex items-center gap-3">
           <button
-            onClick={handleCopy}
-            className="flex-1 bg-primary text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#9c7a48] transition-colors"
+            onClick={() => handleCopy('comma')}
+            className="flex-1 bg-primary text-white py-2.5 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
           >
-            {copied ? '✓ Tersalin!' : 'Salin'}
+            {copied === 'comma' ? '✓ Tersalin' : 'Copy utk Lightroom'}
           </button>
           <button
             onClick={handleDownloadTxt}

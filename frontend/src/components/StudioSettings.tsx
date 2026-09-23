@@ -3,11 +3,11 @@ import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 
 const ACCENT_COLORS = [
-  { name: 'Champagne Gold', value: '#BFA06A' },
+  { name: 'Sage Green', value: '#6B8F71' },
+  { name: 'Emerald Soft', value: '#486B4E' },
   { name: 'Dusty Rose', value: '#C08497' },
-  { name: 'Sage Green', value: '#8A9A7E' },
+  { name: 'Champagne Gold', value: '#BFA06A' },
   { name: 'Dusty Blue', value: '#6B8CAE' },
-  { name: 'Warm Gray', value: '#8C8279' },
   { name: 'Terracotta', value: '#C06B52' },
 ];
 
@@ -21,7 +21,7 @@ const StudioSettings: React.FC = () => {
     studio_name: '',
     studio_slug: '',
     whatsapp_number: '',
-    accent_color: '#BFA06A',
+    accent_color: '#6B8F71',
   });
 
   useEffect(() => {
@@ -35,6 +35,22 @@ const StudioSettings: React.FC = () => {
     }
   }, [user]);
 
+  // ─── Multi-tab sync: listen for studio settings changes from other tabs ───
+  useEffect(() => {
+    try {
+      const bc = new BroadcastChannel('studio-settings-sync');
+      bc.onmessage = (event) => {
+        if (event.data?.type === 'STUDIO_SETTINGS_UPDATED') {
+          const { studio_name, studio_slug, whatsapp_number, accent_color } = event.data.data;
+          setForm({ studio_name, studio_slug, whatsapp_number, accent_color });
+        }
+      };
+      return () => bc.close();
+    } catch (_) {
+      // BroadcastChannel not supported
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'studio_slug') {
@@ -45,6 +61,8 @@ const StudioSettings: React.FC = () => {
     }
   };
 
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -52,6 +70,7 @@ const StudioSettings: React.FC = () => {
       setMessage('File terlalu besar. Maksimal 2MB.');
       return;
     }
+    setLogoFile(file);
     const reader = new FileReader();
     reader.onload = () => setLogoPreview(reader.result as string);
     reader.readAsDataURL(file);
@@ -63,12 +82,36 @@ const StudioSettings: React.FC = () => {
     setIsLoading(true);
     setMessage('');
 
+    let logoUrlToSave = user.user_metadata?.studio_logo || '';
+
+    if (logoFile) {
+      const fileExt = logoFile.name.split('.').pop();
+      const fileName = `logos/${user.id}-${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('portfolio')
+        .upload(fileName, logoFile, { upsert: true });
+
+      if (uploadError) {
+        setIsLoading(false);
+        setMessage('Gagal mengupload logo: ' + uploadError.message);
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('portfolio')
+        .getPublicUrl(fileName);
+        
+      logoUrlToSave = publicUrl;
+    }
+
     const { error } = await supabase.auth.updateUser({
       data: {
         studio_name: form.studio_name,
         studio_slug: form.studio_slug,
         whatsapp_number: form.whatsapp_number,
         accent_color: form.accent_color,
+        studio_logo: logoUrlToSave,
       },
     });
 
@@ -78,6 +121,24 @@ const StudioSettings: React.FC = () => {
     } else {
       setMessage('Identitas studio berhasil disimpan!');
       setTimeout(() => setMessage(''), 3000);
+
+      // Broadcast studio settings change to other tabs for instant sync
+      try {
+        const bc = new BroadcastChannel('studio-settings-sync');
+        bc.postMessage({
+          type: 'STUDIO_SETTINGS_UPDATED',
+          data: {
+            studio_name: form.studio_name,
+            studio_slug: form.studio_slug,
+            whatsapp_number: form.whatsapp_number,
+            accent_color: form.accent_color,
+            studio_logo: logoUrlToSave,
+          },
+        });
+        bc.close();
+      } catch (_) {
+        // BroadcastChannel not supported in some environments
+      }
     }
   };
 

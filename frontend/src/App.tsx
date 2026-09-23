@@ -6,8 +6,8 @@ import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import GallerySelection from './pages/GallerySelection';
-import MemoryAlbum from './pages/MemoryAlbum';
 import AdminDashboard from './pages/AdminDashboard';
+import PortfolioManager from './pages/PortfolioManager';
 import { useAuth } from './hooks/useAuth';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -31,6 +31,31 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading, isAdmin } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-sm text-gray-500">Memuat...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 const App: React.FC = () => {
   return (
     <BrowserRouter>
@@ -39,10 +64,8 @@ const App: React.FC = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
-        {/* Support legacy login.html route */}
-        <Route path="/login.html" element={<LoginPage />} />
 
-        {/* Protected dashboard */}
+        {/* Protected dashboard (photographer) */}
         <Route
           path="/dashboard"
           element={
@@ -51,30 +74,27 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/dashboard/*"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
 
-        {/* Super Admin Panel */}
+        {/* Admin routes */}
         <Route
           path="/admin"
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <AdminDashboard />
-            </ProtectedRoute>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/portfolio"
+          element={
+            <AdminRoute>
+              <PortfolioManager />
+            </AdminRoute>
           }
         />
 
-        {/* Public: client photo selection (must be after /dashboard to avoid conflict) */}
+        {/* Public: client photo selection */}
         <Route path="/:studio_slug/:client_slug" element={<GallerySelection />} />
-
-        {/* Public: memory album (single slug + token) */}
-        <Route path="/:client_slug" element={<MemoryAlbum />} />
 
         {/* 404 */}
         <Route path="*" element={

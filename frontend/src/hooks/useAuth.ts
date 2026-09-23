@@ -3,16 +3,29 @@ import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabaseClient';
 
+export type UserRole = 'admin' | 'photographer' | null;
+
+// Hardcode admin emails — kalau email ini login, langsung jadi admin
+const ADMIN_EMAILS = ['admin@marryland.com'];
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [role, setRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
+
+  const determineRole = (u: User | null): UserRole => {
+    if (!u) return null;
+    if (ADMIN_EMAILS.includes(u.email || '')) return 'admin';
+    return 'photographer';
+  };
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setRole(determineRole(session?.user ?? null));
       setLoading(false);
     });
 
@@ -20,6 +33,7 @@ export function useAuth() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setRole(determineRole(session?.user ?? null));
       setLoading(false);
     });
 
@@ -37,8 +51,11 @@ export function useAuth() {
   };
 
   const signOut = async () => {
+    setRole(null);
     await supabase.auth.signOut();
   };
 
-  return { user, session, loading, signInWithGoogle, signOut };
+  const isAdmin = role === 'admin';
+
+  return { user, session, loading, role, isAdmin, signInWithGoogle, signOut };
 }

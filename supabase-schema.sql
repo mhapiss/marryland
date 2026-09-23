@@ -4,8 +4,6 @@
 -- Hapus tabel jika sudah ada (hati-hati jika ada data penting)
 DROP TABLE IF EXISTS photo_selections CASCADE;
 DROP TABLE IF EXISTS gallery_photos CASCADE;
-DROP TABLE IF EXISTS memory_albums CASCADE;
-DROP TABLE IF EXISTS bookings CASCADE;
 DROP TABLE IF EXISTS galleries CASCADE;
 
 -- 1. Tabel Galleries
@@ -34,7 +32,7 @@ CREATE TABLE gallery_photos (
   gallery_id UUID REFERENCES galleries(id) ON DELETE CASCADE,
   gdrive_file_id TEXT NOT NULL,
   filename TEXT NOT NULL,
-  thumbnail_url TEXT, -- Akan diisi dengan URL drive.google.com/thumbnail?id=...
+  thumbnail_url TEXT,
   is_edited BOOLEAN DEFAULT FALSE,
   category TEXT CHECK (category IN ('edited','umum')) DEFAULT 'umum',
   order_index INT,
@@ -50,39 +48,7 @@ CREATE TABLE photo_selections (
   selection_order INT
 );
 
--- 4. Tabel Memory Albums (Phase berikutnya)
-CREATE TABLE memory_albums (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  gallery_id UUID REFERENCES galleries(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  client_slug TEXT NOT NULL,
-  share_token TEXT NOT NULL UNIQUE,
-  cover_photo_url TEXT,
-  pin_code TEXT,
-  title TEXT,
-  chapters JSONB,
-  is_public BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
-);
-
--- 5. Tabel Bookings (Phase berikutnya)
-CREATE TABLE bookings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  client_name TEXT NOT NULL,
-  client_contact TEXT NOT NULL,
-  event_type TEXT,
-  event_date DATE,
-  package_notes TEXT,
-  status TEXT CHECK (status IN ('pending','confirmed','invoiced','paid')) DEFAULT 'pending',
-  invoice_amount NUMERIC,
-  invoice_url TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
-);
-
 -- RLS (Row Level Security) Policies
--- Mengaktifkan keamanan agar tiap fotografer hanya bisa melihat datanya sendiri
-
 ALTER TABLE galleries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gallery_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE photo_selections ENABLE ROW LEVEL SECURITY;
@@ -108,27 +74,8 @@ CREATE POLICY "Users can delete their own photo selections" ON photo_selections
         )
     );
 
--- SUPERADMIN POLICIES (Role-based Access Control)
--- This allows any user with 'role': 'superadmin' in their user_metadata to view all data.
-
-CREATE POLICY "Superadmin can view all galleries" ON galleries
-    FOR SELECT USING (
-        auth.jwt() -> 'user_metadata' ->> 'role' = 'superadmin'
-    );
-
-CREATE POLICY "Superadmin can view all photos" ON gallery_photos
-    FOR SELECT USING (
-        auth.jwt() -> 'user_metadata' ->> 'role' = 'superadmin'
-    );
-
-CREATE POLICY "Superadmin can view all photo selections" ON photo_selections
-    FOR SELECT USING (
-        auth.jwt() -> 'user_metadata' ->> 'role' = 'superadmin'
-    );
-
 -- Policies untuk Public (Klien tanpa login)
 -- Klien butuh akses BACA ke galleries, gallery_photos berdasarkan gallery_id, serta INSERT/DELETE ke photo_selections
-
 CREATE POLICY "Public bisa melihat galeri" ON galleries FOR SELECT USING (true);
 CREATE POLICY "Public bisa melihat foto galeri" ON gallery_photos FOR SELECT USING (true);
 CREATE POLICY "Public bisa membuat pilihan foto" ON photo_selections FOR INSERT WITH CHECK (true);

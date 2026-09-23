@@ -1,80 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
+import { useRealtime } from '../hooks/useRealtime';
 
 const FEATURES = [
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
     ),
-    title: 'Galeri Seleksi Foto',
-    desc: 'Klien bisa langsung pilih foto favorit dari browser — tanpa download, tanpa install aplikasi.',
+    title: 'Galeri Seleksi Foto Klien',
+    desc: 'Klien bisa langsung memilih foto favorit dari browser — tanpa download, tanpa instal aplikasi apa pun.',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
     ),
-    title: 'Album Kenangan Digital',
-    desc: 'Tampilan ala majalah yang bisa dibagikan ke keluarga. Dibagi per chapter, bisa dikunci PIN.',
+    title: 'Showcase Portofolio (BETA)',
+    desc: 'Tampilkan karya terbaikmu dalam grid masonry yang interaktif dan estetik langsung di halaman utama.',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
     ),
-    title: 'Integrasi Google Drive',
-    desc: 'Langsung ambil foto dari folder Google Drive. Tanpa upload ulang, langsung siap pilih.',
+    title: 'Ambil dari Google Drive',
+    desc: 'Tarik ribuan foto langsung dari link folder Google Drive kamu. Tanpa perlu proses upload ulang ke server kami.',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
     ),
-    title: 'Share via WhatsApp',
-    desc: 'Kirim link galeri langsung ke klien via WhatsApp. Satu klik, pesan otomatis siap dikirim.',
+    title: 'Live Sinkronisasi Multi-Layar',
+    desc: 'Pantau proses seleksi klien secara real-time. Jika klien klik "Pilih", progress di dashboardmu langsung bertambah.',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
     ),
-    title: 'White-Label Branding',
-    desc: 'Nama studio, logo, dan warna aksen tampil di halaman klien. Kesan profesional tanpa biaya ekstra.',
+    title: 'Manajemen Portofolio Terpusat',
+    desc: 'Semua foto unggulanmu terorganisir di satu tempat, siap memukau calon klien kapan saja.',
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
     ),
-    title: 'Privasi Terjaga',
-    desc: 'Album bisa dikunci dengan PIN. Hanya orang yang punya link dan PIN yang bisa mengakses.',
+    title: 'Salin Langsung ke Lightroom',
+    desc: 'Setelah klien selesai memilih, salin nama-nama file fotonya dengan sekali klik untuk dicari di Lightroom.',
   },
 ];
 
 const STEPS = [
   { num: '01', title: 'Buat Galeri', desc: 'Paste link folder Google Drive kamu. Foto langsung tampil sebagai galeri seleksi.' },
-  { num: '02', title: 'Kirim ke Klien', desc: 'Bagikan link via WhatsApp. Klien buka langsung dari browser, tanpa perlu download.' },
-  { num: '03', title: 'Klien Pilih Foto', desc: 'Klien browse, pilih foto favorit, dan kirim pilihan — semua tersimpan otomatis.' },
-  { num: '04', title: 'Export & Selesai', desc: 'Lihat daftar foto pilihan klien, copy ke Lightroom, atau download langsung.' },
+  { num: '02', title: 'Kirim ke Klien', desc: 'Bagikan link galeri. Klien buka langsung dari browser, tanpa perlu download.' },
+  { num: '03', title: 'Klien Memilih', desc: 'Klien bebas memilih foto favorit dan mengirimkan laporannya secara real-time.' },
+  { num: '04', title: 'Salin ke Lightroom', desc: 'Lihat daftar foto pilihan klien di dashboard, lalu salin daftar namanya langsung ke Lightroom.' },
 ];
 
 const FAQS = [
-  { q: 'Apakah by.marryland gratis?', a: 'Ya! Kamu bisa membuat hingga 2 album pertama secara gratis. Tidak perlu kartu kredit untuk mendaftar.' },
-  { q: 'Apakah klien saya perlu buat akun?', a: 'Tidak. Klien cukup klik link yang kamu bagikan dan langsung bisa memilih foto. Tanpa download, tanpa registrasi.' },
-  { q: 'Bagaimana cara integrasi Google Drive?', a: 'Cukup share folder Google Drive kamu dengan setting "Anyone with the link", lalu paste link-nya di dashboard. Foto langsung muncul di galeri.' },
-  { q: 'Apakah foto saya aman?', a: 'Foto tetap tersimpan di Google Drive kamu. Kami hanya menampilkan thumbnail untuk keperluan seleksi. Tidak ada foto yang di-upload ke server kami.' },
-  { q: 'Bisa custom branding studio saya?', a: 'Tentu! Kamu bisa memasang nama studio, logo, dan warna aksen di halaman seleksi klien melalui menu Pengaturan di dashboard.' },
+  { q: 'Apakah klien saya perlu membuat akun?', a: 'Sama sekali tidak. Klien cukup klik link galeri yang kamu bagikan, dan mereka bisa langsung memulai seleksi. Tidak butuh password atau instalasi aplikasi.' },
+  { q: 'Bagaimana cara Google Drive terintegrasi?', a: 'Upload foto ke Google Drive, atur visibilitas link folder ke "Anyone with the link", lalu paste link folder tersebut saat membuat galeri. by.marryland akan menarik otomatis foto-foto tersebut.' },
+  { q: 'Apakah foto asli klien aman?', a: 'Tentu. Sistem kami hanya mengambil akses gambar (thumbnail resolusi layar) tanpa mengubah, mendownload ke server kami, atau menghapus file aslimu di Google Drive.' },
+  { q: 'Bagaimana cara mencari foto pilihan klien di Lightroom?', a: 'Di dashboard, buka menu "Review Pilihan", dan klik "Copy utk Lightroom". Daftar nama file akan tersalin dengan pemisah koma, tinggal di-paste di kolom pencarian Lightroom (Text > Contains).' },
 ];
 
 export default function LandingPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const bg = isDarkMode ? 'bg-[#1a1714]' : 'bg-ivory';
-  const textMain = isDarkMode ? 'text-[#EDE8DF]' : 'text-text';
-  const textSub = isDarkMode ? 'text-[#9C9487]' : 'text-muted';
-  const cardBg = isDarkMode ? 'bg-[#241f1b]' : 'bg-white';
-  const borderC = isDarkMode ? 'border-[#3a332d]' : 'border-primary-100/50';
+  const FALLBACK_IMAGES = [
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?q=80&w=2070&auto=format&fit=crop',
+  ];
+
+  const [heroImages, setHeroImages] = useState<string[]>(FALLBACK_IMAGES);
+  const [portfolioPhotos, setPortfolioPhotos] = useState<{id: string; image_url: string; caption: string | null; category: string}[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>('semua');
+
+  const fetchPortfolio = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('portfolio_photos')
+      .select('id, image_url, caption, category')
+      .eq('is_published', true)
+      .order('order_index', { ascending: true });
+
+    if (!error && data && data.length > 0) {
+      // Hero: first 3 photos
+      const urls = data.slice(0, 3).map(p => p.image_url);
+      while (urls.length < 3) {
+        urls.push(FALLBACK_IMAGES[urls.length]);
+      }
+      setHeroImages(urls);
+
+      // Full portfolio for the gallery section
+      setPortfolioPhotos(data);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPortfolio();
+  }, [fetchPortfolio]);
+
+  // ─── Realtime: portfolio photos update instantly when admin changes them ───
+  useRealtime({
+    table: 'portfolio_photos',
+    onAny: () => {
+      // Re-fetch portfolio when any change happens (insert/update/delete/reorder)
+      fetchPortfolio();
+    },
+  });
+
+  const bg = isDarkMode ? 'bg-[#141E16]' : 'bg-ivory';
+  const textMain = isDarkMode ? 'text-[#E0EDE2]' : 'text-text';
+  const textSub = isDarkMode ? 'text-[#8FA893]' : 'text-muted';
+  const cardBg = isDarkMode ? 'bg-[#1A261C]' : 'bg-white';
+  const borderC = isDarkMode ? 'border-[#2A3D2D]' : 'border-primary-100/50';
 
   return (
-    <div className={`min-h-screen font-sans transition-colors duration-500 ${bg} ${textMain}`}>
+    <div className={`min-h-screen font-sans transition-colors duration-500 ${bg} ${textMain} ambient-bg`}>
+      {/* ─────── Decorative Elements ─────── */}
+      <div className="deco-float w-64 h-64 bg-primary-100 top-20 -left-20 blur-3xl"></div>
+      <div className="deco-float-reverse w-96 h-96 bg-primary-200/50 top-1/3 -right-32 blur-[100px]"></div>
+      <div className="deco-float w-72 h-72 bg-primary-50/80 bottom-40 left-1/4 blur-3xl"></div>
+
       {/* ─────── Navbar ─────── */}
-      <nav className={`sticky top-0 z-50 px-6 py-3.5 flex items-center justify-between border-b backdrop-blur-xl transition-colors duration-500 ${isDarkMode ? 'bg-[#1a1714]/80 border-[#3a332d]' : 'bg-white/80 border-primary-100/40'}`}>
+      <nav className={`sticky top-0 z-50 px-6 py-3.5 flex items-center justify-between border-b backdrop-blur-xl transition-colors duration-500 ${isDarkMode ? 'bg-[#141E16]/80 border-[#2A3D2D]' : 'bg-white/80 border-primary-100/40'}`}>
         <Link to="/" className="text-xl font-bold tracking-tight">
           by.<span className="text-primary">marryland</span>
         </Link>
@@ -85,7 +134,7 @@ export default function LandingPage() {
           <a href="#faq" className={`${textSub} hover:text-primary transition-colors duration-200`}>FAQ</a>
         </div>
         <div className="flex items-center space-x-3">
-          <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 rounded-full transition-colors duration-200 ${isDarkMode ? 'hover:bg-[#3a332d]' : 'hover:bg-primary-50'}`} aria-label="Toggle dark mode">
+          <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 rounded-full transition-colors duration-200 ${isDarkMode ? 'hover:bg-[#2A3D2D]' : 'hover:bg-primary-50'}`} aria-label="Toggle dark mode">
             {isDarkMode
               ? <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path strokeLinecap="round" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
               : <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
@@ -137,17 +186,17 @@ export default function LandingPage() {
           <div className="relative h-[420px] md:h-[520px] w-full">
             <div className={`absolute inset-0 ${cardBg} p-3 rounded-3xl shadow-elevated border ${borderC} transform -rotate-3 transition-transform duration-500 hover:-rotate-5 origin-bottom-left z-10`}>
               <div className="w-full h-full rounded-2xl bg-primary-100/30 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop" alt="Wedding" className="w-full h-full object-cover opacity-80" loading="lazy" />
+                <img src={heroImages[0]} alt="Portfolio" className="w-full h-full object-cover opacity-80" loading="lazy" />
               </div>
             </div>
             <div className={`absolute inset-0 ${cardBg} p-3 rounded-3xl shadow-elevated border ${borderC} transform rotate-2 transition-transform duration-500 hover:rotate-4 origin-bottom-right z-20`}>
               <div className="w-full h-full rounded-2xl bg-primary-100/30 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop" alt="Wedding" className="w-full h-full object-cover opacity-90" loading="lazy" />
+                <img src={heroImages[1]} alt="Portfolio" className="w-full h-full object-cover opacity-90" loading="lazy" />
               </div>
             </div>
             <div className={`absolute inset-0 ${cardBg} p-3 rounded-3xl shadow-elevated border ${borderC} transform rotate-[5deg] transition-transform duration-500 hover:rotate-[7deg] origin-bottom z-30`}>
               <div className="w-full h-full rounded-2xl bg-primary-100/30 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?q=80&w=2070&auto=format&fit=crop" alt="Wedding" className="w-full h-full object-cover" loading="lazy" />
+                <img src={heroImages[2]} alt="Portfolio" className="w-full h-full object-cover" loading="lazy" />
               </div>
             </div>
             <div className="absolute -left-4 md:-left-10 bottom-14 z-40 animate-float">
@@ -163,7 +212,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─────── Features ─────── */}
-      <section id="fotografer" className={`py-24 ${isDarkMode ? 'bg-[#1f1b17]' : 'bg-white'}`}>
+      <section id="fotografer" className={`py-24 ${isDarkMode ? 'bg-[#1A261C]' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <div className="inline-flex items-center space-x-2 text-primary font-semibold text-[11px] tracking-[0.2em] uppercase mb-4">
@@ -189,6 +238,69 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ─────── Portfolio / Karya Kami ─────── */}
+      <section id="portfolio" className={`py-24 overflow-hidden ${bg}`}>
+        <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
+          <div className="inline-flex items-center space-x-2 text-primary font-semibold text-[11px] tracking-[0.2em] uppercase mb-4">
+            <span className="w-6 h-px bg-primary" />
+            <span>Karya Kami</span>
+            <span className="w-6 h-px bg-primary" />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-8">
+            Lebih dari sekadar foto,<br className="hidden md:block" /> ini adalah cerita.
+          </h2>
+          
+          {/* Category Tabs */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {['semua', 'pernikahan', 'wisuda', 'keluarga'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 capitalize ${
+                  activeCategory === cat
+                    ? 'bg-primary text-white shadow-glow'
+                    : `${cardBg} border ${borderC} ${textSub} hover:border-primary/50 hover:text-primary`
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Horizontal Auto-scrolling Portfolio */}
+        <div className="relative w-full">
+          {portfolioPhotos.length > 0 ? (
+            <div className="flex gap-4 px-6 md:px-12 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {portfolioPhotos
+                .filter(p => activeCategory === 'semua' || p.category === activeCategory)
+                .map((photo, i) => (
+                  <div 
+                    key={photo.id} 
+                    className="flex-none w-[280px] md:w-[400px] h-[350px] md:h-[500px] rounded-2xl overflow-hidden relative group snap-center"
+                  >
+                    <img 
+                      src={photo.image_url} 
+                      alt={photo.caption || `Portfolio ${i}`} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                      <p className="text-white font-medium text-sm md:text-base transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                        {photo.caption || <span className="capitalize">{photo.category}</span>}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="text-center text-muted py-12">
+              <p>Belum ada karya yang dipublikasikan.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -243,7 +355,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─────── FAQ ─────── */}
-      <section id="faq" className={`py-24 ${isDarkMode ? 'bg-[#1f1b17]' : 'bg-white'}`}>
+      <section id="faq" className={`py-24 ${isDarkMode ? 'bg-[#1A261C]' : 'bg-white'}`}>
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Pertanyaan Umum</h2>
@@ -269,7 +381,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─────── Footer ─────── */}
-      <footer className={`border-t py-12 ${isDarkMode ? 'border-[#3a332d]' : 'border-primary-100/40'}`}>
+      <footer className={`border-t py-12 ${isDarkMode ? 'border-[#2A3D2D]' : 'border-primary-100/40'}`}>
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center space-x-2">
             <span className="text-lg font-bold tracking-tight">by.<span className="text-primary">marryland</span></span>

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import { useRealtime } from '../hooks/useRealtime';
 import CreateGalleryForm from '../components/CreateGalleryForm';
 import GalleryCard from '../components/GalleryCard';
 import SelectedPhotosModal from '../components/SelectedPhotosModal';
@@ -36,16 +37,7 @@ const Dashboard: React.FC = () => {
   const [selectedGallery, setSelectedGallery] = useState<Gallery | null>(null);
   const [showPhotosModal, setShowPhotosModal] = useState(false);
 
-  useEffect(() => {
-    // Jika yang masuk adalah admin (berdasarkan Role), langsung tendang ke halaman /admin
-    if (user?.user_metadata?.role === 'superadmin') {
-      navigate('/admin');
-      return;
-    }
-    fetchGalleries();
-  }, [user, navigate]);
-
-  const fetchGalleries = async () => {
+  const fetchGalleries = useCallback(async () => {
     if (!user) return;
     setLoadingGalleries(true);
     const { data, error } = await supabase
@@ -58,7 +50,54 @@ const Dashboard: React.FC = () => {
       setGalleries(data);
     }
     setLoadingGalleries(false);
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchGalleries();
+  }, [fetchGalleries]);
+
+  // ─── Realtime: gallery status & selected_count updates ───
+  // When a client submits selections or completes a gallery,
+  // the dashboard updates instantly without manual refresh.
+  useRealtime({
+    table: 'galleries',
+    filter: user ? `user_id=eq.${user.id}` : undefined,
+    enabled: !!user,
+    onUpdate: (payload) => {
+      const updated = payload.new as Gallery;
+      setGalleries((prev) =>
+        prev.map((g) =>
+          g.id === updated.id
+            ? { ...g, status: updated.status, selected_count: updated.selected_count }
+            : g
+        )
+      );
+    },
+    onInsert: (payload) => {
+      const newGallery = payload.new as Gallery;
+      setGalleries((prev) => {
+        // Avoid duplicates (e.g. from optimistic insert + realtime)
+        if (prev.some((g) => g.id === newGallery.id)) return prev;
+        return [newGallery, ...prev];
+      });
+    },
+    onDelete: (payload) => {
+      const deleted = payload.old as { id: string };
+      setGalleries((prev) => prev.filter((g) => g.id !== deleted.id));
+    },
+  });
+
+  // ─── Realtime: photo_selections changes ───
+  // When a client selects/deselects photos, we re-fetch gallery data
+  // to get updated selected_count for the progress bar.
+  useRealtime({
+    table: 'photo_selections',
+    enabled: !!user,
+    onAny: () => {
+      // Re-fetch galleries to update selected_count across all gallery cards
+      fetchGalleries();
+    },
+  });
 
   const handleSignOut = async () => {
     await signOut();
@@ -100,7 +139,11 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans text-text">
+    <div className="min-h-screen bg-background font-sans text-text ambient-bg">
+      {/* ─────── Decorative Elements ─────── */}
+      <div className="deco-float w-64 h-64 bg-primary-100 top-20 -left-20 blur-3xl"></div>
+      <div className="deco-float-reverse w-96 h-96 bg-primary-200/50 top-1/2 -right-32 blur-[100px]"></div>
+
       {/* Header */}
       <header className="bg-white px-6 py-4 flex justify-between items-center border-b border-primary-100/40 sticky top-0 z-40">
         <div className="flex items-center gap-4">
@@ -110,12 +153,6 @@ const Dashboard: React.FC = () => {
           </span>
         </div>
         <div className="flex items-center gap-5">
-          {/* Credit badge */}
-          <div className="flex items-center gap-1.5 border border-primary/30 bg-primary-50 text-primary text-sm px-3 py-1.5 rounded-full font-medium cursor-pointer hover:bg-primary-100 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span>0 kredit</span>
-            <span className="text-lg leading-none font-light ml-1">+</span>
-          </div>
           {/* User email */}
           <span className="text-sm text-muted hidden sm:inline truncate max-w-[200px]">
             {user?.email}
@@ -167,67 +204,6 @@ const Dashboard: React.FC = () => {
       <main className="max-w-4xl mx-auto px-6 py-8">
         {activeTab === 'galeri' && (
           <div className="space-y-8 animate-fade-in">
-
-            {/* Mbak Pili Banner (Phase 2 - info only) */}
-            <div className="card p-8 text-center bg-gradient-to-br from-white to-primary-50">
-              <div className="flex justify-center items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                <span className="bg-primary-100 text-primary-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Baru</span>
-              </div>
-              <h2 className="text-xl font-serif font-bold text-text mb-2">
-                Capek urus vendor kamu <span className="text-primary italic font-serif">sendiri?</span>
-              </h2>
-              <p className="text-sm text-muted max-w-xl mx-auto leading-relaxed mb-6">
-                Kenalan sama Mbak Pili, asisten yang bantu ngurus vendor foto kamu.
-                Editan telat, tagihan yang sungkan dikejar, jadwal numpuk — biar dia yang jagain.
-                Dia catat job, ingetin deadline, sampai bikinin galeri. Kamu tinggal fokus berkarya.
-              </p>
-              <button className="btn-primary w-full max-w-sm py-2.5">
-                Hubungkan Telegram
-              </button>
-            </div>
-
-            {/* Gallery Selection Info Banner */}
-            <div className="card p-6">
-              <h3 className="text-sm font-bold text-text mb-3">Gallery Selection gratis untuk fotografer.</h3>
-              <div className="flex flex-col md:flex-row gap-5 items-start">
-                <div className="flex-1">
-                  {/* Pilihin Job teaser */}
-                  <div className="bg-primary-50/50 rounded-xl p-4 flex items-start gap-3 mb-3 border border-primary-100/50">
-                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shrink-0 shadow-sm">
-                      <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold flex items-center gap-2">
-                        Pilihin Job
-                        <span className="bg-primary-100 text-primary-700 text-[10px] px-1.5 py-0.5 rounded font-bold">PRO</span>
-                      </p>
-                      <p className="text-xs text-muted leading-relaxed mt-1">
-                        Terima booking klien lewat form online, lalu ubah jadi invoice yang rapi & profesional — semua terkelola dari satu tempat, tanpa ribet catat manual.{' '}
-                        <a href="#" className="text-primary font-medium hover:underline">Coba gratis sekarang →</a>
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted leading-relaxed">
-                    <strong>Pilihin Picker</strong> (RAW ke Lightroom) & <strong>Download Pilihan JPG</strong> (JPG asli di layout atau, ke percetakan).
-                    1 kredit membuka satu galeri untuk dua-duanya — atau <strong>Pro</strong> bebas semua tanpa batas.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 shrink-0">
-                  <button className="btn-primary text-sm px-5 py-2.5 rounded-xl">
-                    Coba Picker →
-                  </button>
-                  <button className="btn-outline text-sm px-5 py-2.5 rounded-xl border-primary-200">
-                    Pelajari Pilihin Job →
-                  </button>
-                  <button className="text-muted text-xs hover:text-primary transition-colors mt-1 font-medium">
-                    ▸ Demo Picker
-                  </button>
-                </div>
-              </div>
-            </div>
 
             {/* Create Gallery Form */}
             <CreateGalleryForm onGalleryCreated={handleGalleryCreated} />

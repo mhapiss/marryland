@@ -20,10 +20,9 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [syncStatus, setSyncStatus] = useState('');
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const [form, setForm] = useState({
-    client_name: '',
+    gdrive_url: '',
     max_photos_selectable: 100,
     deadline_date: '',
     highlight_description: '',
@@ -40,17 +39,17 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setSelectedFiles(Array.from(e.target.files));
-    }
+  const extractFolderId = (url: string) => {
+    const match = url.match(/\/folders\/([a-zA-Z0-9-_]+)/);
+    if (match && match[1]) return match[1];
+    const idParam = new URL(url).searchParams.get('id');
+    return idParam;
   };
 
   const isValid =
-    form.client_name.trim() !== '' &&
     form.client_whatsapp.trim() !== '' &&
-    form.max_photos_selectable > 0 &&
-    selectedFiles.length > 0;
+    form.gdrive_url.trim() !== '' &&
+    form.max_photos_selectable > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,19 +59,71 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
     setError('');
     
     try {
-      // 1. Buat Galeri Baru di DB
+      const folderId = extractFolderId(form.gdrive_url);
+      if (!folderId) {
+        throw new Error('Link Google Drive tidak valid. Pastikan format link benar.');
+      }
+
+      setSyncStatus('Menghubungkan ke Google Drive...');
+      const apiKey = import.meta.env.VITE_GOOGLE_DRIVE_API_KEY;
+      if (!apiKey) {
+        throw new Error('API Key Google Drive belum dikonfigurasi.');
+      }
+
+      // 1. Fetch folder name
+      const folderRes = await fetch(`https://www.googleapis.com/drive/v3/files/${folderId}?key=${apiKey}&fields=name`);
+      if (!folderRes.ok) {
+        if (folderRes.status === 403 || folderRes.status === 404) {
+          throw new Error('Folder belum bisa diakses, pastikan sudah di-share ke "Anyone with the link".');
+        }
+        throw new Error('Gagal mengambil detail folder dari Google Drive.');
+      }
+      const folderData = await folderRes.json();
+      const clientName = folderData.name || 'Client Folder';
+
+      // 2. Fetch files from Google Drive (dengan pagination agar bisa lebih dari 1000)
+      let files: any[] = [];
+      let pageToken = '';
+      
+      do {
+        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType+contains+'image/'&key=${apiKey}&fields=nextPageToken,files(id,name,mimeType,thumbnailLink,createdTime,imageMediaMetadata)&pageSize=1000${pageToken ? `&pageToken=${pageToken}` : ''}`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Gagal mengambil isi folder dari Google Drive.');
+        }
+
+        const data = await response.json();
+        if (data.files) {
+          files = [...files, ...data.files];
+        }
+        pageToken = data.nextPageToken || '';
+      } while (pageToken);
+
+      if (files.length === 0) {
+        throw new Error('Tidak ada file gambar di dalam folder tersebut.');
+      }
+
+      // Sort files by EXIF time taken, or fallback to upload time (oldest first)
+      files.sort((a: any, b: any) => {
+        const timeA = a.imageMediaMetadata?.time || a.createdTime || '';
+        const timeB = b.imageMediaMetadata?.time || b.createdTime || '';
+        return new Date(timeA).getTime() - new Date(timeB).getTime();
+      });
+
+      // 3. Buat Galeri Baru di DB
       setSyncStatus('Menyimpan informasi galeri...');
-      const clientSlug = slugify(form.client_name) + '-' + Date.now().toString(36).slice(-4);
+      const clientSlug = slugify(clientName) + '-' + Date.now().toString(36).slice(-4);
       const cleanWa = form.client_whatsapp.replace(/[\s\-\(\)]/g, '');
 
       const { data: gallery, error: insertError } = await supabase
         .from('galleries')
         .insert({
           user_id: user.id,
-          client_name: form.client_name,
+          client_name: clientName,
           client_slug: clientSlug,
-          gdrive_folder_url: '-', // tidak dipakai lagi
-          gdrive_folder_id: '-', // tidak dipakai lagi
+          gdrive_folder_url: form.gdrive_url,
+          gdrive_folder_id: folderId,
           max_photos_selectable: form.max_photos_selectable,
           deadline_date: form.deadline_date || null,
           highlight_description: form.highlight_description || null,
@@ -87,36 +138,23 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
       if (insertError) throw insertError;
       if (!gallery) throw new Error("Gagal membuat galeri");
 
-      // 2. Upload File ke Supabase Storage & Simpan URL
-      setSyncStatus(`Mengunggah ${selectedFiles.length} foto... Jangan tutup halaman ini.`);
-      
-      const photosToInsert = [];
-      for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
-        const fileExt = file.name.split('.').pop();
-        const filePath = `${user.id}/${gallery.id}/${Date.now()}-${i}.${fileExt}`;
-        
-        // Upload
-        const { error: uploadError } = await supabase.storage
-          .from('galleries')
-          .upload(filePath, file);
+      // 4. Insert ke database
+      setSyncStatus(`Menyimpan ${files.length} foto ke database...`);
+      const photosToInsert = files.map((file: any, index: number) => {
+        // Gunakan parameter sz=w800 agar thumbnail ukurannya konsisten
+        const thumbUrl = file.thumbnailLink 
+          ? file.thumbnailLink.replace(/=s\d+/, '=w800') 
+          : `https://drive.google.com/thumbnail?id=${file.id}&sz=w800`;
 
-        if (uploadError) throw uploadError;
-
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage.from('galleries').getPublicUrl(filePath);
-
-        photosToInsert.push({
+        return {
           gallery_id: gallery.id,
-          gdrive_file_id: filePath, // kita simpan pathnya di sini
+          gdrive_file_id: file.id,
           filename: file.name,
-          thumbnail_url: publicUrl,
-          order_index: i + 1,
-        });
-      }
+          thumbnail_url: thumbUrl,
+          order_index: index + 1,
+        };
+      });
 
-      // 3. Insert ke database
-      setSyncStatus('Menyelesaikan galeri...');
       const { error: photosError } = await supabase
         .from('gallery_photos')
         .insert(photosToInsert);
@@ -126,7 +164,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
       // Sukses!
       onGalleryCreated(gallery);
       setForm({
-        client_name: '',
+        gdrive_url: '',
         max_photos_selectable: 100,
         deadline_date: '',
         highlight_description: '',
@@ -134,7 +172,6 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
         client_whatsapp: '',
         allow_download: false,
       });
-      setSelectedFiles([]);
       setIsExpanded(false);
 
     } catch (err: any) {
@@ -157,7 +194,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
           </div>
-          <span className="font-serif text-lg font-bold text-text">Buat Galeri Baru (Upload Langsung)</span>
+          <span className="font-serif text-lg font-bold text-text">Buat Galeri Baru</span>
         </div>
         <svg
           className={`w-5 h-5 text-muted transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
@@ -173,40 +210,23 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
             <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3">{error}</div>
           )}
 
-          {/* Nama Klien */}
+          {/* GDrive URL */}
           <div>
             <label className="label">
-              Nama Klien / Acara{' '}
+              Link Folder Google Drive{' '}
               <span className="badge-required">WAJIB</span>
             </label>
             <input
-              name="client_name"
+              name="gdrive_url"
               type="text"
-              placeholder="Contoh: Budi & Ani Wedding"
-              value={form.client_name}
+              placeholder="https://drive.google.com/drive/folders/..."
+              value={form.gdrive_url}
               onChange={handleChange}
               className="input"
             />
-          </div>
-
-          {/* File Upload */}
-          <div>
-            <label className="label">
-              Pilih Foto Galeri{' '}
-              <span className="badge-required">WAJIB</span>
-            </label>
-            <div className="border-2 border-dashed border-primary-200 rounded-xl p-6 text-center hover:bg-primary-50/50 transition-colors relative">
-              <input 
-                type="file" 
-                multiple 
-                accept="image/*"
-                onChange={handleFileChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <svg className="w-8 h-8 text-primary/60 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-              <p className="text-sm font-medium text-text">Klik atau seret foto ke sini</p>
-              <p className="text-xs text-muted mt-1">{selectedFiles.length > 0 ? `${selectedFiles.length} foto terpilih` : 'Mendukung format JPG, PNG (maksimal 5MB/foto untuk demo)'}</p>
-            </div>
+            <p className="text-[11px] text-muted mt-2">
+              Nama klien otomatis diambil dari nama folder. Folder harus di-share "Anyone with the link".
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
