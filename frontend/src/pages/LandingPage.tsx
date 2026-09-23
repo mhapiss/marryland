@@ -186,7 +186,6 @@ export default function LandingPage() {
         <div className="flex-1 relative w-full max-w-lg mt-8 lg:mt-0 animate-slide-up">
           <DraggableHeroStack isDarkMode={isDarkMode} />
         </div>
-      </div>
       </section>
 
       {/* ─────── Features ─────── */}
