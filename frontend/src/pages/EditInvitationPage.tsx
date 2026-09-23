@@ -63,6 +63,7 @@ export default function EditInvitationPage() {
         resepsi_maps_url: invitation.resepsi_maps_url,
         couple_story: invitation.couple_story,
         theme_color: invitation.theme_color,
+        template_id: invitation.template_id,
         is_published: invitation.is_published
       })
       .eq('id', invitation.id);
@@ -129,6 +130,29 @@ export default function EditInvitationPage() {
               <div>
                 <label className="block text-sm font-semibold mb-2">Tanggal Acara Utama</label>
                 <input type="date" className="input-field" value={invitation.event_date || ''} onChange={e => setInvitation({...invitation, event_date: e.target.value})} required />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold mb-3">Pilih Template Visual</label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[
+                    { id: 'sage-green', name: 'Sage Green (Klasik)', color: 'bg-[#6B8F71]' },
+                    { id: 'elegant-gold', name: 'Elegant Gold (Mewah)', color: 'bg-[#D4AF37]' },
+                    { id: 'minimalist-blush', name: 'Minimal Blush (Modern)', color: 'bg-[#B88686]' }
+                  ].map(tpl => (
+                    <div 
+                      key={tpl.id}
+                      onClick={() => setInvitation({...invitation, template_id: tpl.id})}
+                      className={`cursor-pointer border-2 rounded-xl p-4 flex flex-col items-center justify-center transition-all ${
+                        (invitation.template_id || 'sage-green') === tpl.id 
+                          ? 'border-primary bg-primary-50 ring-2 ring-primary/20' 
+                          : 'border-gray-200 hover:border-primary-300'
+                      }`}
+                    >
+                      <div className={`w-12 h-12 rounded-full mb-3 ${tpl.color} shadow-sm`}></div>
+                      <span className="font-semibold text-sm text-center">{tpl.name}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
