@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useRealtime } from '../hooks/useRealtime';
+import { DraggableHeroStack } from '../components/DraggableHeroStack';
 
 const FEATURES = [
   {
@@ -183,32 +184,9 @@ export default function LandingPage() {
 
         {/* Hero visual */}
         <div className="flex-1 relative w-full max-w-lg mt-8 lg:mt-0 animate-slide-up">
-          <div className="relative h-[420px] md:h-[520px] w-full">
-            <div className={`absolute inset-0 ${cardBg} p-3 rounded-3xl shadow-elevated border ${borderC} transform -rotate-3 transition-transform duration-500 hover:-rotate-5 origin-bottom-left z-10`}>
-              <div className="w-full h-full rounded-2xl bg-primary-100/30 overflow-hidden">
-                <img src={heroImages[0]} alt="Portfolio" className="w-full h-full object-cover opacity-80" loading="lazy" />
-              </div>
-            </div>
-            <div className={`absolute inset-0 ${cardBg} p-3 rounded-3xl shadow-elevated border ${borderC} transform rotate-2 transition-transform duration-500 hover:rotate-4 origin-bottom-right z-20`}>
-              <div className="w-full h-full rounded-2xl bg-primary-100/30 overflow-hidden">
-                <img src={heroImages[1]} alt="Portfolio" className="w-full h-full object-cover opacity-90" loading="lazy" />
-              </div>
-            </div>
-            <div className={`absolute inset-0 ${cardBg} p-3 rounded-3xl shadow-elevated border ${borderC} transform rotate-[5deg] transition-transform duration-500 hover:rotate-[7deg] origin-bottom z-30`}>
-              <div className="w-full h-full rounded-2xl bg-primary-100/30 overflow-hidden">
-                <img src={heroImages[2]} alt="Portfolio" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-            </div>
-            <div className="absolute -left-4 md:-left-10 bottom-14 z-40 animate-float">
-              <div className={`${cardBg} py-3 px-5 rounded-full shadow-card border ${borderC} flex items-center space-x-3`}>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-300 to-primary flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                </div>
-                <span className="font-semibold text-sm">Momen yang dikenang</span>
-              </div>
-            </div>
-          </div>
+          <DraggableHeroStack isDarkMode={isDarkMode} />
         </div>
+      </div>
       </section>
 
       {/* ─────── Features ─────── */}
