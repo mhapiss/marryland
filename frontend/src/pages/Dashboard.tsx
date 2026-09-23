@@ -8,6 +8,7 @@ import GalleryCard from '../components/GalleryCard';
 import SelectedPhotosModal from '../components/SelectedPhotosModal';
 import StudioSettings from '../components/StudioSettings';
 import AccountSettings from '../components/AccountSettings';
+import InvitationsList from '../components/InvitationsList';
 
 export interface Gallery {
   id: string;
@@ -31,7 +32,7 @@ export interface Gallery {
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'galeri' | 'pengaturan'>('galeri');
+  const [activeTab, setActiveTab] = useState<'galeri' | 'undangan' | 'pengaturan'>('galeri');
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [loadingGalleries, setLoadingGalleries] = useState(true);
   const [selectedGallery, setSelectedGallery] = useState<Gallery | null>(null);
@@ -195,6 +196,19 @@ const Dashboard: React.FC = () => {
           </button>
           <button
             className={`pb-3 text-sm font-semibold tracking-wide uppercase transition-colors relative ${
+              activeTab === 'undangan'
+                ? 'text-primary'
+                : 'text-muted hover:text-text'
+            }`}
+            onClick={() => setActiveTab('undangan')}
+          >
+            Undangan
+            {activeTab === 'undangan' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full"></div>
+            )}
+          </button>
+          <button
+            className={`pb-3 text-sm font-semibold tracking-wide uppercase transition-colors relative ${
               activeTab === 'pengaturan'
                 ? 'text-primary'
                 : 'text-muted hover:text-text'
@@ -241,6 +255,12 @@ const Dashboard: React.FC = () => {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {activeTab === 'undangan' && (
+          <div className="space-y-8 animate-fade-in">
+            <InvitationsList galleries={galleries} />
           </div>
         )}
 

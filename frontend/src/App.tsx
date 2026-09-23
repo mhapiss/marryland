@@ -8,6 +8,8 @@ import Dashboard from './pages/Dashboard';
 import GallerySelection from './pages/GallerySelection';
 import AdminDashboard from './pages/AdminDashboard';
 import PortfolioManager from './pages/PortfolioManager';
+import EditInvitationPage from './pages/EditInvitationPage';
+import PublicInvitation from './pages/PublicInvitation';
 import { useAuth } from './hooks/useAuth';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -95,6 +97,19 @@ const App: React.FC = () => {
 
         {/* Public: client photo selection */}
         <Route path="/:studio_slug/:client_slug" element={<GallerySelection />} />
+
+        {/* Edit Invitation Route */}
+        <Route
+          path="/dashboard/invitations/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditInvitationPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Public Invitation Route */}
+        <Route path="/undangan/:slug" element={<PublicInvitation />} />
 
         {/* 404 */}
         <Route path="*" element={
