@@ -153,6 +153,15 @@ const Dashboard: React.FC = () => {
           </span>
         </div>
         <div className="flex items-center gap-5">
+          {/* Admin Panel Link */}
+          {user?.email === 'admin@marryland.com' && (
+            <button
+              onClick={() => navigate('/admin')}
+              className="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-full font-bold hover:bg-red-100 transition-colors"
+            >
+              Masuk Admin Panel
+            </button>
+          )}
           {/* User email */}
           <span className="text-sm text-muted hidden sm:inline truncate max-w-[200px]">
             {user?.email}

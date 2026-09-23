@@ -32,13 +32,10 @@ export default function LoginPage() {
       
       // Check role and redirect accordingly
       if (data.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
+        const ADMIN_EMAILS = ['admin@marryland.com'];
+        const isAdmin = ADMIN_EMAILS.includes(data.user.email || '');
 
-        if (profile?.role === 'admin') {
+        if (isAdmin) {
           navigate('/admin');
         } else {
           navigate('/dashboard');
