@@ -43,28 +43,8 @@ const InvitationsList: React.FC<Props> = ({ galleries }) => {
     setLoading(false);
   };
 
-  const handleCreateNew = async () => {
-    if (!user) return;
-    setCreating(true);
-    const randomSlug = Math.random().toString(36).substring(2, 10);
-    const { data, error } = await supabase
-      .from('invitations')
-      .insert({
-        user_id: user.id,
-        slug: `undangan-${randomSlug}`,
-        groom_name: 'Nama Pria',
-        bride_name: 'Nama Wanita',
-        event_date: new Date().toISOString().split('T')[0],
-      })
-      .select()
-      .single();
-
-    setCreating(false);
-    if (error) {
-      alert('Gagal membuat undangan baru: ' + error.message);
-    } else if (data) {
-      navigate(`/dashboard/invitations/${data.id}/edit`);
-    }
+  const handleCreateNew = () => {
+    navigate('/dashboard/invitations/templates');
   };
 
   const handleDelete = async (id: string) => {

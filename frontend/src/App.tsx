@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import PortfolioManager from './pages/PortfolioManager';
 import EditInvitationPage from './pages/EditInvitationPage';
 import PublicInvitation from './pages/PublicInvitation';
+import TemplateGallery from './pages/TemplateGallery';
 import { useAuth } from './hooks/useAuth';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -97,6 +98,16 @@ const App: React.FC = () => {
 
         {/* Public: client photo selection */}
         <Route path="/:studio_slug/:client_slug" element={<GallerySelection />} />
+
+        {/* Template Gallery Route */}
+        <Route
+          path="/dashboard/invitations/templates"
+          element={
+            <ProtectedRoute>
+              <TemplateGallery />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Edit Invitation Route */}
         <Route
