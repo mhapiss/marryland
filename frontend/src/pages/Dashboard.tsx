@@ -8,7 +8,10 @@ import GalleryCard from '../components/GalleryCard';
 import SelectedPhotosModal from '../components/SelectedPhotosModal';
 import StudioSettings from '../components/StudioSettings';
 import AccountSettings from '../components/AccountSettings';
-import InvitationsList from '../components/InvitationsList';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { toast } from 'sonner';
+import { TOAST } from '../constants/toastMessages';
+import { copyToClipboard } from '../lib/clipboard';
 
 export interface Gallery {
   id: string;
@@ -32,11 +35,13 @@ export interface Gallery {
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'galeri' | 'undangan' | 'pengaturan'>('galeri');
+  const [activeTab, setActiveTab] = useState<'galeri' | 'pengaturan'>('galeri');
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [loadingGalleries, setLoadingGalleries] = useState(true);
   const [selectedGallery, setSelectedGallery] = useState<Gallery | null>(null);
   const [showPhotosModal, setShowPhotosModal] = useState(false);
+  const [galleryToDelete, setGalleryToDelete] = useState<Gallery | null>(null);
+  const [isDeletingGallery, setIsDeletingGallery] = useState(false);
 
   const fetchGalleries = useCallback(async () => {
     if (!user) return;
@@ -114,14 +119,28 @@ const Dashboard: React.FC = () => {
     setShowPhotosModal(true);
   };
 
-  const handleDeleteGallery = async (galleryId: string) => {
-    const { error } = await supabase
-      .from('galleries')
-      .delete()
-      .eq('id', galleryId);
+  const handleDeleteGallery = (gallery: Gallery) => {
+    setGalleryToDelete(gallery);
+  };
 
-    if (!error) {
-      setGalleries((prev) => prev.filter((g) => g.id !== galleryId));
+  const confirmDeleteGallery = async () => {
+    if (!galleryToDelete) return;
+    setIsDeletingGallery(true);
+    
+    try {
+      const { error } = await supabase
+        .from('galleries')
+        .delete()
+        .eq('id', galleryToDelete.id);
+
+      if (error) throw error;
+      setGalleries((prev) => prev.filter((g) => g.id !== galleryToDelete.id));
+      toast.success(TOAST.galleryDeleteSuccess);
+    } catch {
+      toast.error(TOAST.galleryDeleteFail);
+    } finally {
+      setIsDeletingGallery(false);
+      setGalleryToDelete(null);
     }
   };
 
@@ -136,7 +155,7 @@ const Dashboard: React.FC = () => {
   const copyGalleryLink = (gallery: Gallery) => {
     const studioSlug = user?.user_metadata?.studio_slug || 'studio';
     const link = `${window.location.origin}/${studioSlug}/${gallery.client_slug}`;
-    navigator.clipboard.writeText(link);
+    copyToClipboard(link);
   };
 
   return (
@@ -196,19 +215,6 @@ const Dashboard: React.FC = () => {
           </button>
           <button
             className={`pb-3 text-sm font-semibold tracking-wide uppercase transition-colors relative ${
-              activeTab === 'undangan'
-                ? 'text-primary'
-                : 'text-muted hover:text-text'
-            }`}
-            onClick={() => setActiveTab('undangan')}
-          >
-            Undangan
-            {activeTab === 'undangan' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full"></div>
-            )}
-          </button>
-          <button
-            className={`pb-3 text-sm font-semibold tracking-wide uppercase transition-colors relative ${
               activeTab === 'pengaturan'
                 ? 'text-primary'
                 : 'text-muted hover:text-text'
@@ -258,12 +264,6 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'undangan' && (
-          <div className="space-y-8 animate-fade-in">
-            <InvitationsList galleries={galleries} />
-          </div>
-        )}
-
         {activeTab === 'pengaturan' && (
           <div className="space-y-8 animate-fade-in">
             <StudioSettings />
@@ -282,6 +282,19 @@ const Dashboard: React.FC = () => {
           }}
         />
       )}
+
+      {/* Delete Gallery Confirm Dialog */}
+      <ConfirmDialog
+        open={!!galleryToDelete}
+        title="Hapus Galeri"
+        message={`Galeri untuk klien "${galleryToDelete?.client_name}" akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.`}
+        confirmLabel="Hapus"
+        cancelLabel="Batal"
+        loading={isDeletingGallery}
+        destructive
+        onConfirm={confirmDeleteGallery}
+        onCancel={() => setGalleryToDelete(null)}
+      />
     </div>
   );
 };

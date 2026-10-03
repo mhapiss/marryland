@@ -1,125 +1,123 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
+import { toast } from 'sonner';
+import { TOAST } from '../constants/toastMessages';
 
 const AccountSettings: React.FC = () => {
   const { user } = useAuth();
 
   // Change email
   const [newEmail, setNewEmail] = useState('');
-  const [emailMsg, setEmailMsg] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
 
   // Change password
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordMsg, setPasswordMsg] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
 
   const handleChangeEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEmail) return;
     setEmailLoading(true);
-    setEmailMsg('');
 
     const { error } = await supabase.auth.updateUser({ email: newEmail });
     setEmailLoading(false);
 
     if (error) {
-      setEmailMsg('Gagal: ' + error.message);
+      toast.error('Gagal memperbarui email: ' + error.message);
     } else {
-      setEmailMsg('Link konfirmasi telah dikirim ke email baru. Email lama tetap aktif sampai dikonfirmasi.');
+      toast.success('Link konfirmasi telah dikirim ke email baru. Email lama tetap aktif sampai dikonfirmasi.');
       setNewEmail('');
     }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPassword.length < 6) {
-      setPasswordMsg('Password minimal 6 karakter.');
+    if (newPassword.length < 8) {
+      toast.error(TOAST.resetPasswordTooShort);
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordMsg('Password tidak cocok.');
+      toast.error(TOAST.resetPasswordMismatch);
       return;
     }
 
     setPasswordLoading(true);
-    setPasswordMsg('');
 
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setPasswordLoading(false);
 
     if (error) {
-      setPasswordMsg('Gagal: ' + error.message);
+      toast.error('Gagal memperbarui password: ' + error.message);
     } else {
-      setPasswordMsg('Password berhasil diubah!');
+      toast.success('Password berhasil diubah!');
       setNewPassword('');
       setConfirmPassword('');
       setTimeout(() => {
         setShowPasswordModal(false);
-        setPasswordMsg('');
-      }, 2000);
+      }, 1500);
     }
   };
 
   return (
     <>
       <div className="card p-8">
-        <h2 className="font-serif text-2xl font-bold text-text mb-8">Pengaturan Akun</h2>
-
-        {/* Current email */}
-        <div className="mb-8 p-5 bg-background rounded-xl border border-primary-100/30">
-          <p className="text-[11px] font-bold text-muted uppercase tracking-wider mb-1">Email Saat Ini</p>
-          <p className="text-base font-medium text-text flex items-center gap-2">
-            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            {user?.email}
-          </p>
+        <div className="mb-8">
+          <h2 className="font-serif text-2xl font-bold text-text">Keamanan Akun</h2>
+          <p className="text-muted text-sm mt-1">Kelola email masuk dan ubah kata sandi kamu.</p>
         </div>
 
-        {/* Change email */}
-        <form onSubmit={handleChangeEmail} className="mb-8">
-          <label className="label">Ganti Email</label>
-          <div className="flex gap-3">
-            <input
-              type="email"
-              placeholder="email-baru@contoh.com"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              className="input flex-1"
-            />
+        <div className="space-y-8">
+          {/* Current email */}
+          <div className="p-5 bg-background rounded-xl border border-primary-100/30">
+            <p className="text-[11px] font-bold text-muted uppercase tracking-wider mb-1">Email Saat Ini</p>
+            <p className="text-base font-medium text-text flex items-center gap-2">
+              <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              {user?.email}
+            </p>
+          </div>
+
+          {/* Change email */}
+          <div>
+            <h3 className="text-sm font-bold tracking-wider text-text uppercase mb-4">Ubah Email</h3>
+            <form onSubmit={handleChangeEmail}>
+              <div className="flex gap-3">
+                <input
+                  type="email"
+                  placeholder="email-baru@contoh.com"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  className="input flex-1"
+                />
+                <button
+                  type="submit"
+                  disabled={emailLoading || !newEmail}
+                  className="btn-primary px-6 py-2.5"
+                >
+                  {emailLoading ? 'Menyimpan...' : 'Ganti'}
+                </button>
+              </div>
+              <p className="mt-2 text-[11px] text-muted">
+                Link konfirmasi akan dikirim ke email baru. Email lama tetap aktif sampai dikonfirmasi.
+              </p>
+            </form>
+          </div>
+
+          <div className="h-px bg-primary-100/30 my-8"></div>
+
+          {/* Change password */}
+          <div>
+            <label className="label">Password Akun</label>
+            <p className="text-[11px] text-muted mb-4">Pastikan akun kamu aman dengan password yang kuat.</p>
             <button
-              type="submit"
-              disabled={emailLoading || !newEmail}
-              className="btn-primary px-6"
+              onClick={() => setShowPasswordModal(true)}
+              className="btn-outline px-8"
             >
-              {emailLoading ? 'Menyimpan...' : 'Ganti'}
+              Ubah Password
             </button>
           </div>
-          {emailMsg && (
-            <p className={`mt-3 text-xs flex items-center gap-1.5 ${emailMsg.includes('Gagal') ? 'text-red-600' : 'text-green-600'}`}>
-              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={emailMsg.includes('Gagal') ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'}/></svg>
-              {emailMsg}
-            </p>
-          )}
-          <p className="mt-2 text-[11px] text-muted">
-            Link konfirmasi akan dikirim ke email baru. Email lama tetap aktif sampai dikonfirmasi.
-          </p>
-        </form>
-
-        <div className="h-px bg-primary-100/30 my-8"></div>
-
-        {/* Change password */}
-        <div>
-          <label className="label">Password Akun</label>
-          <p className="text-[11px] text-muted mb-4">Pastikan akun kamu aman dengan password yang kuat.</p>
-          <button
-            onClick={() => setShowPasswordModal(true)}
-            className="btn-outline px-8"
-          >
-            Ubah Password
-          </button>
         </div>
       </div>
 
@@ -127,29 +125,23 @@ const AccountSettings: React.FC = () => {
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowPasswordModal(false)} />
-          <div className="relative card p-8 w-full max-w-sm animate-slide-up shadow-2xl border-primary-200">
+          <div className="relative card p-8 w-full max-w-sm animate-slide-up shadow-2xl border-primary-200" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-serif text-xl font-bold text-text">Ubah Password</h3>
+              <h3 id="password-modal-title" className="font-serif text-xl font-bold text-text">Ubah Password</h3>
               <button onClick={() => setShowPasswordModal(false)} className="p-2 text-muted hover:text-text rounded-full hover:bg-background transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
             </div>
             
             <form onSubmit={handleChangePassword} className="space-y-5">
-              {passwordMsg && (
-                <div className={`rounded-xl px-4 py-3 text-sm flex items-center gap-2 ${passwordMsg.includes('berhasil') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
-                  <span>{passwordMsg}</span>
-                </div>
-              )}
-              
               <div>
                 <label className="label">Password Baru</label>
                 <input
                   type="password"
-                  placeholder="Minimal 6 karakter"
+                  placeholder="Minimal 8 karakter"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  minLength={6}
+                  minLength={8}
                   className="input"
                 />
               </div>

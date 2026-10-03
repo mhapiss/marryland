@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
+import { toast } from 'sonner';
+import { TOAST } from '../constants/toastMessages';
 
 const ACCENT_COLORS = [
   { name: 'Sage Green', value: '#6B8F71' },
@@ -14,7 +16,6 @@ const ACCENT_COLORS = [
 const StudioSettings: React.FC = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const [form, setForm] = useState({
@@ -67,7 +68,7 @@ const StudioSettings: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
-      setMessage('File terlalu besar. Maksimal 2MB.');
+      toast.error('File terlalu besar. Maksimal 2MB.');
       return;
     }
     setLogoFile(file);
@@ -80,7 +81,6 @@ const StudioSettings: React.FC = () => {
     e.preventDefault();
     if (!user) return;
     setIsLoading(true);
-    setMessage('');
 
     let logoUrlToSave = user.user_metadata?.studio_logo || '';
 
@@ -94,7 +94,7 @@ const StudioSettings: React.FC = () => {
 
       if (uploadError) {
         setIsLoading(false);
-        setMessage('Gagal mengupload logo: ' + uploadError.message);
+        toast.error('Gagal mengupload logo: ' + uploadError.message);
         return;
       }
 
@@ -117,10 +117,9 @@ const StudioSettings: React.FC = () => {
 
     setIsLoading(false);
     if (error) {
-      setMessage('Gagal menyimpan: ' + error.message);
+      toast.error(TOAST.settingsSaveFail + (error.message ? `: ${error.message}` : ''));
     } else {
-      setMessage('Identitas studio berhasil disimpan!');
-      setTimeout(() => setMessage(''), 3000);
+      toast.success(TOAST.settingsSaveSuccess);
 
       // Broadcast studio settings change to other tabs for instant sync
       try {
@@ -150,16 +149,6 @@ const StudioSettings: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {message && (
-          <div className={`rounded-xl px-4 py-3 text-sm flex items-center gap-3 ${message.includes('berhasil') ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
-            {message.includes('berhasil') ? (
-              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            ) : (
-              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            )}
-            <span>{message}</span>
-          </div>
-        )}
 
         {/* Nama Studio */}
         <div>

@@ -3,6 +3,11 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useRealtime } from '../hooks/useRealtime';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { toast } from 'sonner';
+import { TOAST } from '../constants/toastMessages';
+import ConfirmDialog from '../components/ConfirmDialog';
+import ImageWithFallback from '../components/ImageWithFallback';
+import { usePageMeta } from '../hooks/usePageMeta';
 import type { Gallery } from './Dashboard';
 
 interface Photo {
@@ -25,12 +30,19 @@ export default function GallerySelection() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Lightbox state
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [lightboxImageLoaded, setLightboxImageLoaded] = useState(false);
+
+  // SEO
+  usePageMeta(
+    gallery ? `Galeri ${gallery.client_name}` : 'Galeri Momen',
+    gallery?.highlight_description || 'Pilih foto momen terbaikmu dari sesi foto kami.'
+  );
 
   // ─── Realtime: gallery status changes (e.g. photographer resets status) ───
   useRealtime({
@@ -143,7 +155,7 @@ export default function GallerySelection() {
 
     // Check if we hit the limit during functional update
     if (!wasSelected && selectedPhotoIds.length >= gallery.max_photos_selectable) {
-      alert(`Kamu sudah mencapai batas maksimal ${gallery.max_photos_selectable} foto.`);
+      toast.warning(TOAST.limitReached(gallery.max_photos_selectable));
       return;
     }
 
@@ -171,21 +183,26 @@ export default function GallerySelection() {
   }, [gallery, selectedPhotoIds.length]);
 
   const handleFinalSubmit = async () => {
-    if (!gallery) return;
+    if (!gallery || isSubmitting) return;
     setIsSubmitting(true);
     
-    const { error } = await supabase
-      .from('galleries')
-      .update({ status: 'completed' })
-      .eq('id', gallery.id);
+    try {
+      const { error } = await supabase
+        .from('galleries')
+        .update({ status: 'completed' })
+        .eq('id', gallery.id);
 
-    setIsSubmitting(false);
-    if (!error) {
+      if (error) throw error;
+
       setGallery({ ...gallery, status: 'completed' });
       setSubmitSuccess(true);
       setShowReviewModal(false);
-    } else {
-      alert('Gagal mengirim data. Silakan coba lagi.');
+      setShowConfirmSubmit(false);
+      toast.success(TOAST.selectionSendSuccess);
+    } catch {
+      toast.error(TOAST.selectionSendFail);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -347,11 +364,12 @@ export default function GallerySelection() {
                         isSelected ? 'ring-2 ring-primary ring-offset-2 z-10' : 'hover:shadow-md cursor-pointer'
                       }`}
                     >
-                      <img
+                      <ImageWithFallback
                         src={photo.thumbnail_url}
                         alt={photo.filename}
                         loading="lazy"
                         className="w-full h-auto object-contain block transition-transform duration-500 group-hover:scale-[1.02] select-none"
+                        fallbackClassName="w-full aspect-[3/2]"
                       />
 
                       {/* Permanent Badge (Top Right) - always visible if selected */}
@@ -648,11 +666,11 @@ export default function GallerySelection() {
                     Pilih Lagi
                   </button>
                   <button 
-                    onClick={handleFinalSubmit} 
+                    onClick={() => setShowConfirmSubmit(true)} 
                     disabled={isSubmitting}
                     className="flex-1 sm:flex-none btn-primary px-8"
                   >
-                    {isSubmitting ? 'Mengirim...' : 'Kirim Sekarang'}
+                    Kirim Sekarang
                   </button>
                 </div>
               </div>
@@ -661,6 +679,18 @@ export default function GallerySelection() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={showConfirmSubmit}
+        title="Kirim Pilihan Foto?"
+        message="Setelah dikirim, kamu tidak bisa mengubah pilihan ini lagi. Pastikan semua foto yang dipilih sudah benar."
+        confirmLabel="Ya, Kirim"
+        cancelLabel="Cek Lagi"
+        loading={isSubmitting}
+        destructive={false}
+        onConfirm={handleFinalSubmit}
+        onCancel={() => setShowConfirmSubmit(false)}
+      />
     </div>
   );
 }

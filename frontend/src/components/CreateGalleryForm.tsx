@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
+import { toast } from 'sonner';
+import { TOAST } from '../constants/toastMessages';
+import { parseDriveFolder } from '../lib/drive';
 import type { Gallery } from '../pages/Dashboard';
 
 interface Props {
@@ -18,7 +21,6 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [syncStatus, setSyncStatus] = useState('');
 
   const [form, setForm] = useState({
@@ -39,13 +41,6 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
     }));
   };
 
-  const extractFolderId = (url: string) => {
-    const match = url.match(/\/folders\/([a-zA-Z0-9-_]+)/);
-    if (match && match[1]) return match[1];
-    const idParam = new URL(url).searchParams.get('id');
-    return idParam;
-  };
-
   const isValid =
     form.client_whatsapp.trim() !== '' &&
     form.gdrive_url.trim() !== '' &&
@@ -56,10 +51,9 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
     if (!user || !isValid) return;
 
     setIsLoading(true);
-    setError('');
     
     try {
-      const folderId = extractFolderId(form.gdrive_url);
+      const folderId = parseDriveFolder(form.gdrive_url);
       if (!folderId) {
         throw new Error('Link Google Drive tidak valid. Pastikan format link benar.');
       }
@@ -172,10 +166,10 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
         client_whatsapp: '',
         allow_download: false,
       });
-      setIsExpanded(false);
+      toast.success(TOAST.galleryCreateSuccess);
 
     } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan saat memproses galeri.");
+      toast.error(err.message || TOAST.galleryCreateFail);
     } finally {
       setIsLoading(false);
       setSyncStatus('');
@@ -206,9 +200,6 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
 
       <div className={`transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-5 border-t border-primary-100/30 pt-5">
-          {error && (
-            <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3">{error}</div>
-          )}
 
           {/* GDrive URL */}
           <div>

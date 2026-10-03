@@ -10,9 +10,11 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
+    "types": ["vite/client"],
     "isolatedModules": true,
     "noEmit": true,
     "resolveJsonModule": true,
+    "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     }

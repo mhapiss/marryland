@@ -3,6 +3,10 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useRealtime } from '../hooks/useRealtime';
+import { toast } from 'sonner';
+import { TOAST } from '../constants/toastMessages';
+import ConfirmDialog from '../components/ConfirmDialog';
+import ImageWithFallback from '../components/ImageWithFallback';
 
 interface PortfolioPhoto {
   id: string;
@@ -42,6 +46,10 @@ const PortfolioManager: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCaption, setEditCaption] = useState('');
   const [editCategory, setEditCategory] = useState('');
+
+  // Delete confirm state
+  const [deleteTarget, setDeleteTarget] = useState<PortfolioPhoto | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchPhotos();
@@ -117,8 +125,9 @@ const PortfolioManager: React.FC = () => {
 
       setPhotos(prev => [...prev, data]);
       resetUploadForm();
+      toast.success(TOAST.portfolioUploadSuccess);
     } catch (err: any) {
-      alert('Gagal upload: ' + (err.message || 'Unknown error'));
+      toast.error(TOAST.portfolioUploadFail + (err.message ? `: ${err.message}` : ''));
     } finally {
       setUploading(false);
       setUploadProgress('');
@@ -166,16 +175,29 @@ const PortfolioManager: React.FC = () => {
   };
 
   const handleDelete = async (photo: PortfolioPhoto) => {
-    if (!confirm(`Hapus foto "${photo.caption || 'tanpa caption'}"?`)) return;
+    setDeleteTarget(photo);
+  };
 
-    // Delete from storage
-    const fileName = photo.storage_path.replace('portfolio/', '');
-    await supabase.storage.from('portfolio').remove([fileName]);
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
 
-    // Delete from DB
-    const { error } = await supabase.from('portfolio_photos').delete().eq('id', photo.id);
-    if (!error) {
-      setPhotos(prev => prev.filter(p => p.id !== photo.id));
+    try {
+      // Delete from storage
+      const fileName = deleteTarget.storage_path.replace('portfolio/', '');
+      await supabase.storage.from('portfolio').remove([fileName]);
+
+      // Delete from DB
+      const { error } = await supabase.from('portfolio_photos').delete().eq('id', deleteTarget.id);
+      if (error) throw error;
+
+      setPhotos(prev => prev.filter(p => p.id !== deleteTarget.id));
+      toast.success(TOAST.portfolioDeleteSuccess);
+    } catch {
+      toast.error(TOAST.portfolioDeleteFail);
+    } finally {
+      setIsDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -329,7 +351,12 @@ const PortfolioManager: React.FC = () => {
               <div key={photo.id} className={`card overflow-hidden flex flex-col sm:flex-row items-stretch ${!photo.is_published ? 'opacity-60' : ''}`}>
                 {/* Thumbnail */}
                 <div className="sm:w-48 h-32 sm:h-auto bg-primary-50 flex-shrink-0">
-                  <img src={photo.image_url} alt={photo.caption || ''} className="w-full h-full object-cover" />
+                  <ImageWithFallback 
+                    src={photo.image_url} 
+                    alt={photo.caption || ''} 
+                    className="w-full h-full object-cover" 
+                    fallbackClassName="w-full h-full"
+                  />
                 </div>
 
                 {/* Info */}
@@ -447,6 +474,18 @@ const PortfolioManager: React.FC = () => {
           </div>
         )}
       </main>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Hapus Foto Portofolio"
+        message={`Foto "${deleteTarget?.caption || 'tanpa caption'}" akan dihapus permanen dari portofolio dan storage. Tindakan ini tidak bisa dibatalkan.`}
+        confirmLabel="Hapus"
+        cancelLabel="Batal"
+        loading={isDeleting}
+        destructive
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 };

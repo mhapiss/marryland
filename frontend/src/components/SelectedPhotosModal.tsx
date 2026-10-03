@@ -1,6 +1,7 @@
 // src/components/SelectedPhotosModal.tsx
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { copyToClipboard } from '../lib/clipboard';
 import type { Gallery } from '../pages/Dashboard';
 
 interface PhotoSelection {
@@ -56,11 +57,13 @@ const SelectedPhotosModal: React.FC<Props> = ({ gallery, onClose }) => {
   const fileListNewline = photos.map((p) => p.filename).join('\n');
   const fileListComma = photos.map((p) => p.filename.replace(/\.[^/.]+$/, '')).join(', ');
 
-  const handleCopy = (type: 'newline' | 'comma') => {
+  const handleCopy = async (type: 'newline' | 'comma') => {
     const textToCopy = type === 'comma' ? fileListComma : fileListNewline;
-    navigator.clipboard.writeText(textToCopy);
-    setCopied(type);
-    setTimeout(() => setCopied(false), 2000);
+    const success = await copyToClipboard(textToCopy);
+    if (success) {
+      setCopied(type);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleDownloadTxt = () => {

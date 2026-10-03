@@ -143,9 +143,9 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-8 text-center text-sm">
-          <a href="#" className="text-muted hover:text-text transition-colors">
+          <Link to="/lupa-password" className="text-primary hover:text-primary-600 transition-colors font-medium">
             Lupa password?
-          </a>
+          </Link>
         </div>
       </div>
       

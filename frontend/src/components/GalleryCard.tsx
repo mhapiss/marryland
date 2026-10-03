@@ -4,7 +4,7 @@ import type { Gallery } from '../pages/Dashboard';
 interface Props {
   gallery: Gallery;
   onViewSelections: (gallery: Gallery) => void;
-  onDelete: (galleryId: string) => void;
+  onDelete: (gallery: Gallery) => void;
   onShareWhatsApp: () => void;
   onCopyLink: () => void;
 }
@@ -112,7 +112,7 @@ const GalleryCard: React.FC<Props> = ({ gallery, onViewSelections, onDelete, onS
           </button>
           <div className="w-px h-5 bg-primary-100 mx-1"></div>
           <button
-            onClick={() => onDelete(gallery.id)}
+            onClick={() => onDelete(gallery)}
             className="p-2 rounded-lg hover:bg-red-50 text-muted hover:text-red-500 transition-colors"
             title="Hapus"
           >
