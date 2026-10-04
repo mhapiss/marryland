@@ -48,7 +48,8 @@
 
   /* Card style */
   .card {
-    @apply bg-kertas-tua/40 rounded-sm border border-garis transition-colors duration-200;
+    background-color: var(--kertas-tua);
+    @apply rounded-sm border border-garis transition-colors duration-200;
   }
 
   /* Input style */
@@ -118,6 +119,18 @@
   animation-play-state: paused;
 }
 
+.marquee-track-left {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marqueeLeft linear infinite;
+}
+
+.marquee-track-left:hover,
+.marquee-track-left:focus-within {
+  animation-play-state: paused;
+}
+
 @keyframes marqueeRight {
   0% {
     transform: translateX(-50%);
@@ -127,8 +140,18 @@
   }
 }
 
+@keyframes marqueeLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track-right {
+  .marquee-track-right,
+  .marquee-track-left {
     animation: none !important;
     transform: none !important;
   }
