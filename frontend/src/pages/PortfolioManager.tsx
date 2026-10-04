@@ -48,6 +48,19 @@ import {
   Filter,
 } from 'lucide-react';
 
+interface UploadQueueItem {
+  id: string;
+  file: File;
+  previewUrl: string;
+  width: number;
+  height: number;
+  orientation: 'landscape' | 'portrait' | 'square';
+  selected: boolean;
+  slot: PortfolioPhotoItem['slot'];
+  caption: string;
+  focal: string;
+}
+
 export default function PortfolioManager() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -84,19 +97,14 @@ export default function PortfolioManager() {
   const [deleteTargetCollection, setDeleteTargetCollection] = useState<PortfolioCollection | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Photo Upload in Collection Modal
+  // Photo Upload in Collection Modal (Mendukung Batch / Multi-Upload & Seleksi Pilihan)
   const [showPhotoModal, setShowPhotoModal] = useState(false);
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
-  const [detectedPhotoMeta, setDetectedPhotoMeta] = useState<{
-    width: number;
-    height: number;
-    orientation: 'landscape' | 'portrait' | 'square';
-  } | null>(null);
-  const [photoCaption, setPhotoCaption] = useState('');
-  const [photoAlt, setPhotoAlt] = useState('');
+  const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>([]);
+  const [activeFocalQueueId, setActiveFocalQueueId] = useState<string | null>(null);
+  const [batchTargetSlot, setBatchTargetSlot] = useState<PortfolioPhotoItem['slot']>('gallery');
+  const [isDragOver, setIsDragOver] = useState(false);
   const [photoSlot, setPhotoSlot] = useState<PortfolioPhotoItem['slot']>('gallery');
-  const [photoFocal, setPhotoFocal] = useState('center');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Validation modal state
   const [showValidationModal, setShowValidationModal] = useState(false);
@@ -241,7 +249,7 @@ export default function PortfolioManager() {
       // Check if published collection changed slug: record redirect
       const slugChanged = !isNew && initialSlug && selectedCollection.slug !== initialSlug;
 
-      const payload = {
+      const payload: Record<string, any> = {
         name: selectedCollection.name,
         slug: selectedCollection.slug,
         short_description: selectedCollection.short_description,
@@ -249,9 +257,11 @@ export default function PortfolioManager() {
         theme_palette: selectedCollection.theme_palette,
         theme_font: selectedCollection.theme_font,
         layout: selectedCollection.layout,
-        content: selectedCollection.content,
+        content: {
+          ...selectedCollection.content,
+          cover_url: heroPhoto ? heroPhoto.image_url : (selectedCollection.content as any)?.cover_url || null,
+        },
         position: selectedCollection.position || 0,
-        cover_url: heroPhoto ? heroPhoto.image_url : selectedCollection.cover_url || null,
         updated_at: new Date().toISOString(),
       };
 
@@ -382,125 +392,266 @@ export default function PortfolioManager() {
     }
   };
 
-  // Upload Photo to Collection
-  const handlePhotoUpload = async () => {
-    if (!uploadFile) return;
+  const getSlotLabel = (slot: PortfolioPhotoItem['slot']) => {
+    switch (slot) {
+      case 'hero':
+        return 'Hero (Foto Utama Atas)';
+      case 'highlight':
+        return 'Momen Sorotan (Infinity)';
+      case 'about_1':
+        return 'Tentang Koleksi - Foto 1';
+      case 'about_2':
+        return 'Tentang Koleksi - Foto 2';
+      case 'about_3':
+        return 'Tentang Koleksi - Foto 3';
+      case 'gallery':
+      default:
+        return 'Galeri Arsip';
+    }
+  };
+
+  // Bersihkan memory preview URL
+  const handleClearQueue = useCallback(() => {
+    uploadQueue.forEach((item) => {
+      try {
+        URL.revokeObjectURL(item.previewUrl);
+      } catch {
+        // no-op
+      }
+    });
+    setUploadQueue([]);
+    setActiveFocalQueueId(null);
+  }, [uploadQueue]);
+
+  const handleClosePhotoModal = () => {
+    if (uploading) return;
+    handleClearQueue();
+    setShowPhotoModal(false);
+  };
+
+  // Proses file yang dipilih dari input file atau dropzone
+  const handleFilesSelected = (files: FileList | File[]) => {
+    const fileArray = Array.from(files).filter((f) => f.type.startsWith('image/'));
+    if (fileArray.length === 0) {
+      toast.error('Pilihlah berkas gambar (JPG, PNG, atau WEBP)');
+      return;
+    }
+
+    const newItems: UploadQueueItem[] = fileArray.map((file) => {
+      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      const previewUrl = URL.createObjectURL(file);
+      return {
+        id,
+        file,
+        previewUrl,
+        width: 1200,
+        height: 800,
+        orientation: 'landscape',
+        selected: true,
+        slot: photoSlot || 'gallery',
+        caption: '',
+        focal: 'center',
+      };
+    });
+
+    // Deteksi dimensi dan orientasi masing-masing gambar
+    newItems.forEach((item) => {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+        const orientation: 'landscape' | 'portrait' | 'square' =
+          w > h ? 'landscape' : h > w ? 'portrait' : 'square';
+        setUploadQueue((prev) =>
+          prev.map((q) => (q.id === item.id ? { ...q, width: w, height: h, orientation } : q))
+        );
+      };
+      img.src = item.previewUrl;
+    });
+
+    setUploadQueue((prev) => [...prev, ...newItems]);
+    toast.info(`${fileArray.length} foto ditambahkan ke antrean. Pilih mana yang mau diunggah.`);
+  };
+
+  const handleToggleSelectItem = (id: string) => {
+    setUploadQueue((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, selected: !item.selected } : item))
+    );
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    setUploadQueue((prev) => prev.map((item) => ({ ...item, selected })));
+  };
+
+  const handleRemoveQueueItem = (id: string) => {
+    setUploadQueue((prev) => {
+      const target = prev.find((item) => item.id === id);
+      if (target) {
+        try {
+          URL.revokeObjectURL(target.previewUrl);
+        } catch {
+          // no-op
+        }
+      }
+      return prev.filter((item) => item.id !== id);
+    });
+    if (activeFocalQueueId === id) {
+      setActiveFocalQueueId(null);
+    }
+  };
+
+  const handleUpdateQueueItem = (id: string, updates: Partial<UploadQueueItem>) => {
+    setUploadQueue((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, ...updates } : item))
+    );
+  };
+
+  const handleApplyBatchSlot = () => {
+    const selectedCount = uploadQueue.filter((item) => item.selected).length;
+    if (selectedCount === 0) {
+      toast.error('Centang foto yang ingin diubah slotnya terlebih dahulu');
+      return;
+    }
+    setUploadQueue((prev) =>
+      prev.map((item) => (item.selected ? { ...item, slot: batchTargetSlot } : item))
+    );
+    toast.success(`Slot berhasil diubah ke "${getSlotLabel(batchTargetSlot)}" untuk ${selectedCount} foto terpilih`);
+  };
+
+  // Batch Upload Photo to Collection
+  const handleBatchPhotoUpload = async () => {
+    const selectedItems = uploadQueue.filter((item) => item.selected);
+    if (selectedItems.length === 0) {
+      toast.error('Pilih minimal 1 foto yang ingin diunggah');
+      return;
+    }
+
     setUploading(true);
-    setUploadProgress('Mengoptimalkan & mengompres foto...');
+    let successCount = 0;
+    const total = selectedItems.length;
 
     try {
-      let width = 1200;
-      let height = 800;
-      let uploadBlob: Blob = uploadFile;
-      let isWebP = false;
+      const targetColId =
+        selectedCollection?.id?.startsWith('new-') || selectedCollection?.id?.startsWith('col-')
+          ? null
+          : selectedCollection?.id;
 
-      try {
-        const bitmap = await createImageBitmap(uploadFile, { imageOrientation: 'from-image' });
-        const origW = bitmap.width;
-        const origH = bitmap.height;
-        width = origW;
-        height = origH;
+      let lastHeroUrl: string | null = null;
+      const uploadedPhotosList: PortfolioPhotoItem[] = [];
 
-        // Auto-optimize 1920px max edge
-        const maxEdge = 1920;
-        let targetW = origW;
-        let targetH = origH;
+      for (let i = 0; i < selectedItems.length; i++) {
+        const item = selectedItems[i];
+        const progressPct = Math.round(((i + 1) / total) * 100);
+        setUploadProgress(`Mengunggah foto ${i + 1} dari ${total} (${progressPct}%): ${item.file.name}`);
 
-        if (origW > maxEdge || origH > maxEdge) {
-          if (origW >= origH) {
-            targetW = maxEdge;
-            targetH = Math.round((maxEdge / origW) * origH);
-          } else {
-            targetH = maxEdge;
-            targetW = Math.round((maxEdge / origH) * origW);
+        let width = item.width;
+        let height = item.height;
+        let uploadBlob: Blob = item.file;
+        let isWebP = false;
+
+        try {
+          const bitmap = await createImageBitmap(item.file, { imageOrientation: 'from-image' });
+          const origW = bitmap.width;
+          const origH = bitmap.height;
+          width = origW;
+          height = origH;
+
+          // Auto-optimize 1920px max edge
+          const maxEdge = 1920;
+          let targetW = origW;
+          let targetH = origH;
+
+          if (origW > maxEdge || origH > maxEdge) {
+            if (origW >= origH) {
+              targetW = maxEdge;
+              targetH = Math.round((maxEdge / origW) * origH);
+            } else {
+              targetH = maxEdge;
+              targetW = Math.round((maxEdge / origH) * origW);
+            }
+            width = targetW;
+            height = targetH;
           }
-          width = targetW;
-          height = targetH;
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(bitmap, 0, 0, targetW, targetH);
+            const compressed = await new Promise<Blob | null>((res) =>
+              canvas.toBlob(res, 'image/webp', 0.85)
+            );
+            if (compressed) {
+              uploadBlob = compressed;
+              isWebP = true;
+            }
+          }
+        } catch (err) {
+          console.warn('Canvas optimization fallback to original file:', err);
         }
 
-        const canvas = document.createElement('canvas');
-        canvas.width = targetW;
-        canvas.height = targetH;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(bitmap, 0, 0, targetW, targetH);
-          const compressed = await new Promise<Blob | null>((res) =>
-            canvas.toBlob(res, 'image/webp', 0.85)
-          );
-          if (compressed) {
-            uploadBlob = compressed;
-            isWebP = true;
-          }
+        const fileExt = isWebP ? 'webp' : (item.file.name.split('.').pop() || 'jpg');
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
+        const storagePath = `portfolio/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('media-library')
+          .upload(fileName, uploadBlob, {
+            contentType: isWebP ? 'image/webp' : item.file.type,
+            cacheControl: '31536000',
+            upsert: true,
+          });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('media-library').getPublicUrl(fileName);
+
+        if (item.slot === 'hero') {
+          lastHeroUrl = publicUrl;
         }
-      } catch (err) {
-        console.warn('Canvas optimization fallback to original file:', err);
+
+        const newPhotoData = {
+          image_url: publicUrl,
+          storage_path: storagePath,
+          caption: item.caption || null,
+          alt: item.caption || null,
+          slot: item.slot || 'gallery',
+          collection_id: targetColId,
+          category: 'pernikahan',
+          focal: item.focal || 'center',
+          width,
+          height,
+          order_index: photos.length + i + 1,
+          is_published: true,
+        };
+
+        const { data: inserted, error: insertError } = await supabase
+          .from('portfolio_photos')
+          .insert(newPhotoData)
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+
+        uploadedPhotosList.push(inserted);
+        successCount++;
       }
 
-      setUploadProgress('Mengunggah ke penyimpanan cloud...');
-      const fileExt = isWebP ? 'webp' : (uploadFile.name.split('.').pop() || 'jpg');
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
-      const storagePath = `portfolio/${fileName}`;
+      setPhotos((prev) => [...prev, ...uploadedPhotosList]);
 
-      const { error: uploadError } = await supabase.storage
-        .from('media-library')
-        .upload(fileName, uploadBlob, {
-          contentType: isWebP ? 'image/webp' : uploadFile.type,
-          cacheControl: '31536000',
-          upsert: true,
-        });
-
-      if (uploadError) throw uploadError;
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from('media-library').getPublicUrl(fileName);
-
-      const targetColId = selectedCollection?.id?.startsWith('new-') || selectedCollection?.id?.startsWith('col-')
-        ? null
-        : selectedCollection?.id;
-
-      const newPhotoData = {
-        image_url: publicUrl,
-        storage_path: storagePath,
-        caption: photoCaption || null,
-        alt: photoAlt || photoCaption || null,
-        slot: photoSlot || 'gallery',
-        collection_id: targetColId,
-        category: 'pernikahan',
-        focal: photoFocal,
-        width,
-        height,
-        order_index: photos.length + 1,
-        is_published: true,
-      };
-
-      const { data: inserted, error: insertError } = await supabase
-        .from('portfolio_photos')
-        .insert(newPhotoData)
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-
-      setPhotos((prev) => [...prev, inserted]);
-
-      // If slot is hero, also set collection cover_url if empty
-      if (selectedCollection && (!selectedCollection.cover_url || photoSlot === 'hero')) {
+      if (lastHeroUrl && selectedCollection) {
         setSelectedCollection({
           ...selectedCollection,
-          cover_url: publicUrl,
+          cover_url: lastHeroUrl,
         });
       }
 
-      toast.success('Foto berhasil ditambahkan ke koleksi');
+      toast.success(`${successCount} foto berhasil diunggah ke koleksi`);
+      handleClearQueue();
       setShowPhotoModal(false);
-      setUploadFile(null);
-      setUploadPreview(null);
-      setDetectedPhotoMeta(null);
-      setPhotoCaption('');
-      setPhotoAlt('');
-      setPhotoSlot('gallery');
-      setPhotoFocal('center');
     } catch (err: any) {
       toast.error('Gagal mengupload foto: ' + (err.message || 'Coba lagi'));
     } finally {
@@ -771,18 +922,26 @@ export default function PortfolioManager() {
                       <div>
                         {/* Cover Photo */}
                         <div className="aspect-[16/10] bg-[#f7f5f0] relative overflow-hidden border-b border-garis">
-                          {col.cover_url ? (
-                            <img
-                              src={col.cover_url}
-                              alt={col.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center text-tinta-lembut text-xs font-mono">
-                              <ImageIcon className="w-8 h-8 opacity-40 mb-1 text-tinta-lembut" />
-                              <span>Belum ada foto sampul</span>
-                            </div>
-                          )}
+                          {(() => {
+                            const coverSrc =
+                              colPhotos.find((p) => p.slot === 'hero')?.image_url ||
+                              colPhotos[0]?.image_url ||
+                              (col.content as any)?.cover_url ||
+                              col.cover_url;
+
+                            return coverSrc ? (
+                              <img
+                                src={coverSrc}
+                                alt={col.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center text-tinta-lembut text-xs font-mono">
+                                <ImageIcon className="w-8 h-8 opacity-40 mb-1 text-tinta-lembut" />
+                                <span>Belum ada foto sampul</span>
+                              </div>
+                            );
+                          })()}
 
                           {/* Status Badge */}
                           <div className="absolute top-3 left-3">
@@ -2327,248 +2486,537 @@ export default function PortfolioManager() {
       )}
 
       {/* ========================================================================= */}
-      {/* UPLOAD PHOTO MODAL */}
+      {/* UPLOAD PHOTO MODAL (BATCH / MULTI-UPLOAD & SELEKSI PILIHAN) */}
       {/* ========================================================================= */}
       {showPhotoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => {
-              setShowPhotoModal(false);
-              setUploadFile(null);
-              setUploadPreview(null);
-              setDetectedPhotoMeta(null);
-            }}
+            onClick={handleClosePhotoModal}
           />
-          <div className="relative bg-white rounded-[2px] border border-garis w-full max-w-lg p-6 shadow-elevated z-10 max-h-[90vh] overflow-y-auto">
-            <h3 className="font-serif text-xl font-normal mb-4 text-tinta">Upload Foto Portofolio</h3>
-
-            {/* File input */}
-            <div className="mb-4">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setUploadFile(file);
-                    const url = URL.createObjectURL(file);
-                    setUploadPreview(url);
-                    const img = new Image();
-                    img.onload = () => {
-                      const w = img.naturalWidth;
-                      const h = img.naturalHeight;
-                      const orientation = w > h ? 'landscape' : h > w ? 'portrait' : 'square';
-                      setDetectedPhotoMeta({ width: w, height: h, orientation });
-                    };
-                    img.src = url;
-                  }
-                }}
-                className="w-full text-xs font-mono text-tinta"
-              />
-            </div>
-
-            {uploadPreview && (
-              <div className="mb-4 space-y-3">
-                {/* Interactive Preview Container with Dynamic Slot Aspect Ratio */}
-                <div
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = (e.clientX - rect.left) / rect.width;
-                    const y = (e.clientY - rect.top) / rect.height;
-                    const xPos = x < 0.35 ? 'left' : x > 0.65 ? 'right' : 'center';
-                    const yPos = y < 0.35 ? 'top' : y > 0.65 ? 'bottom' : 'center';
-                    let val = 'center';
-                    if (yPos === 'center' && xPos === 'center') val = 'center';
-                    else if (yPos === 'center') val = `center ${xPos}`;
-                    else if (xPos === 'center') val = `${yPos} center`;
-                    else val = `${yPos} ${xPos}`;
-                    setPhotoFocal(val);
-                  }}
-                  className={`cursor-crosshair relative bg-[#f7f5f0] rounded-[2px] overflow-hidden border border-garis transition-all ${
-                    photoSlot === 'hero'
-                      ? detectedPhotoMeta?.orientation === 'landscape'
-                        ? 'aspect-[4/3] sm:aspect-[3/2]'
-                        : 'aspect-[3/4]'
-                      : photoSlot === 'highlight'
-                      ? detectedPhotoMeta?.orientation === 'landscape'
-                        ? 'aspect-[4/3]'
-                        : 'aspect-[3/4]'
-                      : photoSlot === 'about_1'
-                      ? 'aspect-[3/4]'
-                      : photoSlot === 'about_2'
-                      ? 'aspect-[4/5]'
-                      : photoSlot === 'about_3'
-                      ? 'aspect-[1/1]'
-                      : detectedPhotoMeta?.orientation === 'landscape'
-                      ? 'aspect-[4/3]'
-                      : 'aspect-[3/4]'
-                  }`}
-                  title="Klik bagian foto mana saja untuk menetapkan titik fokus"
-                >
-                  <img
-                    src={uploadPreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover select-none pointer-events-none"
-                    style={{ objectPosition: photoFocal }}
-                  />
-
-                  {/* Focal Indicator Ring Overlay */}
-                  <div
-                    className="absolute w-8 h-8 rounded-full border-2 border-merah bg-merah/25 shadow-md pointer-events-none -translate-x-1/2 -translate-y-1/2 transition-all duration-200 flex items-center justify-center"
-                    style={{
-                      top:
-                        photoFocal.includes('top')
-                          ? '22%'
-                          : photoFocal.includes('bottom')
-                          ? '78%'
-                          : '50%',
-                      left:
-                        photoFocal.includes('left')
-                          ? '22%'
-                          : photoFocal.includes('right')
-                          ? '78%'
-                          : '50%',
-                    }}
-                  >
-                    <div className="w-2 h-2 rounded-full bg-merah shadow-sm" />
-                  </div>
-
-                  <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/75 text-white text-[10px] font-mono rounded-[2px]">
-                    Klik gambar untuk ubah titik fokus
-                  </span>
-                </div>
-
-                {/* Detected Orientation & Friendly Guidance */}
-                {detectedPhotoMeta && (
-                  <div className="p-3 bg-kertas-tua/50 border border-garis rounded-[2px] space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-0.5 rounded-[2px] font-mono text-[10px] font-semibold uppercase ${
-                            detectedPhotoMeta.orientation === 'landscape'
-                              ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                              : detectedPhotoMeta.orientation === 'portrait'
-                              ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                              : 'bg-neutral-100 text-neutral-800 border border-neutral-300'
-                          }`}
-                        >
-                          {detectedPhotoMeta.orientation === 'landscape'
-                            ? 'Lanskap (Mendatar)'
-                            : detectedPhotoMeta.orientation === 'portrait'
-                            ? 'Potret (Tegak)'
-                            : 'Persegi (1:1)'}
-                        </span>
-                        <span className="font-mono text-tinta-lembut text-[11px]">
-                          {detectedPhotoMeta.width} × {detectedPhotoMeta.height} px
-                        </span>
-                      </div>
-                      <span className="text-[11px] font-mono text-merah font-medium">
-                        Fokus: {photoFocal}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-tinta-lembut leading-relaxed">
-                      {detectedPhotoMeta.orientation === 'landscape'
-                        ? 'Foto lanskap akan otomatis ditampilkan proporsional mendatar (tanpa memotong subjek pengantin di kiri/kanan).'
-                        : 'Foto potret akan ditampilkan format potret tinggi dan anggun sesuai format aslinya.'}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="space-y-3">
+          <div className="relative bg-white rounded-[2px] border border-garis w-full max-w-4xl p-6 shadow-elevated z-10 max-h-[92vh] flex flex-col overflow-hidden">
+            {/* Header Modal */}
+            <div className="flex items-start justify-between pb-4 border-b border-garis shrink-0">
               <div>
-                <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">Caption Foto</label>
-                <input
-                  type="text"
-                  value={photoCaption}
-                  onChange={(e) => setPhotoCaption(e.target.value)}
-                  className="w-full border border-garis rounded-[2px] px-3 py-2 text-sm bg-white text-tinta focus:outline-none focus:border-merah"
-                  placeholder="Keterangan momen foto..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">Slot Posisi di Halaman</label>
-                <select
-                  value={photoSlot}
-                  onChange={(e) => setPhotoSlot(e.target.value as any)}
-                  className="w-full border border-garis rounded-[2px] px-3 py-2 text-sm bg-white text-tinta focus:outline-none focus:border-merah"
-                >
-                  <option value="gallery">Galeri Arsip (Grid Foto Justified)</option>
-                  <option value="hero">Hero (Foto Utama Atas - Otomatis Potret / Lanskap)</option>
-                  <option value="highlight">Momen Sorotan (Pita Infinity Bergulir)</option>
-                  <option value="about_1">Tentang Koleksi - Foto 1 (Kolase Utama)</option>
-                  <option value="about_2">Tentang Koleksi - Foto 2 (Kolase Pendamping)</option>
-                  <option value="about_3">Tentang Koleksi - Foto 3 (Kolase Pendamping)</option>
-                </select>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-mono uppercase text-tinta-lembut">
-                    Titik Fokus (Focal Point)
-                  </label>
-                  <span className="text-[10px] font-mono text-tinta-lembut">
-                    Klik gambar atau pilih tombol di bawah
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-1.5 max-w-[280px]">
-                  {[
-                    { id: 'top left', label: 'Kiri Atas' },
-                    { id: 'top center', label: 'Tengah Atas' },
-                    { id: 'top right', label: 'Kanan Atas' },
-                    { id: 'center left', label: 'Kiri' },
-                    { id: 'center', label: 'Tengah' },
-                    { id: 'center right', label: 'Kanan' },
-                    { id: 'bottom left', label: 'Kiri Bawah' },
-                    { id: 'bottom center', label: 'Tengah Bawah' },
-                    { id: 'bottom right', label: 'Kanan Bawah' },
-                  ].map((btn) => (
-                    <button
-                      key={btn.id}
-                      type="button"
-                      onClick={() => setPhotoFocal(btn.id)}
-                      className={`py-1 px-2 text-[11px] font-mono rounded-[2px] border text-center transition-all ${
-                        photoFocal === btn.id
-                          ? 'bg-merah text-white border-merah font-semibold shadow-sm'
-                          : 'bg-white border-garis text-tinta hover:border-tinta'
-                      }`}
-                    >
-                      {btn.label}
-                    </button>
-                  ))}
-                </div>
-
-                <p className="text-[11px] text-tinta-lembut mt-1.5 leading-relaxed">
-                  Titik fokus menjaga wajah atau bagian penting pengantin tetap berada di pusat pandangan saat dibuka di layar ponsel (HP).
+                <h3 className="font-serif text-xl font-normal text-tinta">Upload Foto Portofolio</h3>
+                <p className="text-xs text-tinta-lembut mt-1">
+                  Pilih banyak foto sekaligus, tentukan mana yang ingin di-up, dan atur penempatannya sebelum diunggah.
                 </p>
               </div>
+              <button
+                type="button"
+                onClick={handleClosePhotoModal}
+                disabled={uploading}
+                className="text-tinta-lembut hover:text-tinta p-1 rounded-[2px] disabled:opacity-40"
+                aria-label="Tutup modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-garis">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPhotoModal(false);
-                  setUploadFile(null);
-                  setUploadPreview(null);
-                  setDetectedPhotoMeta(null);
-                }}
-                className="px-4 py-2 border border-garis rounded-[2px] text-xs font-medium text-tinta-lembut hover:text-tinta min-h-[44px]"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={handlePhotoUpload}
-                disabled={uploading || !uploadFile}
-                className="px-5 py-2 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium min-h-[44px] shadow-sm disabled:opacity-50"
-              >
-                {uploading ? uploadProgress || 'Mengunggah...' : 'Unggah Sekarang'}
-              </button>
+            {/* Hidden Multi-file Input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  handleFilesSelected(e.target.files);
+                }
+                e.target.value = '';
+              }}
+            />
+
+            {/* Modal Content Body */}
+            <div className="flex-1 overflow-y-auto py-4 space-y-4">
+              {/* Jika belum ada file di antrean: Tampilkan Dropzone */}
+              {uploadQueue.length === 0 ? (
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(true);
+                  }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(false);
+                    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                      handleFilesSelected(e.dataTransfer.files);
+                    }
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-[2px] p-12 text-center transition-all cursor-pointer flex flex-col items-center justify-center min-h-[320px] ${
+                    isDragOver
+                      ? 'border-merah bg-merah/5'
+                      : 'border-garis hover:border-merah bg-kertas-tua/20 hover:bg-kertas-tua/40'
+                  }`}
+                >
+                  <div className="w-16 h-16 rounded-full bg-white border border-garis flex items-center justify-center mb-4 shadow-sm text-merah">
+                    <Upload className="w-8 h-8" />
+                  </div>
+                  <h4 className="font-serif text-lg text-tinta mb-1">
+                    Pilih atau Tarik Foto ke Sini
+                  </h4>
+                  <p className="text-xs text-tinta-lembut max-w-md mb-5 leading-relaxed">
+                    Bisa memilih belasan hingga puluhan foto sekaligus. Semua foto akan ditinjau dalam daftar sehingga kamu bisa mencentang mana saja yang mau di-up ke koleksi.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    className="px-6 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium inline-flex items-center gap-2 shadow-sm min-h-[44px]"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>Pilih Berkas Foto (Bisa Banyak Sekaligus)</span>
+                  </button>
+                  <span className="text-[11px] font-mono text-tinta-lembut mt-3">
+                    Format didukung: JPG, PNG, WEBP • Otomatis dikompres & orientasi potret/lanskap terjaga
+                  </span>
+                </div>
+              ) : activeFocalQueueId ? (
+                /* Sub-tampilan Pengaturan Titik Fokus Interaktif untuk 1 Foto */
+                (() => {
+                  const activeItem = uploadQueue.find((q) => q.id === activeFocalQueueId);
+                  if (!activeItem) return null;
+
+                  return (
+                    <div className="p-4 bg-kertas-tua/40 border border-garis rounded-[2px] space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-garis">
+                        <div>
+                          <span className="text-[10px] font-mono uppercase text-merah font-semibold tracking-wider">
+                            Atur Titik Fokus Foto
+                          </span>
+                          <h4 className="font-serif text-base text-tinta truncate max-w-md">
+                            {activeItem.file.name}
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setActiveFocalQueueId(null)}
+                          className="px-4 py-1.5 bg-white border border-garis hover:border-tinta rounded-[2px] text-xs font-medium text-tinta"
+                        >
+                          Selesai & Kembali ke Daftar
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+                        {/* Interactive image preview */}
+                        <div
+                          onClick={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = (e.clientX - rect.left) / rect.width;
+                            const y = (e.clientY - rect.top) / rect.height;
+                            const xPos = x < 0.35 ? 'left' : x > 0.65 ? 'right' : 'center';
+                            const yPos = y < 0.35 ? 'top' : y > 0.65 ? 'bottom' : 'center';
+                            let val = 'center';
+                            if (yPos === 'center' && xPos === 'center') val = 'center';
+                            else if (yPos === 'center') val = `center ${xPos}`;
+                            else if (xPos === 'center') val = `${yPos} center`;
+                            else val = `${yPos} ${xPos}`;
+                            handleUpdateQueueItem(activeItem.id, { focal: val });
+                          }}
+                          className={`cursor-crosshair relative bg-neutral-900 rounded-[2px] overflow-hidden border border-garis select-none ${
+                            activeItem.orientation === 'portrait'
+                              ? 'aspect-[3/4] max-h-[380px] mx-auto'
+                              : 'aspect-[4/3] max-h-[320px]'
+                          }`}
+                          title="Klik foto untuk menetapkan titik fokus"
+                        >
+                          <img
+                            src={activeItem.previewUrl}
+                            alt="Focal Preview"
+                            className="w-full h-full object-cover pointer-events-none"
+                            style={{ objectPosition: activeItem.focal }}
+                          />
+
+                          {/* Cincin indikator fokus */}
+                          <div
+                            className="absolute w-8 h-8 rounded-full border-2 border-merah bg-merah/25 shadow-md pointer-events-none -translate-x-1/2 -translate-y-1/2 transition-all duration-200 flex items-center justify-center"
+                            style={{
+                              top: activeItem.focal.includes('top')
+                                ? '22%'
+                                : activeItem.focal.includes('bottom')
+                                ? '78%'
+                                : '50%',
+                              left: activeItem.focal.includes('left')
+                                ? '22%'
+                                : activeItem.focal.includes('right')
+                                ? '78%'
+                                : '50%',
+                            }}
+                          >
+                            <div className="w-2 h-2 rounded-full bg-merah shadow-sm" />
+                          </div>
+
+                          <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/75 text-white text-[10px] font-mono rounded-[2px]">
+                            Klik gambar untuk menetapkan fokus
+                          </span>
+                        </div>
+
+                        {/* Controls */}
+                        <div className="space-y-4">
+                          <div>
+                            <span className="text-xs font-mono uppercase text-tinta-lembut block mb-1">
+                              Status Orientasi & Dimensi
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`px-2 py-0.5 rounded-[2px] font-mono text-[11px] font-semibold uppercase ${
+                                  activeItem.orientation === 'landscape'
+                                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                    : activeItem.orientation === 'portrait'
+                                    ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                                    : 'bg-neutral-100 text-neutral-900 border border-neutral-300'
+                                }`}
+                              >
+                                {activeItem.orientation === 'landscape'
+                                  ? 'Lanskap (Mendatar)'
+                                  : activeItem.orientation === 'portrait'
+                                  ? 'Potret (Tegak)'
+                                  : 'Persegi (1:1)'}
+                              </span>
+                              <span className="font-mono text-xs text-tinta-lembut">
+                                {activeItem.width} × {activeItem.height} px
+                              </span>
+                            </div>
+                          </div>
+
+                          <div>
+                            <span className="text-xs font-mono uppercase text-tinta-lembut block mb-1.5">
+                              Pilih Titik Fokus 3×3
+                            </span>
+                            <div className="grid grid-cols-3 gap-1.5 max-w-[260px]">
+                              {[
+                                { id: 'top left', label: 'Kiri Atas' },
+                                { id: 'top center', label: 'Tengah Atas' },
+                                { id: 'top right', label: 'Kanan Atas' },
+                                { id: 'center left', label: 'Kiri' },
+                                { id: 'center', label: 'Tengah' },
+                                { id: 'center right', label: 'Kanan' },
+                                { id: 'bottom left', label: 'Kiri Bawah' },
+                                { id: 'bottom center', label: 'Tengah Bawah' },
+                                { id: 'bottom right', label: 'Kanan Bawah' },
+                              ].map((btn) => (
+                                <button
+                                  key={btn.id}
+                                  type="button"
+                                  onClick={() =>
+                                    handleUpdateQueueItem(activeItem.id, { focal: btn.id })
+                                  }
+                                  className={`py-1.5 px-2 text-[11px] font-mono rounded-[2px] border text-center transition-all ${
+                                    activeItem.focal === btn.id
+                                      ? 'bg-merah text-white border-merah font-semibold shadow-sm'
+                                      : 'bg-white border-garis text-tinta hover:border-tinta'
+                                  }`}
+                                >
+                                  {btn.label}
+                                </button>
+                              ))}
+                            </div>
+                            <p className="text-[11px] text-tinta-lembut mt-2 leading-relaxed">
+                              Titik fokus menjaga posisi wajah pengantin tetap di tengah saat foto dipotong responsif di berbagai resolusi layar ponsel.
+                            </p>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">
+                              Slot Penempatan
+                            </label>
+                            <select
+                              value={activeItem.slot}
+                              onChange={(e) =>
+                                handleUpdateQueueItem(activeItem.id, { slot: e.target.value as any })
+                              }
+                              className="w-full border border-garis rounded-[2px] px-3 py-2 text-xs bg-white text-tinta"
+                            >
+                              <option value="gallery">Galeri Arsip (Grid Foto)</option>
+                              <option value="hero">Hero (Foto Utama Atas)</option>
+                              <option value="highlight">Momen Sorotan (Infinity)</option>
+                              <option value="about_1">Tentang Koleksi - Foto 1</option>
+                              <option value="about_2">Tentang Koleksi - Foto 2</option>
+                              <option value="about_3">Tentang Koleksi - Foto 3</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()
+              ) : (
+                /* Daftar Antrean Foto (Multi-Upload Selector) */
+                <div className="space-y-4">
+                  {/* Bar Ringkasan & Aksi Seleksi */}
+                  <div className="p-3 bg-kertas-tua/50 border border-garis rounded-[2px] flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-xs font-semibold text-tinta">
+                        {uploadQueue.filter((q) => q.selected).length} dari {uploadQueue.length} foto dipilih untuk diunggah
+                      </span>
+                      <div className="h-4 w-px bg-garis hidden sm:block" />
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSelectAll(true)}
+                          className="px-2.5 py-1 text-[11px] font-mono bg-white border border-garis hover:border-tinta rounded-[2px] text-tinta"
+                        >
+                          Pilih Semua
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectAll(false)}
+                          className="px-2.5 py-1 text-[11px] font-mono bg-white border border-garis hover:border-tinta rounded-[2px] text-tinta"
+                        >
+                          Batalkan Semua
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleClearQueue}
+                          className="px-2.5 py-1 text-[11px] font-mono text-merah hover:underline"
+                        >
+                          Hapus Antrean
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-mono text-tinta-lembut hidden lg:inline">
+                          Ubah slot terpilih:
+                        </span>
+                        <select
+                          value={batchTargetSlot}
+                          onChange={(e) => setBatchTargetSlot(e.target.value as any)}
+                          className="text-xs border border-garis rounded-[2px] px-2 py-1 bg-white text-tinta"
+                        >
+                          <option value="gallery">Galeri Arsip</option>
+                          <option value="hero">Hero (Foto Utama)</option>
+                          <option value="highlight">Momen Sorotan</option>
+                          <option value="about_1">Tentang - Foto 1</option>
+                          <option value="about_2">Tentang - Foto 2</option>
+                          <option value="about_3">Tentang - Foto 3</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={handleApplyBatchSlot}
+                          className="px-2.5 py-1 text-xs font-medium bg-white border border-garis hover:border-tinta rounded-[2px] text-tinta"
+                        >
+                          Terapkan
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="px-3 py-1 bg-white border border-garis hover:border-merah text-tinta text-xs rounded-[2px] font-medium flex items-center gap-1"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-merah" />
+                        <span>Tambah Foto</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Grid Kartu Antrean Foto */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 max-h-[52vh] overflow-y-auto pr-1">
+                    {uploadQueue.map((item, index) => {
+                      return (
+                        <div
+                          key={item.id}
+                          className={`border rounded-[2px] overflow-hidden flex flex-col justify-between transition-all ${
+                            item.selected
+                              ? 'bg-white border-merah/50 shadow-sm ring-1 ring-merah/20'
+                              : 'bg-neutral-50/80 border-garis opacity-65'
+                          }`}
+                        >
+                          {/* Card Header: Checkbox & Remove */}
+                          <div className="p-2.5 flex items-center justify-between border-b border-garis/80 bg-white">
+                            <label className="flex items-center gap-2 cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={item.selected}
+                                onChange={() => handleToggleSelectItem(item.id)}
+                                className="w-4 h-4 accent-merah rounded cursor-pointer"
+                              />
+                              <span
+                                className={`text-xs font-mono font-medium ${
+                                  item.selected ? 'text-merah' : 'text-tinta-lembut'
+                                }`}
+                              >
+                                {item.selected ? 'Mau Di-up' : 'Dilewati'}
+                              </span>
+                            </label>
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveQueueItem(item.id)}
+                              className="text-tinta-lembut hover:text-merah p-1 rounded transition-colors"
+                              title="Hapus dari antrean"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+
+                          {/* Image Thumbnail with Dynamic Orientation Aspect Ratio */}
+                          <div className="relative bg-neutral-900 border-b border-garis overflow-hidden group">
+                            <div
+                              className={`w-full overflow-hidden flex items-center justify-center ${
+                                item.orientation === 'portrait'
+                                  ? 'aspect-[3/4] max-h-[200px]'
+                                  : 'aspect-[4/3] max-h-[160px]'
+                              }`}
+                            >
+                              <img
+                                src={item.previewUrl}
+                                alt={item.file.name}
+                                className="w-full h-full object-cover select-none"
+                                style={{ objectPosition: item.focal }}
+                              />
+                            </div>
+
+                            {/* Orientation & Dimensions Badge */}
+                            <div className="absolute top-2 left-2 flex items-center gap-1">
+                              <span
+                                className={`px-1.5 py-0.5 rounded-[2px] font-mono text-[9px] font-semibold uppercase ${
+                                  item.orientation === 'landscape'
+                                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                    : item.orientation === 'portrait'
+                                    ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                                    : 'bg-neutral-100 text-neutral-900 border border-neutral-300'
+                                }`}
+                              >
+                                {item.orientation === 'landscape'
+                                  ? 'Lanskap'
+                                  : item.orientation === 'portrait'
+                                  ? 'Potret'
+                                  : '1:1'}
+                              </span>
+                            </div>
+
+                            {/* Focal Point Indicator Link */}
+                            <button
+                              type="button"
+                              onClick={() => setActiveFocalQueueId(item.id)}
+                              className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 hover:bg-black text-white text-[10px] font-mono rounded-[2px] transition-colors"
+                              title="Klik untuk mengubah titik fokus foto ini"
+                            >
+                              Fokus: {item.focal}
+                            </button>
+                          </div>
+
+                          {/* Card Body: Slot & Caption */}
+                          <div className="p-3 space-y-2.5 bg-white flex-1 flex flex-col justify-between">
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between text-[11px] font-mono text-tinta-lembut truncate">
+                                <span className="truncate max-w-[130px]" title={item.file.name}>
+                                  {index + 1}. {item.file.name}
+                                </span>
+                                <span>{(item.file.size / (1024 * 1024)).toFixed(1)} MB</span>
+                              </div>
+
+                              <div>
+                                <label className="block text-[10px] font-mono uppercase text-tinta-lembut mb-0.5">
+                                  Slot Penempatan
+                                </label>
+                                <select
+                                  value={item.slot}
+                                  onChange={(e) =>
+                                    handleUpdateQueueItem(item.id, { slot: e.target.value as any })
+                                  }
+                                  className="w-full border border-garis rounded-[2px] px-2 py-1 text-xs bg-white text-tinta focus:outline-none focus:border-merah"
+                                >
+                                  <option value="gallery">Galeri Arsip</option>
+                                  <option value="hero">Hero (Foto Utama)</option>
+                                  <option value="highlight">Momen Sorotan (Infinity)</option>
+                                  <option value="about_1">Tentang - Foto 1</option>
+                                  <option value="about_2">Tentang - Foto 2</option>
+                                  <option value="about_3">Tentang - Foto 3</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <input
+                                  type="text"
+                                  value={item.caption}
+                                  onChange={(e) =>
+                                    handleUpdateQueueItem(item.id, { caption: e.target.value })
+                                  }
+                                  placeholder="Keterangan momen (opsional)..."
+                                  className="w-full border border-garis rounded-[2px] px-2 py-1 text-xs bg-white text-tinta focus:outline-none focus:border-merah"
+                                />
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => setActiveFocalQueueId(item.id)}
+                              className="text-[11px] font-mono text-merah hover:underline text-left mt-1"
+                            >
+                              Atur Titik Fokus Foto →
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-4 border-t border-garis flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+              {/* Progress info */}
+              <div className="flex-1">
+                {uploading ? (
+                  <div className="space-y-1.5 max-w-md">
+                    <div className="flex items-center justify-between text-xs font-mono text-merah">
+                      <span>{uploadProgress || 'Mengunggah foto...'}</span>
+                    </div>
+                    <div className="w-full bg-garis h-2 rounded-[2px] overflow-hidden">
+                      <div className="bg-merah h-full transition-all duration-300 animate-pulse w-full" />
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-xs text-tinta-lembut font-mono">
+                    {uploadQueue.length > 0
+                      ? `${uploadQueue.filter((q) => q.selected).length} foto akan diunggah ke koleksi ini`
+                      : 'Belum ada foto yang dipilih'}
+                  </span>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2.5 justify-end">
+                <button
+                  type="button"
+                  onClick={handleClosePhotoModal}
+                  disabled={uploading}
+                  className="px-4 py-2 border border-garis rounded-[2px] text-xs font-medium text-tinta-lembut hover:text-tinta min-h-[44px] disabled:opacity-40"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBatchPhotoUpload}
+                  disabled={uploading || uploadQueue.filter((q) => q.selected).length === 0}
+                  className="px-6 py-2 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium min-h-[44px] shadow-sm disabled:opacity-40 flex items-center gap-2"
+                >
+                  {uploading ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Mengunggah...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>
+                        Unggah {uploadQueue.filter((q) => q.selected).length} Foto Terpilih
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
