@@ -131,6 +131,23 @@
   animation-play-state: paused;
 }
 
+/* Pita Sorotan Infinity: bergulir halus non-stop tanpa bisa diinteraksi/dijeda */
+.marquee-track-continuous {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marqueeLeft 40s linear infinite !important;
+  animation-play-state: running !important;
+  pointer-events: none;
+  user-select: none;
+}
+
+.marquee-track-continuous:hover,
+.marquee-track-continuous:focus,
+.marquee-track-continuous:focus-within {
+  animation-play-state: running !important;
+}
+
 @keyframes marqueeRight {
   0% {
     transform: translateX(-50%);
@@ -151,7 +168,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track-right,
-  .marquee-track-left {
+  .marquee-track-left,
+  .marquee-track-continuous {
     animation: none !important;
     transform: none !important;
   }

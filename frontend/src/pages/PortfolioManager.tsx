@@ -643,32 +643,27 @@ export default function PortfolioManager() {
         isComplete: Boolean(selectedCollection.content?.about_heading && aboutPhotos.length > 0),
       },
       {
-        id: 'events_section',
-        label: '3. Rangkaian Acara',
-        isComplete: Boolean(eventTypes.length > 0),
-      },
-      {
         id: 'highlight_section',
-        label: '4. Momen Sorotan',
-        isComplete: Boolean(highlightPhotos.length >= 3),
+        label: '3. Pita Sorotan Infinity',
+        isComplete: Boolean(highlightPhotos.length >= 1 || currentCollectionPhotos.length >= 3),
       },
       {
         id: 'testimonials_section',
-        label: '5. Kutipan Pengantin',
+        label: '4. Kutipan Pengantin',
         isComplete: Boolean(selectedCollection.content?.testimonials?.length),
       },
       {
         id: 'gallery_section',
-        label: '6. Galeri Arsip',
+        label: '5. Galeri Arsip',
         isComplete: Boolean(currentCollectionPhotos.length >= 5),
       },
       {
         id: 'cta_section',
-        label: '7. Konsultasi WhatsApp',
+        label: '6. Konsultasi WhatsApp',
         isComplete: Boolean(selectedCollection.content?.cta_heading),
       },
     ];
-  }, [selectedCollection, heroPhoto, aboutPhotos.length, eventTypes.length, highlightPhotos.length, currentCollectionPhotos.length]);
+  }, [selectedCollection, heroPhoto, aboutPhotos.length, highlightPhotos.length, currentCollectionPhotos.length]);
 
   return (
     <div className="min-h-screen bg-kertas font-sans text-tinta flex flex-col">
@@ -1456,69 +1451,7 @@ export default function PortfolioManager() {
                 </div>
               </div>
 
-              {/* CARD 3: EVENTS SECTION */}
-              <div
-                id="card-events_section"
-                className={`bg-white p-6 rounded-[2px] border transition-all duration-300 ${
-                  highlightedCardId === 'events_section' ? 'border-merah ring-2 ring-merah bg-merah/[0.02]' : 'border-garis'
-                }`}
-              >
-                <div className="flex items-center justify-between border-b border-garis pb-3 mb-5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-merah/10 text-merah flex items-center justify-center font-mono text-xs font-semibold">
-                      3
-                    </span>
-                    <h3 className="font-serif text-lg font-medium text-tinta">
-                      Bagian Rangkaian Acara (Prosesi)
-                    </h3>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedCollection(null);
-                      setActiveTab('eventTypes');
-                    }}
-                    className="text-xs text-merah font-medium hover:underline flex items-center gap-1 font-mono"
-                  >
-                    <span>Kelola Jenis Acara ({eventTypes.length})</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-kertas-tua/40 rounded-[2px] border border-garis">
-                  <div>
-                    <span className="text-xs font-medium text-tinta block mb-0.5">
-                      Gaya Kartu Bertingkat (Staggered Layout)
-                    </span>
-                    <span className="text-[11px] text-tinta-lembut">
-                      Memberikan ritme visual editorial dengan menggeser kartu genap ke bawah secara dinamis.
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSelectedCollection({
-                        ...selectedCollection,
-                        layout: {
-                          ...selectedCollection.layout,
-                          event_cards_staggered: !selectedCollection.layout?.event_cards_staggered,
-                        },
-                      })
-                    }
-                    className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${
-                      selectedCollection.layout?.event_cards_staggered ?? true ? 'bg-merah' : 'bg-garis'
-                    }`}
-                  >
-                    <span
-                      className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${
-                        selectedCollection.layout?.event_cards_staggered ?? true ? 'right-1' : 'left-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* CARD 4: HIGHLIGHT SECTION */}
+              {/* CARD 3: HIGHLIGHT SECTION (Infinity Marquee) */}
               <div
                 id="card-highlight_section"
                 className={`bg-white p-6 rounded-[2px] border transition-all duration-300 ${
@@ -1528,16 +1461,20 @@ export default function PortfolioManager() {
                 <div className="flex items-center justify-between border-b border-garis pb-3 mb-5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-merah/10 text-merah flex items-center justify-center font-mono text-xs font-semibold">
-                      4
+                      3
                     </span>
                     <h3 className="font-serif text-lg font-medium text-tinta">
-                      Bagian Momen Sorotan (Dark Showcase Section)
+                      Bagian Momen Sorotan (Pita Infinity Bergulir)
                     </h3>
                   </div>
                   <span className="text-[10px] font-mono uppercase tracking-wider text-tinta-lembut">
-                    Slot: highlight ({highlightPhotos.length}/3)
+                    Prioritas Sorotan: {highlightPhotos.length} Foto
                   </span>
                 </div>
+
+                <p className="text-xs text-tinta-lembut mb-5 leading-relaxed">
+                  Bagian ini menampilkan foto berbusana adat yang bergulir horizontal secara terus menerus (infinity marquee) tanpa interaksi klik. Foto yang diberi slot &quot;highlight&quot; akan diprioritaskan tampil di pita sorotan. Jika kosong, semua foto koleksi otomatis diputar bergantian.
+                </p>
 
                 <div className="space-y-4 mb-6">
                   <div>
@@ -1577,11 +1514,11 @@ export default function PortfolioManager() {
                   </div>
                 </div>
 
-                {/* 3 Showcase Photos Slots */}
+                {/* Highlight Photos Slots */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-mono uppercase text-tinta-lembut">
-                      3 Foto Sorotan Utama (Kiri, Pusat Skala Terbesar, Kanan)
+                      Foto Prioritas Pita Infinity ({highlightPhotos.length})
                     </span>
                     <button
                       type="button"
@@ -1592,52 +1529,54 @@ export default function PortfolioManager() {
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {[0, 1, 2].map((idx) => {
-                      const photo = highlightPhotos[idx];
-
-                      return (
+                  {highlightPhotos.length === 0 ? (
+                    <div className="p-5 bg-kertas rounded-[2px] border border-dashed border-garis text-center">
+                      <p className="text-xs text-tinta-lembut mb-2">
+                        Belum ada foto yang ditandai khusus sebagai sorotan. Semua foto koleksi akan otomatis diputar di pita infinity.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setSlotPickerTarget('highlight')}
+                        className="text-xs text-merah font-semibold hover:underline font-mono"
+                      >
+                        + Pilih Foto Prioritas
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {highlightPhotos.map((photo, idx) => (
                         <div
-                          key={idx}
-                          className="border border-garis rounded-[2px] p-3 bg-neutral-900 text-white flex flex-col justify-between"
+                          key={photo.id}
+                          className="border border-garis rounded-[2px] p-2 bg-neutral-900 text-white flex flex-col justify-between"
                         >
                           <div className="aspect-[3/4] bg-neutral-800 rounded-[2px] overflow-hidden mb-2 relative group">
-                            {photo ? (
-                              <img
-                                src={photo.image_url}
-                                alt={`Sorotan ${idx + 1}`}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex flex-col items-center justify-center text-white/50 text-xs p-4 text-center font-mono">
-                                <span>Slot Sorotan {idx === 1 ? '2 (Pusat)' : `${idx + 1}`}</span>
-                                <span className="text-[10px] opacity-70 mt-1">Kosong</span>
-                              </div>
-                            )}
+                            <img
+                              src={photo.image_url}
+                              alt={`Sorotan ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
 
                           <div className="flex items-center justify-between pt-1 text-xs">
                             <span className="font-mono text-[10px] text-white/70">
-                              {idx === 1 ? 'Pusat (Terbesar)' : `Sayap ${idx === 0 ? 'Kiri' : 'Kanan'}`}
+                              #{idx + 1}
                             </span>
-                            {photo && (
-                              <button
-                                type="button"
-                                onClick={() => handleAssignPhotoToSlot(photo.id, 'gallery')}
-                                className="text-[10px] text-red-400 hover:underline"
-                              >
-                                Lepas Slot
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleAssignPhotoToSlot(photo.id, 'gallery')}
+                              className="text-[10px] text-red-400 hover:underline"
+                            >
+                              Lepas
+                            </button>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* CARD 5: TESTIMONIALS SECTION */}
+              {/* CARD 4: TESTIMONIALS SECTION */}
               <div
                 id="card-testimonials_section"
                 className={`bg-white p-6 rounded-[2px] border transition-all duration-300 ${
@@ -1647,7 +1586,7 @@ export default function PortfolioManager() {
                 <div className="flex items-center justify-between border-b border-garis pb-3 mb-5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-merah/10 text-merah flex items-center justify-center font-mono text-xs font-semibold">
-                      5
+                      4
                     </span>
                     <h3 className="font-serif text-lg font-medium text-tinta">
                       Bagian Kutipan / Testimoni Pengantin
@@ -1774,7 +1713,7 @@ export default function PortfolioManager() {
                 )}
               </div>
 
-              {/* CARD 6: GALLERY SECTION */}
+              {/* CARD 5: GALLERY SECTION */}
               <div
                 id="card-gallery_section"
                 className={`bg-white p-6 rounded-[2px] border transition-all duration-300 ${
@@ -1784,7 +1723,7 @@ export default function PortfolioManager() {
                 <div className="flex items-center justify-between border-b border-garis pb-3 mb-5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-merah/10 text-merah flex items-center justify-center font-mono text-xs font-semibold">
-                      6
+                      5
                     </span>
                     <h3 className="font-serif text-lg font-medium text-tinta">
                       Bagian Galeri Arsip Lengkap
@@ -1815,7 +1754,7 @@ export default function PortfolioManager() {
                 </div>
               </div>
 
-              {/* CARD 7: CTA SECTION */}
+              {/* CARD 6: CTA SECTION */}
               <div
                 id="card-cta_section"
                 className={`bg-white p-6 rounded-[2px] border transition-all duration-300 ${
@@ -1825,7 +1764,7 @@ export default function PortfolioManager() {
                 <div className="flex items-center justify-between border-b border-garis pb-3 mb-5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-merah/10 text-merah flex items-center justify-center font-mono text-xs font-semibold">
-                      7
+                      6
                     </span>
                     <h3 className="font-serif text-lg font-medium text-tinta">
                       Bagian Konsultasi WhatsApp & Penutup

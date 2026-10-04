@@ -61,12 +61,29 @@ export function CollectionDetailView({
   // Layout preferences
   const heroSide = collection?.layout?.hero_side || 'left';
   const collageVariant = collection?.layout?.collage_variant || 'A';
-  const isStaggered = collection?.layout?.event_cards_staggered ?? true;
 
   // Photo slots
   const heroPhoto = photos.find((p) => p.slot === 'hero') || photos[0];
   const aboutPhotos = photos.filter((p) => p.slot?.startsWith('about_'));
   const highlightPhotos = photos.filter((p) => p.slot === 'highlight');
+
+  // Photos for continuous infinite marquee in highlight section
+  const marqueePhotos = useMemo(() => {
+    // Prioritize highlight slot photos, supplemented with other collection photos
+    const base =
+      highlightPhotos.length > 0
+        ? [...highlightPhotos, ...photos.filter((p) => p.slot !== 'highlight')]
+        : photos;
+
+    if (base.length === 0) return [];
+
+    // Ensure at least 8 items for a seamless infinite loop across wide viewports
+    let list = [...base];
+    while (list.length < 8) {
+      list = [...list, ...base];
+    }
+    return list;
+  }, [highlightPhotos, photos]);
 
   // Gallery items filtering
   const galleryPhotos = useMemo(() => {
@@ -394,15 +411,6 @@ export function CollectionDetailView({
                       Karya Terkurasi
                     </span>
                   </div>
-                  <div className="w-px h-8 bg-[var(--collection-border)]" />
-                  <div>
-                    <span className="block font-serif text-2xl font-bold text-[var(--collection-ink)]">
-                      {eventTypes.length}
-                    </span>
-                    <span className="text-xs uppercase tracking-wider text-[var(--collection-ink-muted)]">
-                      Rangkaian Acara
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -410,90 +418,7 @@ export function CollectionDetailView({
         </section>
       </EditableRegion>
 
-      {/* 3. KARTU JENIS ACARA (Lamaran, Akad, Resepsi, dll) */}
-      <EditableRegion
-        id="events_section"
-        label="Rangkaian Prosesi Acara"
-        isPreview={isPreview}
-        isActive={activeEditKey === 'events_section'}
-        isHovered={hoverEditKey === 'events_section'}
-        onSelect={onSelectRegion}
-        onHover={onHoverRegion}
-      >
-        <section className="py-20 md:py-24 border-b border-[var(--collection-border)]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="text-xs uppercase tracking-[0.25em] font-semibold text-[var(--collection-accent)] block mb-3">
-                RANGKAIAN PROSESI
-              </span>
-              <h2 className="font-serif text-3xl sm:text-4xl text-[var(--collection-ink)] font-normal mb-4">
-                Jelajahi Berdasarkan Jenis Acara
-              </h2>
-              <p className="text-sm sm:text-base text-[var(--collection-ink-muted)]">
-                Pilih prosesi di bawah ini untuk melihat dokumentasi spesifik pada galeri kami.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {eventTypes.slice(0, 4).map((evt, idx) => {
-                const samplePhoto =
-                  photos.find((p) => p.event_type_slug === evt.slug) || photos[idx % (photos.length || 1)];
-                const isSelected = activeEventSlug === evt.slug;
-                const staggerClass = isStaggered && idx % 2 === 1 ? 'sm:translate-y-6' : '';
-
-                return (
-                  <div
-                    key={evt.id || idx}
-                    onClick={() => {
-                      setActiveEventSlug(evt.slug);
-                      const el = document.getElementById('galeri');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className={`group cursor-pointer rounded-[2px] border overflow-hidden bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated ${
-                      isSelected
-                        ? 'border-[var(--collection-accent)] ring-1 ring-[var(--collection-accent)]'
-                        : 'border-[var(--collection-border)]'
-                    } ${staggerClass}`}
-                  >
-                    <div className="aspect-[4/3] w-full overflow-hidden bg-[var(--collection-muted-paper)] relative">
-                      {samplePhoto ? (
-                        <img
-                          src={samplePhoto.image_url}
-                          alt={evt.name}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs text-neutral-400">
-                          {evt.name}
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
-                      <span className="absolute bottom-3 left-4 text-xs uppercase tracking-widest text-white/90 font-medium">
-                        Acara {idx + 1}
-                      </span>
-                    </div>
-
-                    <div className="p-5">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-serif text-xl font-bold text-[var(--collection-ink)] group-hover:text-[var(--collection-accent)] transition-colors">
-                          {evt.name}
-                        </h3>
-                        <ArrowUpRight className="w-4 h-4 text-[var(--collection-ink-muted)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                      </div>
-                      <p className="text-xs text-[var(--collection-ink-muted)] line-clamp-2 leading-relaxed">
-                        {evt.description || `Dokumentasi prosesi ${evt.name} penuh kekhidmatan.`}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      </EditableRegion>
-
-      {/* 4. DARK SECTION (Momen Sorotan) */}
+      {/* 3. DARK SECTION (Momen Sorotan - Infinite Marquee Bergulir Non-Interaktif) */}
       <EditableRegion
         id="highlight_section"
         label="Momen Sorotan"
@@ -503,9 +428,9 @@ export function CollectionDetailView({
         onSelect={onSelectRegion}
         onHover={onHoverRegion}
       >
-        <section className="py-20 md:py-28 bg-[var(--collection-dark)] text-[var(--collection-dark-text)]">
+        <section className="py-20 md:py-28 bg-[var(--collection-dark)] text-[var(--collection-dark-text)] overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-16">
+            <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
               <span className="text-xs uppercase tracking-[0.25em] text-[var(--collection-accent)] font-semibold block mb-3">
                 {collection.content?.highlight_eyebrow || 'MOMEN SOROTAN'}
               </span>
@@ -514,58 +439,36 @@ export function CollectionDetailView({
               </h2>
               <div className="w-12 h-px bg-[var(--collection-accent)] mx-auto opacity-70" />
             </div>
+          </div>
 
-            {/* Staggered Showcase Row: Center photo largest */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-center">
-              {/* Left Photo */}
-              <div className="aspect-[3/4] rounded-[2px] overflow-hidden border border-white/10 shadow-elevated bg-white/5">
-                {highlightPhotos[0]?.image_url || photos[0]?.image_url ? (
-                  <img
-                    src={highlightPhotos[0]?.image_url || photos[0]?.image_url}
-                    alt="Sorotan 1"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs font-mono text-white/50 p-4 text-center">
-                    Foto Sorotan 1
+          {/* Pita Foto Bergulir Infinity: Berjalan terus menerus tanpa henti & tidak bisa diinteraksi */}
+          {marqueePhotos.length > 0 ? (
+            <div className="w-full overflow-hidden marquee-mask pointer-events-none select-none py-2">
+              <div className="marquee-track-continuous gap-6 md:gap-8 items-center pointer-events-none select-none">
+                {[...marqueePhotos, ...marqueePhotos].map((photo, idx) => (
+                  <div
+                    key={`${photo.id || 'marquee'}-${idx}`}
+                    className="w-64 sm:w-80 md:w-96 aspect-[3/4] shrink-0 rounded-[2px] overflow-hidden border border-white/10 shadow-elevated bg-white/5 relative pointer-events-none select-none"
+                  >
+                    <img
+                      src={photo.image_url}
+                      alt={photo.caption || collection?.name || 'Momen Sorotan'}
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      loading="lazy"
+                      draggable={false}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                   </div>
-                )}
-              </div>
-
-              {/* Center Photo (Largest) */}
-              <div className="aspect-[3/4] md:scale-105 rounded-[2px] overflow-hidden border border-white/20 shadow-elevated z-10 bg-white/5">
-                {highlightPhotos[1]?.image_url || photos[1]?.image_url || photos[0]?.image_url ? (
-                  <img
-                    src={highlightPhotos[1]?.image_url || photos[1]?.image_url || photos[0]?.image_url}
-                    alt="Sorotan 2 (Pusat)"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs font-mono text-white/50 p-4 text-center">
-                    Foto Sorotan 2 (Pusat)
-                  </div>
-                )}
-              </div>
-
-              {/* Right Photo */}
-              <div className="aspect-[3/4] rounded-[2px] overflow-hidden border border-white/10 shadow-elevated bg-white/5">
-                {highlightPhotos[2]?.image_url || photos[2]?.image_url || photos[0]?.image_url ? (
-                  <img
-                    src={highlightPhotos[2]?.image_url || photos[2]?.image_url || photos[0]?.image_url}
-                    alt="Sorotan 3"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs font-mono text-white/50 p-4 text-center">
-                    Foto Sorotan 3
-                  </div>
-                )}
+                ))}
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="max-w-md mx-auto text-center py-12 px-4 border border-white/10 rounded-[2px] bg-white/5">
+              <p className="text-sm text-neutral-400">
+                Pita sorotan infinity akan otomatis bergulir setelah foto diunggah ke koleksi ini.
+              </p>
+            </div>
+          )}
         </section>
       </EditableRegion>
 
@@ -649,46 +552,48 @@ export function CollectionDetailView({
               </div>
 
               {/* Filter Tabs */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveEventSlug('semua');
-                    setDisplayLimit(24);
-                  }}
-                  className={`px-4 py-2 text-xs uppercase tracking-wider font-semibold rounded-[2px] whitespace-nowrap transition-colors min-h-[44px] ${
-                    activeEventSlug === 'semua'
-                      ? 'bg-[var(--collection-dark)] text-[var(--collection-dark-text)]'
-                      : 'bg-white border border-[var(--collection-border)] text-[var(--collection-ink-muted)] hover:text-[var(--collection-ink)]'
-                  }`}
-                >
-                  Semua ({photos.length})
-                </button>
+              {eventTypes.length > 0 && photos.some((p) => p.event_type_slug) && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveEventSlug('semua');
+                      setDisplayLimit(24);
+                    }}
+                    className={`px-4 py-2 text-xs uppercase tracking-wider font-semibold rounded-[2px] whitespace-nowrap transition-colors min-h-[44px] ${
+                      activeEventSlug === 'semua'
+                        ? 'bg-[var(--collection-dark)] text-[var(--collection-dark-text)]'
+                        : 'bg-white border border-[var(--collection-border)] text-[var(--collection-ink-muted)] hover:text-[var(--collection-ink)]'
+                    }`}
+                  >
+                    Semua ({photos.length})
+                  </button>
 
-                {eventTypes.map((evt) => {
-                  const count = photos.filter((p) => p.event_type_slug === evt.slug).length;
-                  if (count === 0 && activeEventSlug !== evt.slug) return null;
+                  {eventTypes.map((evt) => {
+                    const count = photos.filter((p) => p.event_type_slug === evt.slug).length;
+                    if (count === 0 && activeEventSlug !== evt.slug) return null;
 
-                  const isSelected = activeEventSlug === evt.slug;
-                  return (
-                    <button
-                      key={evt.id}
-                      type="button"
-                      onClick={() => {
-                        setActiveEventSlug(evt.slug);
-                        setDisplayLimit(24);
-                      }}
-                      className={`px-4 py-2 text-xs uppercase tracking-wider font-semibold rounded-[2px] whitespace-nowrap transition-colors min-h-[44px] ${
-                        isSelected
-                          ? 'bg-[var(--collection-dark)] text-[var(--collection-dark-text)]'
-                          : 'bg-white border border-[var(--collection-border)] text-[var(--collection-ink-muted)] hover:text-[var(--collection-ink)]'
-                      }`}
-                    >
-                      {evt.name} {count > 0 ? `(${count})` : ''}
-                    </button>
-                  );
-                })}
-              </div>
+                    const isSelected = activeEventSlug === evt.slug;
+                    return (
+                      <button
+                        key={evt.id}
+                        type="button"
+                        onClick={() => {
+                          setActiveEventSlug(evt.slug);
+                          setDisplayLimit(24);
+                        }}
+                        className={`px-4 py-2 text-xs uppercase tracking-wider font-semibold rounded-[2px] whitespace-nowrap transition-colors min-h-[44px] ${
+                          isSelected
+                            ? 'bg-[var(--collection-dark)] text-[var(--collection-dark-text)]'
+                            : 'bg-white border border-[var(--collection-border)] text-[var(--collection-ink-muted)] hover:text-[var(--collection-ink)]'
+                        }`}
+                      >
+                        {evt.name} {count > 0 ? `(${count})` : ''}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Responsive Grid */}
