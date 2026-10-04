@@ -136,7 +136,7 @@
   display: flex !important;
   width: max-content !important;
   will-change: transform;
-  animation: marqueeContinuous 30s linear infinite !important;
+  animation: marqueeContinuous var(--marquee-duration, 95s) linear infinite !important;
   animation-play-state: running !important;
   pointer-events: none;
   user-select: none;

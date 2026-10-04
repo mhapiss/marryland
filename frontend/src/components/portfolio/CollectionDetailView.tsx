@@ -85,21 +85,28 @@ export function CollectionDetailView({
 
   // Photos for continuous infinite marquee in highlight section
   const marqueePhotos = useMemo(() => {
-    // Prioritize highlight slot photos, supplemented with other collection photos
-    const base =
+    // Prioritaskan kurasi foto sorotan khusus jika ada, jika kosong gunakan 10 foto pertama koleksi
+    const source =
       highlightPhotos.length > 0
-        ? [...highlightPhotos, ...photos.filter((p) => p.slot !== 'highlight')]
-        : photos;
+        ? highlightPhotos
+        : photos.slice(0, 10);
 
-    if (base.length === 0) return [];
+    if (source.length === 0) return [];
 
-    // Ensure at least 8 items for a seamless infinite loop across wide viewports
-    let list = [...base];
+    // Pastikan minimal 8 item agar loop seamless di layar ultrawide
+    let list = [...source];
     while (list.length < 8) {
-      list = [...list, ...base];
+      list = [...list, ...source];
     }
-    return list;
+    return list.slice(0, 16);
   }, [highlightPhotos, photos]);
+
+  // Durasi gulir sinematik estetik (~12 detik per foto, drift kecepatan mewah dan tenang)
+  const marqueeDuration = useMemo(() => {
+    const count = marqueePhotos.length;
+    if (count === 0) return 90;
+    return Math.max(80, Math.round(count * 12));
+  }, [marqueePhotos.length]);
 
   // Gallery items filtering: Galeri Arsip Lengkap menampilkan SELURUH karya foto dokumentasi koleksi
   const galleryPhotos = useMemo(() => {
@@ -493,7 +500,7 @@ export function CollectionDetailView({
                 .continuous-infinity-track {
                   display: flex !important;
                   width: max-content !important;
-                  animation: continuousMarqueeScroll 35s linear infinite !important;
+                  animation: continuousMarqueeScroll ${marqueeDuration}s linear infinite !important;
                   will-change: transform;
                 }
               `}</style>
