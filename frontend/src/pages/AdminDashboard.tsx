@@ -36,7 +36,7 @@ interface Stats {
 const AdminDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'galeri' | 'fotografer' | 'portofolio' | 'beranda'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'galeri' | 'fotografer' | 'portofolio' | 'konten' | 'media' | 'beranda'>('overview');
   const [galleries, setGalleries] = useState<GalleryWithUser[]>([]);
   const [photographers, setPhotographers] = useState<PhotographerInfo[]>([]);
   const [stats, setStats] = useState<Stats>({ totalGalleries: 0, totalPhotos: 0, activeGalleries: 0, completedGalleries: 0, totalPhotographers: 0 });

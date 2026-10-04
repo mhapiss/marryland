@@ -27,6 +27,8 @@ const ContentManager = React.lazy(() => import('./pages/ContentManager'));
 const MediaLibraryPage = React.lazy(() => import('./pages/MediaLibraryPage'));
 const CollectionDetailPage = React.lazy(() => import('./pages/CollectionDetailPage'));
 const DemoPage = React.lazy(() => import('./pages/DemoPage'));
+const AlbumPage = React.lazy(() => import('./pages/AlbumPage'));
+const CollectionPreviewPage = React.lazy(() => import('./pages/CollectionPreviewPage'));
 const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
 
 function PageLoader() {
@@ -49,6 +51,7 @@ function TextureManager() {
       p.startsWith('/admin') ||
       p.startsWith('/g/') ||
       p.startsWith('/galeri/') ||
+      p.startsWith('/album/') ||
       (/^\/[^/]+\/[^/]+$/.test(p) && !p.startsWith('/portofolio/'));
 
     if (isExcluded) {
@@ -166,6 +169,14 @@ const App: React.FC = () => {
                 </AdminRoute>
               }
             />
+            <Route
+              path="/admin/pratinjau/koleksi"
+              element={
+                <AdminRoute>
+                  <CollectionPreviewPage />
+                </AdminRoute>
+              }
+            />
 
             {/* Public: client photo selection (both /g/:slug and /:studio/:slug) */}
             <Route
@@ -192,6 +203,21 @@ const App: React.FC = () => {
                 </ErrorBoundary>
               }
             />
+            {/* Public: Family Album (Second Link) */}
+            <Route
+              path="/album/:client_slug"
+              element={
+                <ErrorBoundary
+                  fallbackTitle="Album Tidak Dapat Dimuat"
+                  fallbackMessage="Terjadi kendala saat membuka album keluarga. Silakan periksa kembali tautan Anda."
+                  showHomeButton={false}
+                >
+                  <AlbumPage />
+                </ErrorBoundary>
+              }
+            />
+
+            {/* Public: Custom studio slug selection route */}
             <Route
               path="/:studio_slug/:client_slug"
               element={

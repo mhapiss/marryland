@@ -856,13 +856,13 @@ export default function ContentManager() {
 
       {/* CONFLICT RESOLUTION DIALOG */}
       <ConfirmDialog
-        isOpen={hasConflict}
+        open={hasConflict}
         title="Konflik Penyimpanan Terdeteksi"
         message="Konten halaman ini telah diubah dari perangkat atau sesi lain sejak terakhir kali dimuat. Apakah kamu ingin memuat ulang versi terbaru atau menimpa secara sadar?"
         confirmLabel="Timpa Perubahan Server"
         cancelLabel="Muat Ulang Konten Server"
-        isDestructive={true}
-        isLoading={saving}
+        destructive={true}
+        loading={saving}
         onConfirm={() => {
           setHasConflict(false);
           handleSave(true);

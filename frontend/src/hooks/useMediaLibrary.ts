@@ -207,7 +207,11 @@ export function useMediaLibrary() {
       .eq('id', assetId);
 
     // Bump global cache version
-    await supabase.rpc('bump_site_content_version').catch(() => {});
+    try {
+      await supabase.rpc('bump_site_content_version');
+    } catch {
+      // Gagal menaikkan versi cache tidak boleh menghentikan penggantian foto
+    }
 
     await fetchAssets();
   };

@@ -9,6 +9,8 @@ import SelectedPhotosModal from '../components/SelectedPhotosModal';
 import StudioSettings from '../components/StudioSettings';
 import AccountSettings from '../components/AccountSettings';
 import ConfirmDialog from '../components/ConfirmDialog';
+import SendClientMessageModal from '../components/SendClientMessageModal';
+import GallerySettingsModal from '../components/GallerySettingsModal';
 import { toast } from 'sonner';
 import { TOAST } from '../constants/toastMessages';
 import { copyToClipboard } from '../lib/clipboard';
@@ -30,6 +32,15 @@ export interface Gallery {
   status: 'draft' | 'active' | 'completed';
   created_at: string;
   selected_count?: number;
+  album_enabled?: boolean;
+  album_token?: string | null;
+  album_pin_hash?: string | null;
+  album_expires_at?: string | null;
+  album_allow_download?: boolean;
+  album_scope?: 'all' | 'selected_only';
+  submitted_at?: string | null;
+  photographer_phone?: string | null;
+  studio_name?: string | null;
 }
 
 const Dashboard: React.FC = () => {
@@ -38,10 +49,14 @@ const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'galeri' | 'pengaturan'>('galeri');
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [loadingGalleries, setLoadingGalleries] = useState(true);
+
+  // Modals state
   const [selectedGallery, setSelectedGallery] = useState<Gallery | null>(null);
   const [showPhotosModal, setShowPhotosModal] = useState(false);
   const [galleryToDelete, setGalleryToDelete] = useState<Gallery | null>(null);
   const [isDeletingGallery, setIsDeletingGallery] = useState(false);
+  const [galleryForMessage, setGalleryForMessage] = useState<Gallery | null>(null);
+  const [galleryForSettings, setGalleryForSettings] = useState<Gallery | null>(null);
 
   const fetchGalleries = useCallback(async () => {
     if (!user) return;
@@ -62,9 +77,7 @@ const Dashboard: React.FC = () => {
     fetchGalleries();
   }, [fetchGalleries]);
 
-  // ─── Realtime: gallery status & selected_count updates ───
-  // When a client submits selections or completes a gallery,
-  // the dashboard updates instantly without manual refresh.
+  // Realtime updates
   useRealtime({
     table: 'galleries',
     filter: user ? `user_id=eq.${user.id}` : undefined,
@@ -74,7 +87,7 @@ const Dashboard: React.FC = () => {
       setGalleries((prev) =>
         prev.map((g) =>
           g.id === updated.id
-            ? { ...g, status: updated.status, selected_count: updated.selected_count }
+            ? { ...g, ...updated }
             : g
         )
       );
@@ -82,7 +95,6 @@ const Dashboard: React.FC = () => {
     onInsert: (payload) => {
       const newGallery = payload.new as Gallery;
       setGalleries((prev) => {
-        // Avoid duplicates (e.g. from optimistic insert + realtime)
         if (prev.some((g) => g.id === newGallery.id)) return prev;
         return [newGallery, ...prev];
       });
@@ -93,14 +105,10 @@ const Dashboard: React.FC = () => {
     },
   });
 
-  // ─── Realtime: photo_selections changes ───
-  // When a client selects/deselects photos, we re-fetch gallery data
-  // to get updated selected_count for the progress bar.
   useRealtime({
     table: 'photo_selections',
     enabled: !!user,
     onAny: () => {
-      // Re-fetch galleries to update selected_count across all gallery cards
       fetchGalleries();
     },
   });
@@ -112,6 +120,12 @@ const Dashboard: React.FC = () => {
 
   const handleGalleryCreated = (newGallery: Gallery) => {
     setGalleries((prev) => [newGallery, ...prev]);
+    // Automatically open SendClientMessageModal so photographer can share immediately
+    setGalleryForMessage(newGallery);
+  };
+
+  const handleGalleryUpdated = (updated: Gallery) => {
+    setGalleries((prev) => prev.map((g) => (g.id === updated.id ? { ...g, ...updated } : g)));
   };
 
   const handleViewSelections = (gallery: Gallery) => {
@@ -126,12 +140,9 @@ const Dashboard: React.FC = () => {
   const confirmDeleteGallery = async () => {
     if (!galleryToDelete) return;
     setIsDeletingGallery(true);
-    
+
     try {
-      const { error } = await supabase
-        .from('galleries')
-        .delete()
-        .eq('id', galleryToDelete.id);
+      const { error } = await supabase.from('galleries').delete().eq('id', galleryToDelete.id);
 
       if (error) throw error;
       setGalleries((prev) => prev.filter((g) => g.id !== galleryToDelete.id));
@@ -144,18 +155,26 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const generateWhatsAppLink = (gallery: Gallery) => {
-    const studioSlug = user?.user_metadata?.studio_slug || 'studio';
-    const domain = window.location.origin;
-    const message = `Halo ${gallery.client_name},\nGaleri foto kamu dari by.marryland sudah siap!\n\nPilih foto favorit kamu di sini:\n${domain}/${studioSlug}/${gallery.client_slug}\n\nSelamat menikmati momennya!`;
-    const phone = gallery.client_whatsapp.replace(/[^0-9]/g, '');
-    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  const handleCopySelectLink = (gallery: Gallery) => {
+    const origin = window.location.origin;
+    const link = `${origin}/g/${gallery.client_slug}`;
+    copyToClipboard(link);
+    toast.success('Tautan kurasi klien berhasil disalin.');
   };
 
-  const copyGalleryLink = (gallery: Gallery) => {
-    const studioSlug = user?.user_metadata?.studio_slug || 'studio';
-    const link = `${window.location.origin}/${studioSlug}/${gallery.client_slug}`;
+  const handleCopyAlbumLink = (gallery: Gallery) => {
+    if (!gallery.album_enabled) {
+      setGalleryForSettings(gallery);
+      toast.info('Album keluarga belum aktif. Atur dan aktifkan di panel ini.');
+      return;
+    }
+    const origin = window.location.origin;
+    const token = gallery.album_token || '';
+    const link = token
+      ? `${origin}/album/${gallery.client_slug}?t=${token}`
+      : `${origin}/album/${gallery.client_slug}`;
     copyToClipboard(link);
+    toast.success('Tautan album keluarga berhasil disalin.');
   };
 
   return (
@@ -163,13 +182,14 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <header className="bg-white px-6 py-4 flex justify-between items-center border-b border-garis sticky top-0 z-40">
         <div className="flex items-center gap-4">
-          <Link to="/" className="text-xl font-serif tracking-tight text-tinta">by.<span className="text-merah">marryland</span></Link>
+          <Link to="/" className="text-xl font-serif tracking-tight text-tinta">
+            by.<span className="text-merah">marryland</span>
+          </Link>
           <span className="hidden sm:inline-block border border-garis text-merah bg-kertas-tua/60 text-[10px] px-2.5 py-0.5 rounded-[2px] font-mono uppercase tracking-widest">
             Untuk Fotografer
           </span>
         </div>
         <div className="flex items-center gap-5">
-          {/* Admin Panel Link */}
           {user?.email === 'admin@marryland.com' && (
             <button
               onClick={() => navigate('/admin')}
@@ -178,18 +198,23 @@ const Dashboard: React.FC = () => {
               Panel Admin
             </button>
           )}
-          {/* User email */}
           <span className="text-xs text-tinta-lembut hidden sm:inline truncate max-w-[200px] font-mono">
             {user?.email}
           </span>
-          {/* Logout */}
           <button
             onClick={handleSignOut}
-            className="text-tinta-lembut hover:text-merah transition-colors"
+            className="text-tinta-lembut hover:text-merah transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             title="Keluar"
             aria-label="Keluar"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
           </button>
         </div>
       </header>
@@ -198,29 +223,25 @@ const Dashboard: React.FC = () => {
       <div className="max-w-4xl mx-auto px-6">
         <div className="flex gap-8 border-b border-garis mt-6">
           <button
-            className={`pb-3 text-xs font-mono uppercase tracking-wider transition-colors relative ${
-              activeTab === 'galeri'
-                ? 'text-merah font-bold'
-                : 'text-tinta-lembut hover:text-tinta'
+            className={`pb-3 text-xs font-mono uppercase tracking-wider transition-colors relative min-h-[44px] flex items-center ${
+              activeTab === 'galeri' ? 'text-merah font-bold' : 'text-tinta-lembut hover:text-tinta'
             }`}
             onClick={() => setActiveTab('galeri')}
           >
-            Galeri
-            {activeTab === 'galeri' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-merah"></div>
-            )}
+            Galeri Klien
+            {activeTab === 'galeri' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-merah" />}
           </button>
           <button
-            className={`pb-3 text-xs font-mono uppercase tracking-wider transition-colors relative ${
+            className={`pb-3 text-xs font-mono uppercase tracking-wider transition-colors relative min-h-[44px] flex items-center ${
               activeTab === 'pengaturan'
                 ? 'text-merah font-bold'
                 : 'text-tinta-lembut hover:text-tinta'
             }`}
             onClick={() => setActiveTab('pengaturan')}
           >
-            Pengaturan Studio
+            Pengaturan Studio & Pesan
             {activeTab === 'pengaturan' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-merah"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-merah" />
             )}
           </button>
         </div>
@@ -230,18 +251,25 @@ const Dashboard: React.FC = () => {
       <main className="max-w-4xl mx-auto px-6 py-8">
         {activeTab === 'galeri' && (
           <div className="space-y-8 animate-fade-in">
-
             {/* Create Gallery Form */}
             <CreateGalleryForm onGalleryCreated={handleGalleryCreated} />
 
             {/* Gallery List */}
             <div>
-              <h2 className="text-xl font-serif font-normal text-tinta mb-5">Semua Galeri Klien</h2>
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-xl font-serif font-normal text-tinta">Daftar Galeri Klien</h2>
+                <span className="text-xs font-mono text-tinta-lembut">
+                  Total: {galleries.length} galeri
+                </span>
+              </div>
+
               {loadingGalleries ? (
-                <div className="text-center text-tinta-lembut py-12 text-sm">Memuat galeri...</div>
+                <div className="text-center text-tinta-lembut py-12 text-sm font-mono">
+                  Memuat galeri klien...
+                </div>
               ) : galleries.length === 0 ? (
                 <div className="bg-white p-12 text-center text-tinta-lembut border border-dashed border-garis rounded-[2px] text-sm">
-                  Belum ada galeri aktif. Buat galeri pertamamu pada formulir di atas.
+                  Belum ada galeri aktif. Masukkan tautan folder Google Drive pada formulir di atas untuk membuat galeri pertama.
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -251,8 +279,10 @@ const Dashboard: React.FC = () => {
                       gallery={gallery}
                       onViewSelections={handleViewSelections}
                       onDelete={handleDeleteGallery}
-                      onShareWhatsApp={() => window.open(generateWhatsAppLink(gallery), '_blank')}
-                      onCopyLink={() => copyGalleryLink(gallery)}
+                      onSendClientMessage={(g) => setGalleryForMessage(g)}
+                      onOpenSettings={(g) => setGalleryForSettings(g)}
+                      onCopySelectLink={handleCopySelectLink}
+                      onCopyAlbumLink={handleCopyAlbumLink}
                     />
                   ))}
                 </div>
@@ -280,12 +310,34 @@ const Dashboard: React.FC = () => {
         />
       )}
 
+      {/* Send Client Message Modal (Bagian D) */}
+      {galleryForMessage && (
+        <SendClientMessageModal
+          gallery={galleryForMessage}
+          onClose={() => setGalleryForMessage(null)}
+          photographerName={user?.user_metadata?.full_name || 'Fotografer'}
+          studioName={user?.user_metadata?.studio_name || 'by.marryland'}
+          studioSlug={user?.user_metadata?.studio_slug || 'studio'}
+          mainTemplate={user?.user_metadata?.message_template_main}
+          albumTemplate={user?.user_metadata?.message_template_album}
+        />
+      )}
+
+      {/* Gallery Settings Modal (Bagian A & E) */}
+      {galleryForSettings && (
+        <GallerySettingsModal
+          gallery={galleryForSettings}
+          onClose={() => setGalleryForSettings(null)}
+          onGalleryUpdated={handleGalleryUpdated}
+        />
+      )}
+
       {/* Delete Gallery Confirm Dialog */}
       <ConfirmDialog
         open={!!galleryToDelete}
-        title="Hapus Galeri"
-        message={`Galeri untuk klien "${galleryToDelete?.client_name}" akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.`}
-        confirmLabel="Hapus"
+        title="Hapus Galeri Klien"
+        message={`Galeri untuk klien "${galleryToDelete?.client_name}" beserta data kurasinya akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+        confirmLabel="Hapus Galeri"
         cancelLabel="Batal"
         loading={isDeletingGallery}
         destructive

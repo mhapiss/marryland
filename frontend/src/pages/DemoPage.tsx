@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import PhotoViewer from '../components/gallery/PhotoViewer';
 import { toast } from 'sonner';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { usePageContent } from '../hooks/useContent';
@@ -236,80 +236,26 @@ export default function DemoPage() {
         </div>
       </div>
 
-      {/* Lightbox Modal */}
-      {lightboxIndex !== null && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between p-4">
-          <div className="flex justify-between items-center text-white px-4 py-2">
-            <span className="text-xs font-mono text-white/70">
-              {lightboxIndex + 1} / {photos.length} - {photos[lightboxIndex].filename}
-            </span>
-            <button
-              onClick={() => setLightboxIndex(null)}
-              className="p-2 text-white/80 hover:text-white rounded min-h-[44px]"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-            <TransformWrapper initialScale={1} minScale={0.8} maxScale={4}>
-              {({ zoomIn, zoomOut, resetTransform }) => (
-                <div className="w-full h-full flex items-center justify-center relative">
-                  <TransformComponent wrapperClass="w-full h-full" contentClass="w-full h-full flex items-center justify-center">
-                    <img
-                      src={photos[lightboxIndex].url}
-                      alt={photos[lightboxIndex].filename}
-                      className="max-h-[75vh] max-w-full object-contain select-none"
-                    />
-                  </TransformComponent>
-
-                  {/* Zoom Controls */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md border border-white/20 rounded-full px-4 py-1.5 flex items-center gap-3 text-white">
-                    <button onClick={() => zoomOut()} className="p-1 hover:text-merah-tanda">
-                      <ZoomOut className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => resetTransform()} className="text-[11px] font-mono hover:text-merah-tanda">
-                      Reset
-                    </button>
-                    <button onClick={() => zoomIn()} className="p-1 hover:text-merah-tanda">
-                      <ZoomIn className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </TransformWrapper>
-          </div>
-
-          {/* Navigation Controls */}
-          <button
-            onClick={() => setLightboxIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : photos.length - 1))}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white/80 hover:text-white bg-black/40 rounded-full min-h-[44px]"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-
-          <button
-            onClick={() => setLightboxIndex((prev) => (prev !== null && prev < photos.length - 1 ? prev + 1 : 0))}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white/80 hover:text-white bg-black/40 rounded-full min-h-[44px]"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-
-          {/* Bottom toggle button */}
-          <div className="text-center pb-2">
-            <button
-              onClick={() => toggleSelect(photos[lightboxIndex].id)}
-              className={`px-6 py-2.5 rounded-[2px] text-xs font-semibold transition-colors ${
-                selectedIds.includes(photos[lightboxIndex].id)
-                  ? 'bg-merah-tanda text-kertas hover:bg-merah'
-                  : 'bg-merah text-kertas hover:bg-merah-hover'
-              }`}
-            >
-              {selectedIds.includes(photos[lightboxIndex].id) ? 'Batal Pilih Foto Ini' : 'Pilih Foto Ini'}
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Reusable PhotoViewer */}
+      <PhotoViewer
+        photos={photos.map((p) => ({ id: p.id, filename: p.filename, thumbnail_url: p.url }))}
+        initialIndex={lightboxIndex ?? 0}
+        isOpen={lightboxIndex !== null}
+        onClose={() => setLightboxIndex(null)}
+        isPhotoSelected={(id) => selectedIds.includes(id)}
+        onToggleSelection={(id) => {
+          toggleSelect(id);
+          return true;
+        }}
+        getSelectionOrder={(id) => {
+          const idx = selectedIds.indexOf(id);
+          return idx !== -1 ? idx + 1 : null;
+        }}
+        selectionCount={selectedIds.length}
+        maxSelectable={MAX_SELECTABLE}
+        allowDownload={false}
+        readOnly={isSubmitted}
+      />
 
       {/* Review Modal */}
       {showReview && (

@@ -140,9 +140,10 @@ export interface PortfolioCollection {
     cta_subheading?: string;
     wa_message_template?: string;
   };
-  cover_url?: string;
+  cover_url?: string | null;
   position?: number;
   created_at?: string;
+  updated_at?: string;
 }
 
 export interface EventType {

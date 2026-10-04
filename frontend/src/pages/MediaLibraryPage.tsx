@@ -379,7 +379,7 @@ export default function MediaLibraryPage() {
 
       {/* CONFIRM DELETE DIALOG */}
       <ConfirmDialog
-        isOpen={deleteTarget !== null}
+        open={deleteTarget !== null}
         title="Hapus Foto dari Pustaka"
         message={
           (deleteTarget?.usage_count || 0) > 0
@@ -387,8 +387,8 @@ export default function MediaLibraryPage() {
             : 'Apakah kamu yakin ingin menghapus foto ini? File WebP di server akan dihapus permanen.'
         }
         confirmLabel="Ya, Hapus Foto"
-        isDestructive={true}
-        isLoading={isDeleting}
+        destructive={true}
+        loading={isDeleting}
         onConfirm={handleDeleteConfirm}
         onCancel={() => {
           setDeleteTarget(null);

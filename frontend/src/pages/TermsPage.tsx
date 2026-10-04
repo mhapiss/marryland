@@ -11,19 +11,33 @@ export default function TermsPage() {
   const clauses = content?.clauses?.items || [
     {
       title: '1. Definisi Layanan',
-      content: 'by.marryland adalah platform seleksi foto digital yang dirancang untuk memudahkan fotografer dalam membagikan galeri foto kepada klien mereka.',
+      content:
+        'by.marryland adalah platform kurasi dan album foto digital yang dirancang untuk memudahkan fotografer dalam membagikan galeri foto kepada klien dan keluarga mereka tanpa memerlukan akun atau instalasi aplikasi tambahan bagi pihak klien.',
     },
     {
       title: '2. Akun Fotografer dan Tanggung Jawabnya',
-      content: 'Sebagai fotografer yang menggunakan layanan kami, kamu bertanggung jawab atas keamanan akunmu dan seluruh aktivitas di bawahnya.',
+      content:
+        'Sebagai fotografer yang menggunakan layanan kami, kamu bertanggung jawab atas kerahasiaan kredensial akunmu dan seluruh aktivitas di bawahnya, termasuk pengelolaan tautan galeri dan album yang dibagikan kepada pihak ketiga.',
     },
     {
-      title: '3. Penggunaan Google Drive',
-      content: 'Layanan kami terintegrasi dengan tautan folder Google Drive yang kamu sediakan. Platform hanya mengakses thumbnail tanpa memodifikasi file asli.',
+      title: '3. Penggunaan dan Batasan Teknis Google Drive',
+      content:
+        'Layanan kami terintegrasi dengan tautan folder Google Drive publik ("Siapa saja yang memiliki link") yang kamu sediakan. Platform hanya membaca metadata nama file dan memuat thumbnail foto melalui CDN Google Drive tanpa memodifikasi atau menghapus file asli di Drive kamu. Ketersediaan pemuatan foto bergantung pada server dan kuota API Google Drive.',
     },
     {
-      title: '4. Batas Tanggung Jawab',
-      content: 'by.marryland tidak menyimpan file foto resolusi tinggi di server publik. Kami hanya memproses seleksi dan thumbnail.',
+      title: '4. Batas Tanggung Jawab Penyimpanan',
+      content:
+        'by.marryland tidak menyimpan file foto resolusi tinggi di server publik kami. Kami hanya menyimpan relasi seleksi, catatan kurasi, dan token akses.',
+    },
+    {
+      title: '5. Tautan Album Keluarga dan Proteksi PIN',
+      content:
+        'Fitur Tautan Album Keluarga menyediakan tautan sekunder ber-token acak 128-bit yang dapat dilengkapi opsi PIN proteksi (4-6 angka) dan batas waktu kedaluwarsa. Perlindungan PIN ini merupakan lapisan pengamanan tingkat aplikasi (application-level protection). Karena folder Google Drive asal berstatus "Siapa saja yang memiliki link", siapa pun yang memegang tautan folder Google Drive asli tetap dapat mengakses file secara mandiri di luar platform kami.',
+    },
+    {
+      title: '6. Pembatalan Tautan dan Hak Akses',
+      content:
+        'Fotografer dapat kapan saja memperbarui token tautan album, mengubah kode PIN, menonaktifkan album keluarga, atau menghapus galeri secara permanen melalui Dashboard Fotografer.',
     },
   ];
 
@@ -39,7 +53,9 @@ export default function TermsPage() {
         {clauses.map((clause: any, idx: number) => (
           <section key={idx} className="mb-8 border-b border-garis/40 pb-6 last:border-b-0">
             <h2 className="text-lg font-serif font-normal mb-3 text-tinta">{clause.title}</h2>
-            <p className="text-tinta-lembut leading-relaxed text-sm whitespace-pre-line font-sans">{clause.content}</p>
+            <p className="text-tinta-lembut leading-relaxed text-sm whitespace-pre-line font-sans">
+              {clause.content}
+            </p>
           </section>
         ))}
       </div>
