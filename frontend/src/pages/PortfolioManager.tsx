@@ -88,10 +88,14 @@ export default function PortfolioManager() {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+  const [detectedPhotoMeta, setDetectedPhotoMeta] = useState<{
+    width: number;
+    height: number;
+    orientation: 'landscape' | 'portrait' | 'square';
+  } | null>(null);
   const [photoCaption, setPhotoCaption] = useState('');
   const [photoAlt, setPhotoAlt] = useState('');
   const [photoSlot, setPhotoSlot] = useState<PortfolioPhotoItem['slot']>('gallery');
-  const [photoEventSlug, setPhotoEventSlug] = useState('akad');
   const [photoFocal, setPhotoFocal] = useState('center');
 
   // Validation modal state
@@ -451,8 +455,6 @@ export default function PortfolioManager() {
         data: { publicUrl },
       } = supabase.storage.from('media-library').getPublicUrl(fileName);
 
-      const matchedEv = eventTypes.find((e) => e.slug === photoEventSlug);
-
       const targetColId = selectedCollection?.id?.startsWith('new-') || selectedCollection?.id?.startsWith('col-')
         ? null
         : selectedCollection?.id;
@@ -464,9 +466,7 @@ export default function PortfolioManager() {
         alt: photoAlt || photoCaption || null,
         slot: photoSlot || 'gallery',
         collection_id: targetColId,
-        event_type_id: matchedEv?.id || null,
-        event_type_slug: photoEventSlug,
-        category: photoEventSlug,
+        category: 'wedding',
         focal: photoFocal,
         width,
         height,
@@ -496,8 +496,11 @@ export default function PortfolioManager() {
       setShowPhotoModal(false);
       setUploadFile(null);
       setUploadPreview(null);
+      setDetectedPhotoMeta(null);
       setPhotoCaption('');
       setPhotoAlt('');
+      setPhotoSlot('gallery');
+      setPhotoFocal('center');
     } catch (err: any) {
       toast.error('Gagal mengupload foto: ' + (err.message || 'Coba lagi'));
     } finally {
@@ -2155,7 +2158,7 @@ export default function PortfolioManager() {
 
                         <div className="flex items-center justify-between pt-2 border-t border-garis">
                           <span className="text-[10px] text-tinta-lembut uppercase font-mono truncate max-w-[80px]">
-                            {photo.event_type_slug || 'Umum'}
+                            {photo.width && photo.height ? (photo.width > photo.height ? 'Lanskap' : 'Potret') : 'Foto'}
                           </span>
 
                           <div className="flex items-center gap-1">
@@ -2328,7 +2331,15 @@ export default function PortfolioManager() {
       {/* ========================================================================= */}
       {showPhotoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowPhotoModal(false)} />
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => {
+              setShowPhotoModal(false);
+              setUploadFile(null);
+              setUploadPreview(null);
+              setDetectedPhotoMeta(null);
+            }}
+          />
           <div className="relative bg-white rounded-[2px] border border-garis w-full max-w-lg p-6 shadow-elevated z-10 max-h-[90vh] overflow-y-auto">
             <h3 className="font-serif text-xl font-normal mb-4 text-tinta">Upload Foto Portofolio</h3>
 
@@ -2341,7 +2352,16 @@ export default function PortfolioManager() {
                   const file = e.target.files?.[0];
                   if (file) {
                     setUploadFile(file);
-                    setUploadPreview(URL.createObjectURL(file));
+                    const url = URL.createObjectURL(file);
+                    setUploadPreview(url);
+                    const img = new Image();
+                    img.onload = () => {
+                      const w = img.naturalWidth;
+                      const h = img.naturalHeight;
+                      const orientation = w > h ? 'landscape' : h > w ? 'portrait' : 'square';
+                      setDetectedPhotoMeta({ width: w, height: h, orientation });
+                    };
+                    img.src = url;
                   }
                 }}
                 className="w-full text-xs font-mono text-tinta"
@@ -2349,8 +2369,111 @@ export default function PortfolioManager() {
             </div>
 
             {uploadPreview && (
-              <div className="aspect-[16/10] bg-[#f7f5f0] rounded-[2px] overflow-hidden mb-4 border border-garis">
-                <img src={uploadPreview} alt="Preview" className="w-full h-full object-cover" />
+              <div className="mb-4 space-y-3">
+                {/* Interactive Preview Container with Dynamic Slot Aspect Ratio */}
+                <div
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+                    const xPos = x < 0.35 ? 'left' : x > 0.65 ? 'right' : 'center';
+                    const yPos = y < 0.35 ? 'top' : y > 0.65 ? 'bottom' : 'center';
+                    let val = 'center';
+                    if (yPos === 'center' && xPos === 'center') val = 'center';
+                    else if (yPos === 'center') val = `center ${xPos}`;
+                    else if (xPos === 'center') val = `${yPos} center`;
+                    else val = `${yPos} ${xPos}`;
+                    setPhotoFocal(val);
+                  }}
+                  className={`cursor-crosshair relative bg-[#f7f5f0] rounded-[2px] overflow-hidden border border-garis transition-all ${
+                    photoSlot === 'hero'
+                      ? detectedPhotoMeta?.orientation === 'landscape'
+                        ? 'aspect-[4/3] sm:aspect-[3/2]'
+                        : 'aspect-[3/4]'
+                      : photoSlot === 'highlight'
+                      ? detectedPhotoMeta?.orientation === 'landscape'
+                        ? 'aspect-[4/3]'
+                        : 'aspect-[3/4]'
+                      : photoSlot === 'about_1'
+                      ? 'aspect-[3/4]'
+                      : photoSlot === 'about_2'
+                      ? 'aspect-[4/5]'
+                      : photoSlot === 'about_3'
+                      ? 'aspect-[1/1]'
+                      : detectedPhotoMeta?.orientation === 'landscape'
+                      ? 'aspect-[4/3]'
+                      : 'aspect-[3/4]'
+                  }`}
+                  title="Klik bagian foto mana saja untuk menetapkan titik fokus"
+                >
+                  <img
+                    src={uploadPreview}
+                    alt="Preview"
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                    style={{ objectPosition: photoFocal }}
+                  />
+
+                  {/* Focal Indicator Ring Overlay */}
+                  <div
+                    className="absolute w-8 h-8 rounded-full border-2 border-merah bg-merah/25 shadow-md pointer-events-none -translate-x-1/2 -translate-y-1/2 transition-all duration-200 flex items-center justify-center"
+                    style={{
+                      top:
+                        photoFocal.includes('top')
+                          ? '22%'
+                          : photoFocal.includes('bottom')
+                          ? '78%'
+                          : '50%',
+                      left:
+                        photoFocal.includes('left')
+                          ? '22%'
+                          : photoFocal.includes('right')
+                          ? '78%'
+                          : '50%',
+                    }}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-merah shadow-sm" />
+                  </div>
+
+                  <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/75 text-white text-[10px] font-mono rounded-[2px]">
+                    Klik gambar untuk ubah titik fokus
+                  </span>
+                </div>
+
+                {/* Detected Orientation & Friendly Guidance */}
+                {detectedPhotoMeta && (
+                  <div className="p-3 bg-kertas-tua/50 border border-garis rounded-[2px] space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`px-2 py-0.5 rounded-[2px] font-mono text-[10px] font-semibold uppercase ${
+                            detectedPhotoMeta.orientation === 'landscape'
+                              ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                              : detectedPhotoMeta.orientation === 'portrait'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                              : 'bg-neutral-100 text-neutral-800 border border-neutral-300'
+                          }`}
+                        >
+                          {detectedPhotoMeta.orientation === 'landscape'
+                            ? 'Lanskap (Mendatar)'
+                            : detectedPhotoMeta.orientation === 'portrait'
+                            ? 'Potret (Tegak)'
+                            : 'Persegi (1:1)'}
+                        </span>
+                        <span className="font-mono text-tinta-lembut text-[11px]">
+                          {detectedPhotoMeta.width} × {detectedPhotoMeta.height} px
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-mono text-merah font-medium">
+                        Fokus: {photoFocal}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-tinta-lembut leading-relaxed">
+                      {detectedPhotoMeta.orientation === 'landscape'
+                        ? 'Foto lanskap akan otomatis ditampilkan proporsional mendatar (tanpa memotong subjek pengantin di kiri/kanan).'
+                        : 'Foto potret akan ditampilkan format potret tinggi dan anggun sesuai format aslinya.'}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -2373,51 +2496,67 @@ export default function PortfolioManager() {
                   onChange={(e) => setPhotoSlot(e.target.value as any)}
                   className="w-full border border-garis rounded-[2px] px-3 py-2 text-sm bg-white text-tinta focus:outline-none focus:border-merah"
                 >
-                  <option value="gallery">Galeri Arsip (Biasa)</option>
-                  <option value="hero">Hero (Foto Utama Atas)</option>
-                  <option value="about_1">Tentang Koleksi - Foto 1</option>
-                  <option value="about_2">Tentang Koleksi - Foto 2</option>
-                  <option value="about_3">Tentang Koleksi - Foto 3</option>
-                  <option value="highlight">Momen Sorotan (Dark Section)</option>
-                  <option value="event_cover">Sampul Jenis Acara</option>
+                  <option value="gallery">Galeri Arsip (Grid Foto Justified)</option>
+                  <option value="hero">Hero (Foto Utama Atas - Otomatis Potret / Lanskap)</option>
+                  <option value="highlight">Momen Sorotan (Pita Infinity Bergulir)</option>
+                  <option value="about_1">Tentang Koleksi - Foto 1 (Kolase Utama)</option>
+                  <option value="about_2">Tentang Koleksi - Foto 2 (Kolase Pendamping)</option>
+                  <option value="about_3">Tentang Koleksi - Foto 3 (Kolase Pendamping)</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">Jenis Acara</label>
-                <select
-                  value={photoEventSlug}
-                  onChange={(e) => setPhotoEventSlug(e.target.value)}
-                  className="w-full border border-garis rounded-[2px] px-3 py-2 text-sm bg-white text-tinta focus:outline-none focus:border-merah"
-                >
-                  {eventTypes.map((evt) => (
-                    <option key={evt.id} value={evt.slug}>
-                      {evt.name}
-                    </option>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-mono uppercase text-tinta-lembut">
+                    Titik Fokus (Focal Point)
+                  </label>
+                  <span className="text-[10px] font-mono text-tinta-lembut">
+                    Klik gambar atau pilih tombol di bawah
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-1.5 max-w-[280px]">
+                  {[
+                    { id: 'top left', label: 'Kiri Atas' },
+                    { id: 'top center', label: 'Tengah Atas' },
+                    { id: 'top right', label: 'Kanan Atas' },
+                    { id: 'center left', label: 'Kiri' },
+                    { id: 'center', label: 'Tengah' },
+                    { id: 'center right', label: 'Kanan' },
+                    { id: 'bottom left', label: 'Kiri Bawah' },
+                    { id: 'bottom center', label: 'Tengah Bawah' },
+                    { id: 'bottom right', label: 'Kanan Bawah' },
+                  ].map((btn) => (
+                    <button
+                      key={btn.id}
+                      type="button"
+                      onClick={() => setPhotoFocal(btn.id)}
+                      className={`py-1 px-2 text-[11px] font-mono rounded-[2px] border text-center transition-all ${
+                        photoFocal === btn.id
+                          ? 'bg-merah text-white border-merah font-semibold shadow-sm'
+                          : 'bg-white border-garis text-tinta hover:border-tinta'
+                      }`}
+                    >
+                      {btn.label}
+                    </button>
                   ))}
-                </select>
-              </div>
+                </div>
 
-              <div>
-                <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">Titik Fokus (Focal Point)</label>
-                <select
-                  value={photoFocal}
-                  onChange={(e) => setPhotoFocal(e.target.value)}
-                  className="w-full border border-garis rounded-[2px] px-3 py-2 text-sm bg-white text-tinta capitalize focus:outline-none focus:border-merah"
-                >
-                  <option value="center">Center (Tengah)</option>
-                  <option value="top center">Top Center (Atas)</option>
-                  <option value="bottom center">Bottom Center (Bawah)</option>
-                  <option value="center left">Center Left (Kiri)</option>
-                  <option value="center right">Center Right (Kanan)</option>
-                </select>
+                <p className="text-[11px] text-tinta-lembut mt-1.5 leading-relaxed">
+                  Titik fokus menjaga wajah atau bagian penting pengantin tetap berada di pusat pandangan saat dibuka di layar ponsel (HP).
+                </p>
               </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-garis">
               <button
                 type="button"
-                onClick={() => setShowPhotoModal(false)}
+                onClick={() => {
+                  setShowPhotoModal(false);
+                  setUploadFile(null);
+                  setUploadPreview(null);
+                  setDetectedPhotoMeta(null);
+                }}
                 className="px-4 py-2 border border-garis rounded-[2px] text-xs font-medium text-tinta-lembut hover:text-tinta min-h-[44px]"
               >
                 Batal

@@ -67,6 +67,22 @@ export function CollectionDetailView({
   const aboutPhotos = photos.filter((p) => p.slot?.startsWith('about_'));
   const highlightPhotos = photos.filter((p) => p.slot === 'highlight');
 
+  // Dynamic orientation detection for Hero Photo (portrait vs landscape)
+  const [heroOrientation, setHeroOrientation] = useState<'portrait' | 'landscape'>(() => {
+    if (heroPhoto?.width && heroPhoto?.height) {
+      return heroPhoto.width > heroPhoto.height ? 'landscape' : 'portrait';
+    }
+    return 'portrait';
+  });
+
+  useEffect(() => {
+    if (heroPhoto?.width && heroPhoto?.height) {
+      setHeroOrientation(heroPhoto.width > heroPhoto.height ? 'landscape' : 'portrait');
+    }
+  }, [heroPhoto?.width, heroPhoto?.height, heroPhoto?.image_url]);
+
+  const isHeroLandscape = heroOrientation === 'landscape';
+
   // Photos for continuous infinite marquee in highlight section
   const marqueePhotos = useMemo(() => {
     // Prioritize highlight slot photos, supplemented with other collection photos
@@ -190,8 +206,8 @@ export function CollectionDetailView({
             >
               {/* Hero Text Column */}
               <div
-                className={`lg:col-span-7 flex flex-col justify-center ${
-                  heroSide === 'right' ? 'lg:order-1' : 'lg:order-1'
+                className={`${isHeroLandscape ? 'lg:col-span-6' : 'lg:col-span-7'} flex flex-col justify-center ${
+                  heroSide === 'right' ? 'lg:order-2' : 'lg:order-1'
                 }`}
               >
                 <span className="inline-block text-xs uppercase tracking-[0.25em] font-semibold text-[var(--collection-accent)] mb-4">
@@ -236,18 +252,24 @@ export function CollectionDetailView({
 
               {/* Hero Image Column */}
               <div
-                className={`lg:col-span-5 ${
-                  heroSide === 'right' ? 'lg:order-2' : 'lg:order-2'
+                className={`${isHeroLandscape ? 'lg:col-span-6' : 'lg:col-span-5'} ${
+                  heroSide === 'right' ? 'lg:order-1' : 'lg:order-2'
                 }`}
               >
                 <div className="relative group">
-                  <div className="aspect-[3/4] rounded-[2px] overflow-hidden border border-[var(--collection-border)] shadow-soft bg-[var(--collection-muted-paper)] relative">
+                  <div className={`${isHeroLandscape ? 'aspect-[4/3] sm:aspect-[3/2]' : 'aspect-[3/4]'} rounded-[2px] overflow-hidden border border-[var(--collection-border)] shadow-soft bg-[var(--collection-muted-paper)] relative`}>
                     {heroPhoto ? (
                       <img
                         src={heroPhoto.image_url}
                         alt={heroPhoto.alt || heroPhoto.caption || collection.name}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         style={{ objectPosition: heroPhoto.focal || 'center' }}
+                        onLoad={(e) => {
+                          const { naturalWidth, naturalHeight } = e.currentTarget;
+                          if (naturalWidth && naturalHeight) {
+                            setHeroOrientation(naturalWidth > naturalHeight ? 'landscape' : 'portrait');
+                          }
+                        }}
                         decoding="async"
                       />
                     ) : (
@@ -256,7 +278,7 @@ export function CollectionDetailView({
                           Foto Sampul Hero
                         </span>
                         <span className="text-xs text-[var(--collection-ink-muted)] font-mono">
-                          Format potret rasio 3:4 disarankan
+                          Format potret (3:4) atau lanskap (4:3) otomatis didukung
                         </span>
                       </div>
                     )}
@@ -445,21 +467,29 @@ export function CollectionDetailView({
           {marqueePhotos.length > 0 ? (
             <div className="w-full overflow-hidden marquee-mask pointer-events-none select-none py-2">
               <div className="marquee-track-continuous gap-6 md:gap-8 items-center pointer-events-none select-none">
-                {[...marqueePhotos, ...marqueePhotos].map((photo, idx) => (
-                  <div
-                    key={`${photo.id || 'marquee'}-${idx}`}
-                    className="w-64 sm:w-80 md:w-96 aspect-[3/4] shrink-0 rounded-[2px] overflow-hidden border border-white/10 shadow-elevated bg-white/5 relative pointer-events-none select-none"
-                  >
-                    <img
-                      src={photo.image_url}
-                      alt={photo.caption || collection?.name || 'Momen Sorotan'}
-                      className="w-full h-full object-cover pointer-events-none select-none"
-                      loading="lazy"
-                      draggable={false}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-                  </div>
-                ))}
+                {[...marqueePhotos, ...marqueePhotos].map((photo, idx) => {
+                  const isLandscape =
+                    photo.width && photo.height ? photo.width > photo.height : false;
+
+                  return (
+                    <div
+                      key={`${photo.id || 'marquee'}-${idx}`}
+                      className={`h-72 sm:h-80 md:h-96 shrink-0 rounded-[2px] overflow-hidden border border-white/10 shadow-elevated bg-white/5 relative pointer-events-none select-none ${
+                        isLandscape ? 'aspect-[4/3]' : 'aspect-[3/4]'
+                      }`}
+                    >
+                      <img
+                        src={photo.image_url}
+                        alt={photo.caption || collection?.name || 'Momen Sorotan'}
+                        className="w-full h-full object-cover pointer-events-none select-none"
+                        style={{ objectPosition: photo.focal || 'center' }}
+                        loading="lazy"
+                        draggable={false}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : (
