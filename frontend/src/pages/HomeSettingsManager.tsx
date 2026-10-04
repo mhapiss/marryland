@@ -39,10 +39,62 @@ export default function HomeSettingsManager() {
   
   const [photosData, setPhotosData] = useState<any[]>([]);
   const [originalPhotosData, setOriginalPhotosData] = useState<any[]>([]);
+
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [portfolioOptions, setPortfolioOptions] = useState<any[]>([]);
+  const [loadingPicker, setLoadingPicker] = useState(false);
   
   const [isDirty, setIsDirty] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const resolvePhotoUrl = (path: string) => {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    const clean = path.replace(/^\/+/, '');
+    return supabase.storage.from('home-media').getPublicUrl(clean).data.publicUrl;
+  };
+
+  const openPortfolioPicker = async () => {
+    setIsPickerOpen(true);
+    if (portfolioOptions.length === 0) {
+      try {
+        setLoadingPicker(true);
+        const { data, error } = await supabase
+          .from('portfolio_photos')
+          .select('id, image_url, caption, alt, category, slot')
+          .eq('is_published', true)
+          .order('order_index', { ascending: true });
+        if (!error && data) {
+          setPortfolioOptions(data);
+        }
+      } catch (err) {
+        console.error('Error loading portfolio photos:', err);
+      } finally {
+        setLoadingPicker(false);
+      }
+    }
+  };
+
+  const selectPhotoFromPortfolio = (photoItem: any) => {
+    const baseId = crypto.randomUUID();
+    const newPhoto = {
+      id: baseId,
+      slot: activeSection,
+      position: photosData.filter(p => p.slot === activeSection).length,
+      path: photoItem.image_url,
+      width: 1200,
+      height: 1600,
+      blur_data: '',
+      focal: 'top',
+      alt: photoItem.alt || photoItem.category || 'Momen Pilihan',
+      title: photoItem.caption || (activeSection === 'marquee' ? "TODAY'S CHAPTER" : ''),
+      description: photoItem.caption || '',
+    };
+    setPhotosData(prev => [...prev, newPhoto]);
+    setIsDirty(true);
+    toast.success('Foto dari portofolio ditambahkan');
+  };
 
   useEffect(() => {
     if (!isAdmin) {
@@ -376,34 +428,40 @@ export default function HomeSettingsManager() {
                   <h3 className="text-lg font-serif font-normal text-tinta mb-4">Foto Bagian Ini</h3>
                   
                   <div className="space-y-6">
-                    {sectionPhotos.map((photo, index) => (
-                      <div key={photo.id} className="flex gap-6 p-4 border border-garis rounded-[2px] bg-white">
-                        <div className="w-48 flex flex-col gap-2">
+                    {sectionPhotos.map((photo) => (
+                      <div key={photo.id} className="flex flex-col sm:flex-row gap-6 p-4 border border-garis rounded-[2px] bg-white">
+                        <div className="w-full sm:w-48 flex flex-col gap-2">
                           <img 
-                            src={supabase.storage.from('home-media').getPublicUrl(photo.path).data.publicUrl} 
-                            alt={photo.alt} 
-                            className="w-full h-auto rounded-[2px] object-cover aspect-video bg-[#f7f5f0] border border-garis"
+                            src={resolvePhotoUrl(photo.path)} 
+                            alt={photo.alt || 'Pratinjau'} 
+                            className="w-full h-auto rounded-[2px] object-cover aspect-[3/4] bg-[#f7f5f0] border border-garis"
                             style={{ objectPosition: photo.focal || 'center' }}
                           />
                           <button onClick={() => handlePhotoDelete(photo.id)} className="text-xs text-merah font-mono hover:underline text-left">Hapus Foto</button>
                         </div>
                         <div className="flex-1 space-y-4">
                           <div>
-                            <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">Alt Text (Aksesibilitas)</label>
+                            <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">
+                              {activeSection === 'marquee' ? 'Kategori / Tag (misal: Wisuda, Tradisi)' : 'Alt Text (Aksesibilitas)'}
+                            </label>
                             <input 
                               type="text" 
                               className="w-full p-2 border border-garis rounded-[2px] text-xs bg-white text-tinta focus:outline-none focus:border-merah"
                               value={photo.alt || ''}
+                              placeholder={activeSection === 'marquee' ? 'Contoh: Wisuda / Tradisi / Janji Suci' : ''}
                               onChange={e => handlePhotoUpdate(photo.id, { alt: e.target.value })}
                             />
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">Judul (Opsional)</label>
+                              <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">
+                                {activeSection === 'marquee' ? "Judul Poster (misal: TODAY'S CHAPTER)" : 'Judul (Opsional)'}
+                              </label>
                               <input 
                                 type="text" 
                                 className="w-full p-2 border border-garis rounded-[2px] text-xs bg-white text-tinta focus:outline-none focus:border-merah"
                                 value={photo.title || ''}
+                                placeholder={activeSection === 'marquee' ? "Contoh: TODAY'S CHAPTER / JAVANESE TRADITIONS" : ''}
                                 onChange={e => handlePhotoUpdate(photo.id, { title: e.target.value })}
                               />
                             </div>
@@ -426,16 +484,34 @@ export default function HomeSettingsManager() {
                               </select>
                             </div>
                           </div>
+                          <div>
+                            <label className="block text-xs font-mono uppercase text-tinta-lembut mb-1">Takarir / Subjudul (Opsional)</label>
+                            <input 
+                              type="text" 
+                              className="w-full p-2 border border-garis rounded-[2px] text-xs bg-white text-tinta focus:outline-none focus:border-merah"
+                              value={photo.description || ''}
+                              placeholder="Keterangan singkat momen"
+                              onChange={e => handlePhotoUpdate(photo.id, { description: e.target.value })}
+                            />
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="mt-4">
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
                     <label className="inline-block px-5 py-2.5 bg-merah text-white rounded-[2px] text-xs font-medium cursor-pointer hover:bg-merah-hover transition-colors min-h-[44px]">
-                      Tambah Foto
+                      Unggah Foto Baru
                       <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={e => handlePhotoUpload(activeSection, e)} />
                     </label>
+
+                    <button
+                      type="button"
+                      onClick={openPortfolioPicker}
+                      className="px-5 py-2.5 bg-white border border-garis text-tinta rounded-[2px] text-xs font-medium hover:bg-kertas-tua/60 transition-colors min-h-[44px]"
+                    >
+                      Pilih dari Foto Portofolio
+                    </button>
                   </div>
                 </div>
               )}
@@ -443,6 +519,86 @@ export default function HomeSettingsManager() {
           )}
         </div>
       </div>
+
+      {/* Modal Dialog: Pilih dari Portofolio */}
+      {isPickerOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-4xl max-h-[85vh] rounded-[2px] border border-garis shadow-2xl flex flex-col">
+            <div className="p-4 sm:p-5 border-b border-garis flex items-center justify-between">
+              <div>
+                <h3 className="font-serif text-lg text-tinta">Pilih Foto dari Portofolio</h3>
+                <p className="text-xs text-tinta-lembut font-mono mt-0.5">
+                  Pilih foto yang ingin dimasukkan khusus ke bagian {currentSchema?.label}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsPickerOpen(false)}
+                className="p-2 text-tinta-lembut hover:text-merah text-sm font-mono"
+              >
+                ✕ Tutup
+              </button>
+            </div>
+
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+              {loadingPicker ? (
+                <div className="py-12 text-center text-xs text-tinta-lembut font-mono">
+                  Memuat arsip foto portofolio...
+                </div>
+              ) : portfolioOptions.length === 0 ? (
+                <div className="py-12 text-center text-xs text-tinta-lembut font-mono">
+                  Belum ada foto portofolio yang tersimpan.
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {portfolioOptions.map((opt) => (
+                    <div
+                      key={opt.id}
+                      className="group relative border border-garis rounded-[2px] overflow-hidden bg-kertas-tua flex flex-col hover:border-merah transition-all"
+                    >
+                      <div className="aspect-[3/4] w-full overflow-hidden bg-black/10">
+                        <img
+                          src={opt.image_url}
+                          alt={opt.alt || opt.caption || 'Foto Portofolio'}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="p-2 bg-white flex flex-col justify-between flex-1">
+                        <div>
+                          <span className="text-[10px] font-mono uppercase bg-kertas-tua px-1.5 py-0.5 rounded-[2px] text-tinta-lembut block w-fit mb-1">
+                            {opt.category || 'Portofolio'}
+                          </span>
+                          <p className="text-[11px] font-serif line-clamp-1 text-tinta">
+                            {opt.caption || opt.alt || 'Tanpa Takarir'}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => selectPhotoFromPortfolio(opt)}
+                          className="mt-2 w-full py-1.5 bg-merah text-white text-[11px] font-medium rounded-[2px] hover:bg-merah-hover transition-colors"
+                        >
+                          + Pilih Foto Ini
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-garis flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsPickerOpen(false)}
+                className="px-5 py-2 bg-kertas-tua border border-garis text-tinta text-xs font-medium rounded-[2px] hover:bg-garis transition-colors"
+              >
+                Selesai
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Save Bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-garis p-4 flex justify-between items-center z-50">
