@@ -77,18 +77,18 @@ export default function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-desc"
-        className="relative w-full max-w-sm bg-white rounded-2xl shadow-elevated p-6 animate-slide-up"
+        className="relative w-full max-w-sm bg-white rounded-[2px] border border-garis shadow-xl p-6 font-sans text-tinta animate-slide-up"
         onKeyDown={handleKeyDown}
       >
         <h3
           id="confirm-dialog-title"
-          className="font-serif text-lg font-bold text-text mb-2"
+          className="font-serif text-lg font-normal text-tinta mb-2"
         >
           {title}
         </h3>
         <p
           id="confirm-dialog-desc"
-          className="text-sm text-muted leading-relaxed mb-6"
+          className="text-xs text-tinta-lembut leading-relaxed mb-6"
         >
           {message}
         </p>
@@ -98,7 +98,7 @@ export default function ConfirmDialog({
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 btn-outline text-sm py-2.5"
+            className="flex-1 py-2.5 px-3 border border-garis rounded-[2px] text-xs font-medium text-tinta hover:border-merah hover:text-merah transition-colors"
           >
             {cancelLabel}
           </button>
@@ -106,14 +106,10 @@ export default function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className={`flex-1 inline-flex items-center justify-center text-sm py-2.5 rounded-full font-medium transition-all duration-300 active:scale-[0.98] ${
-              destructive
-                ? 'bg-red-500 text-white hover:bg-red-600 disabled:opacity-50'
-                : 'bg-primary text-white hover:bg-primary-500 disabled:opacity-50'
-            }`}
+            className="flex-1 inline-flex items-center justify-center text-xs py-2.5 px-3 rounded-[2px] font-medium transition-colors bg-merah hover:bg-merah-hover text-white disabled:opacity-50"
           >
             {loading && (
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+              <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
             )}
             {confirmLabel}
           </button>

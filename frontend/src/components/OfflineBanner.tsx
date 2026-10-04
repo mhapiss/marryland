@@ -30,10 +30,10 @@ export default function OfflineBanner() {
 
   return (
     <div
-      className={`fixed top-0 inset-x-0 z-40 text-center text-sm font-medium py-2 px-4 transition-all duration-300 ${
+      className={`fixed top-0 inset-x-0 z-50 text-center text-xs font-mono py-2 px-4 transition-all duration-300 ${
         isOnline
-          ? 'bg-green-50 text-green-700 border-b border-green-200'
-          : 'bg-amber-50 text-amber-700 border-b border-amber-200'
+          ? 'bg-kertas-tua text-tinta border-b border-garis'
+          : 'bg-merah text-white border-b border-marun'
       }`}
     >
       {isOnline

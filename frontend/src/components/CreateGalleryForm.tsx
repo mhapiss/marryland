@@ -149,11 +149,15 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
         };
       });
 
-      const { error: photosError } = await supabase
-        .from('gallery_photos')
-        .insert(photosToInsert);
+      const BATCH_SIZE = 500;
+      for (let i = 0; i < photosToInsert.length; i += BATCH_SIZE) {
+        const chunk = photosToInsert.slice(i, i + BATCH_SIZE);
+        const { error: photosError } = await supabase
+          .from('gallery_photos')
+          .insert(chunk);
 
-      if (photosError) throw photosError;
+        if (photosError) throw photosError;
+      }
 
       // Sukses!
       onGalleryCreated(gallery);
@@ -177,35 +181,35 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
   };
 
   return (
-    <div className="card overflow-hidden">
+    <div className="bg-white border border-garis rounded-[2px] overflow-hidden font-sans text-tinta">
       <button
-        className="w-full flex items-center justify-between p-6 text-left hover:bg-primary-50/50 transition-colors"
+        className="w-full flex items-center justify-between p-6 text-left hover:bg-kertas transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary-50 text-primary flex items-center justify-center">
+          <div className="w-8 h-8 rounded-[2px] bg-kertas-tua text-merah border border-garis flex items-center justify-center">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
           </div>
-          <span className="font-serif text-lg font-bold text-text">Buat Galeri Baru</span>
+          <span className="font-serif text-lg font-normal text-tinta">Buat Galeri Baru</span>
         </div>
         <svg
-          className={`w-5 h-5 text-muted transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-tinta-lembut transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
           fill="none" stroke="currentColor" viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       <div className={`transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-        <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-5 border-t border-primary-100/30 pt-5">
+        <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-5 border-t border-garis pt-5">
 
           {/* GDrive URL */}
           <div>
-            <label className="label">
-              Link Folder Google Drive{' '}
-              <span className="badge-required">WAJIB</span>
+            <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">
+              Tautan Folder Google Drive{' '}
+              <span className="text-[10px] text-merah bg-merah/10 border border-merah/25 px-1.5 py-0.5 rounded-[2px] ml-1.5">WAJIB</span>
             </label>
             <input
               name="gdrive_url"
@@ -213,18 +217,18 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
               placeholder="https://drive.google.com/drive/folders/..."
               value={form.gdrive_url}
               onChange={handleChange}
-              className="input"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
             />
-            <p className="text-[11px] text-muted mt-2">
-              Nama klien otomatis diambil dari nama folder. Folder harus di-share "Anyone with the link".
+            <p className="text-[11px] text-tinta-lembut mt-1.5 font-mono">
+              Nama klien diambil otomatis dari nama folder. Pastikan izin berbagi folder: "Siapa saja yang memiliki link".
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="label">
+              <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">
                 Batas Maksimal Pilih{' '}
-                <span className="badge-required">WAJIB</span>
+                <span className="text-[10px] text-merah bg-merah/10 border border-merah/25 px-1.5 py-0.5 rounded-[2px] ml-1.5">WAJIB</span>
               </label>
               <input
                 name="max_photos_selectable"
@@ -232,49 +236,49 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                 min={1}
                 value={form.max_photos_selectable}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
               />
             </div>
             <div>
-              <label className="label">Batas Waktu Klien</label>
+              <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Tenggat Waktu Klien</label>
               <input
                 name="deadline_date"
                 type="date"
                 value={form.deadline_date}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
               />
             </div>
           </div>
 
           <div>
-            <label className="label">Deskripsi Highlight</label>
+            <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Deskripsi / Catatan Pembuka</label>
             <textarea
               name="highlight_description"
-              placeholder="Tambahkan pesan hangat atau highlight untuk klien (opsional)"
+              placeholder="Tambahkan pesan hangat atau petunjuk seleksi untuk klien (opsional)"
               value={form.highlight_description}
               onChange={handleChange}
               rows={2}
-              className="input resize-none"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors resize-none"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="label">Email Klien</label>
+              <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Email Klien</label>
               <input
                 name="client_email"
                 type="email"
                 placeholder="klien@email.com (opsional)"
                 value={form.client_email}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
               />
             </div>
             <div>
-              <label className="label">
+              <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">
                 WhatsApp Klien{' '}
-                <span className="badge-required">WAJIB</span>
+                <span className="text-[10px] text-merah bg-merah/10 border border-merah/25 px-1.5 py-0.5 rounded-[2px] ml-1.5">WAJIB</span>
               </label>
               <input
                 name="client_whatsapp"
@@ -282,32 +286,27 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                 placeholder="08123456789"
                 value={form.client_whatsapp}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
               />
             </div>
           </div>
 
           <label className="flex items-center gap-3 cursor-pointer group w-max">
-            <div className="relative flex items-center justify-center">
-              <input
-                name="allow_download"
-                type="checkbox"
-                checked={form.allow_download}
-                onChange={handleChange}
-                className="peer appearance-none w-5 h-5 border-2 border-primary-200 rounded-md checked:bg-primary checked:border-primary transition-colors cursor-pointer"
-              />
-              <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <span className="text-sm font-medium text-text group-hover:text-primary transition-colors">Izinkan klien mengunduh foto</span>
+            <input
+              name="allow_download"
+              type="checkbox"
+              checked={form.allow_download}
+              onChange={handleChange}
+              className="w-4 h-4 accent-merah rounded-[2px] cursor-pointer"
+            />
+            <span className="text-xs text-tinta-lembut group-hover:text-tinta transition-colors">Izinkan klien mengunduh foto pilihan</span>
           </label>
 
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end pt-4 border-t border-garis">
             <button
               type="submit"
               disabled={!isValid || isLoading}
-              className={`btn-primary px-8 py-2.5 text-sm ${
-                !isValid || isLoading ? 'opacity-50 cursor-not-allowed hover:bg-primary hover:shadow-none hover:scale-100' : ''
-              }`}
+              className="px-8 py-2.5 bg-merah hover:bg-merah-hover text-white text-sm font-medium rounded-[2px] transition-colors disabled:opacity-50"
             >
               {isLoading ? (syncStatus || 'Membuat...') : 'Buat Galeri Sekarang'}
             </button>

@@ -17,6 +17,7 @@ export function useAuth() {
   const determineRole = (u: User | null): UserRole => {
     if (!u) return null;
     if (ADMIN_EMAILS.includes(u.email || '')) return 'admin';
+    if (u.user_metadata?.role === 'admin' || u.app_metadata?.role === 'admin') return 'admin';
     return 'photographer';
   };
 

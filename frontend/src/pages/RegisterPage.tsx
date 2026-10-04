@@ -22,52 +22,51 @@ const RegisterTypeSelection: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-sans text-text ambient-bg">
-      {/* ─────── Decorative Elements ─────── */}
-      <div className="deco-float w-64 h-64 bg-primary-100 top-10 -left-20 blur-3xl"></div>
-      <div className="deco-float-reverse w-96 h-96 bg-primary-200/50 bottom-10 -right-32 blur-[100px]"></div>
-      <div className="w-full max-w-4xl flex flex-col items-center animate-fade-in">
-        <div className="w-full flex justify-between items-center mb-12">
+    <div className="min-h-screen bg-kertas flex flex-col items-center justify-center p-6 font-sans text-tinta">
+      <div className="w-full max-w-4xl flex flex-col items-center">
+        <div className="w-full flex justify-between items-center mb-10">
           <button 
             onClick={() => navigate(-1)} 
-            className="p-2.5 hover:bg-black/5 rounded-full transition-colors duration-200"
+            className="p-2 border border-garis rounded-[2px] hover:border-merah text-tinta hover:text-merah transition-colors"
+            aria-label="Kembali"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
           </button>
-          <Link to="/" className="font-serif text-2xl font-bold tracking-tight">
-            by.<span className="text-primary">marryland</span>
+          <Link to="/" className="font-serif text-2xl tracking-tight text-tinta">
+            by.<span className="text-merah">marryland</span>
           </Link>
-          <div className="w-11"></div> {/* Spacer */}
+          <div className="w-9"></div>
         </div>
         
-        <h1 className="font-serif text-3xl md:text-5xl font-bold mb-4 text-center">
+        <p className="text-xs font-mono uppercase tracking-widest text-merah mb-2 text-center">Registrasi Akun</p>
+        <h1 className="font-serif text-3xl md:text-4xl font-normal mb-3 text-center text-tinta">
           Pilih tipe akun kamu
         </h1>
-        <p className="text-muted text-center mb-12 max-w-lg">
-          Platform yang dirancang khusus untuk mempermudah alur kerja fotografer dan menjaga kenangan klien.
+        <p className="text-tinta-lembut text-center mb-10 max-w-lg text-sm">
+          Platform kurasi dan seleksi foto digital terstruktur untuk alur kerja fotografer dan kenyamanan klien.
         </p>
 
-        <div className="grid md:grid-cols-2 gap-8 w-full max-w-3xl">
+        <div className="grid md:grid-cols-2 gap-6 w-full max-w-3xl">
           <div 
             onClick={() => navigate('/register?type=photographer')}
-            className="card p-10 cursor-pointer flex flex-col items-center text-center group"
+            className="bg-white border border-garis rounded-[2px] p-8 cursor-pointer flex flex-col items-center text-center group hover:border-merah transition-all duration-200"
           >
-            <div className="w-20 h-20 bg-primary-50 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-primary group-hover:text-white transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-glow">
-              <svg className="w-10 h-10 text-primary group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+            <div className="w-16 h-16 bg-kertas-tua/60 border border-garis rounded-[2px] flex items-center justify-center mb-6 group-hover:bg-merah group-hover:border-merah transition-all duration-200">
+              <svg className="w-8 h-8 text-merah group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
             </div>
-            <h2 className="font-serif text-2xl font-bold mb-4 group-hover:text-primary transition-colors">Untuk Fotografer & Studio</h2>
-            <p className="text-muted leading-relaxed">Buat galeri seleksi foto, kelola klien, dan bagikan album kenangan profesional dengan branding studio kamu.</p>
+            <h2 className="font-serif text-xl font-normal mb-2 text-tinta group-hover:text-merah transition-colors">Untuk Fotografer & Studio</h2>
+            <p className="text-tinta-lembut text-xs leading-relaxed">Buat galeri seleksi dari Google Drive, atur batas kuota & tenggat, dan ekspor nama file langsung ke Lightroom.</p>
           </div>
 
           <div 
             onClick={() => navigate('/register?type=family')}
-            className="card p-10 cursor-pointer flex flex-col items-center text-center group"
+            className="bg-white border border-garis rounded-[2px] p-8 cursor-pointer flex flex-col items-center text-center group hover:border-merah transition-all duration-200"
           >
-            <div className="w-20 h-20 bg-primary-50 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-primary group-hover:text-white transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-glow">
-              <svg className="w-10 h-10 text-primary group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <div className="w-16 h-16 bg-kertas-tua/60 border border-garis rounded-[2px] flex items-center justify-center mb-6 group-hover:bg-merah group-hover:border-merah transition-all duration-200">
+              <svg className="w-8 h-8 text-merah group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             </div>
-            <h2 className="font-serif text-2xl font-bold mb-4 group-hover:text-primary transition-colors">Untuk Kenangan & Keluarga</h2>
-            <p className="text-muted leading-relaxed">Simpan dan bagikan momen berharga dalam album digital yang indah, aman, dan mudah diakses kapan saja.</p>
+            <h2 className="font-serif text-xl font-normal mb-2 text-tinta group-hover:text-merah transition-colors">Untuk Klien & Keluarga</h2>
+            <p className="text-tinta-lembut text-xs leading-relaxed">Klien tidak perlu mendaftar untuk memilih foto. Cukup buka tautan galeri privat yang dikirimkan oleh fotografermu.</p>
           </div>
         </div>
       </div>
@@ -92,12 +91,12 @@ const PhotographerRegistration: React.FC = () => {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError('Password tidak sama.');
+      setError('Kata sandi konfirmasi tidak cocok.');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password minimal 6 karakter.');
+      setError('Kata sandi minimal 6 karakter.');
       return;
     }
 
@@ -131,123 +130,121 @@ const PhotographerRegistration: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-sans text-text ambient-bg">
-      {/* ─────── Decorative Elements ─────── */}
-      <div className="deco-float w-64 h-64 bg-primary-100 top-10 -left-20 blur-3xl"></div>
-      <div className="deco-float-reverse w-96 h-96 bg-primary-200/50 bottom-10 -right-32 blur-[100px]"></div>
-      <div className="w-full max-w-[440px] mt-8 card p-10 animate-fade-in">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-full flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-kertas flex flex-col items-center justify-center p-6 font-sans text-tinta">
+      <div className="w-full max-w-[440px] bg-white border border-garis rounded-[2px] p-8 sm:p-10 relative z-10">
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-full flex justify-between items-center mb-6">
             <button 
               onClick={() => navigate('/register')} 
-              className="p-2 -ml-2 hover:bg-black/5 rounded-full transition-colors"
+              className="p-1.5 border border-garis rounded-[2px] hover:border-merah text-tinta hover:text-merah transition-colors"
+              aria-label="Kembali"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </button>
-            <Link to="/" className="font-serif text-xl font-bold">by.<span className="text-primary">marryland</span></Link>
-            <div className="w-9"></div>
+            <Link to="/" className="font-serif text-xl tracking-tight text-tinta">by.<span className="text-merah">marryland</span></Link>
+            <div className="w-7"></div>
           </div>
           
-          <div className="text-[10px] font-bold tracking-[0.2em] text-primary bg-primary-50 px-3 py-1 rounded-full uppercase mb-4 border border-primary-100">
-            FOR PHOTOGRAPHERS
+          <div className="text-[10px] font-mono tracking-[0.2em] text-merah bg-kertas-tua/60 px-3 py-1 rounded-[2px] uppercase mb-3 border border-garis">
+            Untuk Fotografer
           </div>
-          <h1 className="font-serif text-3xl font-bold text-center">Buat Akun</h1>
+          <h1 className="font-serif text-2xl sm:text-3xl font-normal text-center text-tinta">Buat Akun Studio</h1>
         </div>
 
         {/* Google Login */}
         <button 
           type="button"
           onClick={signInWithGoogle}
-          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-xl py-3 px-4 font-medium hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow mb-8"
+          className="w-full flex items-center justify-center gap-3 bg-white border border-garis rounded-[2px] py-2.5 px-4 text-sm font-medium text-tinta hover:bg-kertas transition-colors mb-6"
         >
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-4 h-4" alt="Google" />
           Daftar dengan Google
         </button>
 
-        <div className="flex items-center gap-4 mb-8">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <div className="text-[10px] font-bold text-muted tracking-widest uppercase">ATAU DENGAN EMAIL</div>
-          <div className="flex-1 h-px bg-gray-200"></div>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex-1 h-px bg-garis"></div>
+          <div className="text-[10px] font-mono text-tinta-lembut tracking-widest uppercase">ATAU DENGAN EMAIL</div>
+          <div className="flex-1 h-px bg-garis"></div>
         </div>
 
         {error && (
-          <div className="bg-red-50/80 border border-red-100 text-red-600 p-4 rounded-xl text-sm mb-6 flex items-start gap-3">
-            <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div className="bg-merah/5 border border-merah/25 text-merah p-3.5 rounded-[2px] text-xs mb-6 flex items-start gap-2.5">
+            <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="label">Nama Lengkap</label>
+            <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Nama Lengkap / Studio</label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="input"
-              placeholder="Nama kamu"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
+              placeholder="Nama kamu atau nama studio"
             />
           </div>
 
           <div>
-            <label className="label">Email</label>
+            <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="input"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
               placeholder="nama@email.com"
             />
           </div>
 
           <div>
-            <label className="label">Password</label>
+            <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Kata Sandi</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input pr-16"
-                placeholder="Buat password"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] pr-16 focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
+                placeholder="Buat kata sandi"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-primary font-medium hover:text-primary-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-merah font-medium hover:text-merah-hover"
               >
                 {showPassword ? 'Tutup' : 'Lihat'}
               </button>
             </div>
-            <p className="text-[11px] text-muted mt-2">Minimal 6 karakter.</p>
+            <p className="text-[11px] text-tinta-lembut mt-1">Minimal 6 karakter.</p>
           </div>
 
           <div>
-            <label className="label">Ulangi Password</label>
+            <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Ulangi Kata Sandi</label>
             <input
               type={showPassword ? 'text' : 'password'}
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="input"
-              placeholder="Ketik ulang password"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
+              placeholder="Ketik ulang kata sandi"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full mt-4"
+            className="w-full py-2.5 px-4 bg-merah hover:bg-merah-hover text-white text-sm font-medium rounded-[2px] transition-colors disabled:opacity-50 mt-2"
           >
             {loading ? 'Mendaftar...' : 'Buat Akun Sekarang'}
           </button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-muted">
+        <div className="mt-6 text-center text-xs text-tinta-lembut">
           Sudah punya akun?{' '}
-          <Link to="/login" className="text-primary font-semibold hover:text-primary-600 transition-colors">
+          <Link to="/login" className="text-merah font-medium hover:text-merah-hover transition-colors">
             Masuk di sini
           </Link>
         </div>

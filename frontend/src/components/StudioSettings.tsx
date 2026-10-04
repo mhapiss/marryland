@@ -5,12 +5,12 @@ import { toast } from 'sonner';
 import { TOAST } from '../constants/toastMessages';
 
 const ACCENT_COLORS = [
-  { name: 'Sage Green', value: '#6B8F71' },
-  { name: 'Emerald Soft', value: '#486B4E' },
-  { name: 'Dusty Rose', value: '#C08497' },
-  { name: 'Champagne Gold', value: '#BFA06A' },
-  { name: 'Dusty Blue', value: '#6B8CAE' },
-  { name: 'Terracotta', value: '#C06B52' },
+  { name: 'Merah Vintage', value: '#9B2C24' },
+  { name: 'Marun Tua', value: '#3A0F0D' },
+  { name: 'Merah Spidol', value: '#C93A2E' },
+  { name: 'Hijau Zaitun', value: '#2D4A27' },
+  { name: 'Arang Klasik', value: '#201515' },
+  { name: 'Emas Kuno', value: '#A8824B' },
 ];
 
 const StudioSettings: React.FC = () => {
@@ -22,7 +22,7 @@ const StudioSettings: React.FC = () => {
     studio_name: '',
     studio_slug: '',
     whatsapp_number: '',
-    accent_color: '#6B8F71',
+    accent_color: '#9B2C24',
   });
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const StudioSettings: React.FC = () => {
         studio_name: user.user_metadata.studio_name || '',
         studio_slug: user.user_metadata.studio_slug || '',
         whatsapp_number: user.user_metadata.whatsapp_number || '',
-        accent_color: user.user_metadata.accent_color || '#BFA06A',
+        accent_color: user.user_metadata.accent_color || '#9B2C24',
       });
     }
   }, [user]);
@@ -142,32 +142,32 @@ const StudioSettings: React.FC = () => {
   };
 
   return (
-    <div className="card p-8">
+    <div className="bg-white border border-garis rounded-[2px] p-8 font-sans text-tinta">
       <div className="mb-8">
-        <h2 className="font-serif text-2xl font-bold text-text">Identitas Studio</h2>
-        <p className="text-muted text-sm mt-1">Branding ini akan ditampilkan di halaman seleksi klien kamu.</p>
+        <h2 className="font-serif text-2xl font-normal text-tinta">Identitas Studio</h2>
+        <p className="text-tinta-lembut text-xs mt-1">Branding ini akan ditampilkan di galeri seleksi klien kamu.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
 
         {/* Nama Studio */}
         <div>
-          <label className="label">Nama Studio</label>
+          <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Nama Studio</label>
           <input
             name="studio_name"
             type="text"
-            placeholder="by.marryland photography"
+            placeholder="Contoh: Sanggar Foto Marryland"
             value={form.studio_name}
             onChange={handleChange}
-            className="input"
+            className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
           />
         </div>
 
         {/* Nama Studio di Link */}
         <div>
-          <label className="label">Nama Studio di Link</label>
+          <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Nama Studio di Link</label>
           <div className="flex items-center">
-            <span className="bg-background border border-primary-100 border-r-0 px-4 py-3 rounded-l-xl text-muted text-sm shrink-0 font-mono">
+            <span className="bg-kertas border border-garis border-r-0 px-3.5 py-2.5 rounded-l-[2px] text-tinta-lembut text-xs shrink-0 font-mono">
               by-marryland.app/
             </span>
             <input
@@ -176,82 +176,83 @@ const StudioSettings: React.FC = () => {
               placeholder="slug-studio"
               value={form.studio_slug}
               onChange={handleChange}
-              className="input rounded-l-none"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-r-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
             />
           </div>
         </div>
 
         {/* Logo Studio */}
         <div>
-          <label className="label mb-2">Logo Studio</label>
+          <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-2">Logo Studio</label>
           <div className="flex items-center gap-5">
             {logoPreview ? (
-              <div className="w-20 h-20 bg-background rounded-2xl border border-primary-100/50 p-2 shadow-sm">
+              <div className="w-20 h-20 bg-kertas rounded-[2px] border border-garis p-2">
                 <img src={logoPreview} alt="Logo" className="w-full h-full object-contain" />
               </div>
             ) : (
-              <div className="w-20 h-20 bg-background rounded-2xl flex items-center justify-center text-muted border border-dashed border-primary-200">
+              <div className="w-20 h-20 bg-kertas rounded-[2px] flex items-center justify-center text-tinta-lembut border border-dashed border-garis">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               </div>
             )}
             <div>
-              <label className="inline-flex items-center justify-center bg-white border border-primary-100 text-text text-sm px-5 py-2.5 rounded-xl hover:bg-primary-50 hover:text-primary transition-colors font-medium cursor-pointer">
-                Upload Logo
+              <label className="inline-flex items-center justify-center bg-white border border-garis text-tinta text-xs px-4 py-2 rounded-[2px] hover:border-merah hover:text-merah transition-colors font-medium cursor-pointer">
+                Unggah Logo
                 <input type="file" accept="image/png" className="hidden" onChange={handleLogoUpload} />
               </label>
-              <p className="text-[11px] text-muted mt-2">Format PNG transparan, maksimal 2MB.</p>
+              <p className="text-[11px] text-tinta-lembut mt-1.5 font-mono">Format PNG transparan, maksimal 2MB.</p>
             </div>
           </div>
         </div>
 
         {/* Nomor WhatsApp */}
         <div>
-          <label className="label">Nomor WhatsApp</label>
+          <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Nomor WhatsApp</label>
           <input
             name="whatsapp_number"
             type="text"
             placeholder="08123456789 atau 628123456789"
             value={form.whatsapp_number}
             onChange={handleChange}
-            className="input"
+            className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
           />
         </div>
 
         {/* Warna Aksen */}
         <div>
-          <label className="label mb-3">Warna Aksen Galeri</label>
-          <div className="flex gap-4 flex-wrap bg-background p-4 rounded-xl border border-primary-100/30">
+          <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-2">Warna Aksen Galeri Klien</label>
+          <div className="flex gap-4 flex-wrap bg-kertas p-4 rounded-[2px] border border-garis">
             {ACCENT_COLORS.map((color) => (
               <button
                 key={color.value}
                 type="button"
                 onClick={() => setForm((prev) => ({ ...prev, accent_color: color.value }))}
-                className="group flex flex-col items-center gap-2"
+                className="group flex flex-col items-center gap-1.5"
                 title={color.name}
               >
                 <div 
-                  className={`w-10 h-10 rounded-full transition-all duration-300 flex items-center justify-center ${
+                  className={`w-9 h-9 rounded-full transition-all duration-200 flex items-center justify-center ${
                     form.accent_color === color.value
-                      ? 'ring-2 ring-offset-2 ring-primary scale-110 shadow-md'
-                      : 'hover:scale-110 hover:shadow-sm'
+                      ? 'ring-2 ring-offset-2 ring-merah scale-110 shadow-sm'
+                      : 'hover:scale-105'
                   }`}
                   style={{ backgroundColor: color.value }}
                 >
                   {form.accent_color === color.value && (
-                    <svg className="w-4 h-4 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/></svg>
+                    <svg className="w-3.5 h-3.5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"/></svg>
                   )}
                 </div>
+                <span className="text-[10px] font-mono text-tinta-lembut">{color.name}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Submit */}
-        <div className="pt-6 border-t border-primary-100/30">
+        <div className="pt-6 border-t border-garis">
           <button
             type="submit"
             disabled={isLoading}
-            className="btn-primary w-full sm:w-auto px-10"
+            className="w-full sm:w-auto px-8 py-2.5 bg-merah hover:bg-merah-hover text-white text-sm font-medium rounded-[2px] transition-colors disabled:opacity-50"
           >
             {isLoading ? 'Menyimpan...' : 'Simpan Identitas'}
           </button>

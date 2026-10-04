@@ -77,37 +77,37 @@ const SelectedPhotosModal: React.FC<Props> = ({ gallery, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
+      <div className="relative bg-white rounded-[2px] border border-garis shadow-xl w-full max-w-lg mx-auto max-h-[80vh] flex flex-col font-sans text-tinta">
         {/* Header */}
-        <div className="p-6 border-b border-gray-100">
-          <h3 className="text-lg font-bold text-text">Daftar Foto Terpilih</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            {photos.length} foto dipilih klien — urut sesuai urutan mereka memilih
+        <div className="p-6 border-b border-garis">
+          <h3 className="text-xl font-serif font-normal text-tinta">Daftar Foto Terpilih</h3>
+          <p className="text-xs text-tinta-lembut mt-1 font-mono">
+            {photos.length} foto dipilih klien — tersusun urut sesuai urutan pilihan
           </p>
         </div>
 
         {/* Photo list */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {loading ? (
-            <div className="text-center text-gray-400 py-8">Memuat daftar foto...</div>
+            <div className="text-center text-tinta-lembut py-8 text-xs font-mono">Memuat daftar foto...</div>
           ) : photos.length === 0 ? (
-            <div className="text-center text-gray-400 py-8">Belum ada foto yang dipilih klien.</div>
+            <div className="text-center text-tinta-lembut py-8 text-xs font-mono">Belum ada foto yang dipilih klien.</div>
           ) : (
             <div className="space-y-1.5">
               {photos.map((photo, idx) => (
                 <div
                   key={photo.id}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 px-3 py-2 rounded-[2px] hover:bg-kertas transition-colors"
                 >
-                  <span className="w-6 h-6 flex items-center justify-center bg-primary/10 text-primary text-xs font-bold rounded-full shrink-0">
+                  <span className="w-6 h-6 flex items-center justify-center bg-kertas-tua text-merah border border-garis text-xs font-mono rounded-[2px] shrink-0">
                     {idx + 1}
                   </span>
-                  <span className="text-sm text-text font-mono">
+                  <span className="text-sm text-tinta font-mono">
                     {photo.filename.replace(/\.[^/.]+$/, '')}
                   </span>
                 </div>
@@ -117,22 +117,22 @@ const SelectedPhotosModal: React.FC<Props> = ({ gallery, onClose }) => {
         </div>
 
         {/* Footer actions */}
-        <div className="p-6 border-t border-gray-100 flex items-center gap-3">
+        <div className="p-6 border-t border-garis flex items-center gap-3">
           <button
             onClick={() => handleCopy('comma')}
-            className="flex-1 bg-primary text-white py-2.5 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+            className="flex-1 bg-merah hover:bg-merah-hover text-white py-2.5 rounded-[2px] text-xs sm:text-sm font-medium transition-colors"
           >
-            {copied === 'comma' ? '✓ Tersalin' : 'Copy utk Lightroom'}
+            {copied === 'comma' ? 'Tersalin' : 'Salin utk Lightroom'}
           </button>
           <button
             onClick={handleDownloadTxt}
-            className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="flex-1 border border-garis text-tinta hover:border-merah hover:text-merah py-2.5 rounded-[2px] text-xs sm:text-sm font-medium transition-colors"
           >
-            Download .txt
+            Unduh .txt
           </button>
           <button
             onClick={onClose}
-            className="px-6 py-2.5 text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors"
+            className="px-5 py-2.5 text-tinta-lembut hover:text-merah text-xs sm:text-sm font-medium transition-colors"
           >
             Tutup
           </button>

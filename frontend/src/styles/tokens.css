@@ -1,0 +1,154 @@
+/* src/styles/tokens.css */
+/* Desain Token: Merah Vintage (by.marryland) */
+
+:root {
+  /* 1. Warna Dasar */
+  --kertas: #F3EADB;
+  --kertas-tua: #E8DCC8;
+  --tinta: #2B1815;
+  --tinta-lembut: #5A433D;
+  --merah: #9B2C24;
+  --merah-hover: #7E211B;
+  --marun: #3A0F0D;
+  --merah-tanda: #C93A2E;
+  --garis: rgba(43, 24, 21, 0.18);
+
+  /* 2. Warna Status (Disertai teks label dan ikon) */
+  --sukses-bg: #EAF2EB;
+  --sukses-teks: #1E3A24;
+  --sukses-garis: rgba(30, 58, 36, 0.25);
+  
+  --peringatan-bg: #FAF0DC;
+  --peringatan-teks: #5F420B;
+  --peringatan-garis: rgba(95, 66, 11, 0.25);
+
+  --error-bg: #FBECEB;
+  --error-teks: #64201D;
+  --error-garis: rgba(100, 32, 29, 0.25);
+
+  /* 3. Tipografi Bawaan */
+  --font-display: 'Gloock', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Hanken Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* 4. Skala Spasi & Layout */
+  --spasi-section: clamp(4rem, 9vw, 8rem);
+  --lebar-maks: 1200px;
+}
+
+/* Tipografi Skala Token */
+.font-display-xl {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 7.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.font-display-l {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.font-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  line-height: 1.15;
+}
+
+.font-h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  line-height: 1.25;
+}
+
+.font-body {
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  max-width: 60ch;
+}
+
+.label-caps {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+/* Pemisah Garis Ganda Vintage */
+.border-double-t {
+  border-top: 3px double var(--garis);
+}
+
+.border-double-b {
+  border-bottom: 3px double var(--garis);
+}
+
+.border-double-y {
+  border-top: 3px double var(--garis);
+  border-bottom: 3px double var(--garis);
+}
+
+/* Garis Bawah Halus Animasi */
+.link-vintage {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+}
+
+.link-vintage::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.link-vintage:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Opsi Bingkai Cetakan Foto */
+.frame-cetakan {
+  padding: 10px;
+  background-color: var(--kertas);
+  border: 1px solid var(--garis);
+  box-shadow: 0 1px 3px rgba(43, 24, 21, 0.08);
+}
+
+/* Tekstur Kertas Halus (Statis, 5.5% opasitas, tanpa blend-mode berat) */
+body.has-paper-texture::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Matikan tekstur di dashboard, admin, galeri klien, prefers-reduced-data, dan print */
+body.no-paper-texture::before,
+.dashboard-root::before,
+.admin-root::before,
+.gallery-client-root::before {
+  display: none !important;
+}
+
+@media (prefers-reduced-data: reduce), print {
+  body.has-paper-texture::before {
+    display: none !important;
+  }
+}

@@ -58,12 +58,12 @@ export default function ResetPasswordPage() {
         throw error;
       }
 
-      toast.success(TOAST?.passwordUpdated || 'Kata sandi berhasil diperbarui');
+      toast.success(TOAST?.resetSuccess || 'Kata sandi berhasil diperbarui');
       await supabase.auth.signOut();
       navigate('/login');
     } catch (error: any) {
       console.error('Update password error:', error.message);
-      toast.error(TOAST?.passwordUpdateFail || 'Gagal memperbarui kata sandi');
+      toast.error(TOAST?.resetFail || 'Gagal memperbarui kata sandi');
     } finally {
       setLoading(false);
     }
@@ -71,25 +71,25 @@ export default function ResetPasswordPage() {
 
   if (isRecoverySession === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-kertas">
+        <div className="w-8 h-8 border-4 border-merah/30 border-t-merah rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!isRecoverySession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-border p-8 text-center">
-          <h2 className="text-xl font-bold text-text mb-4">Link Tidak Valid</h2>
-          <p className="text-muted mb-6">
-            Link reset kata sandi tidak valid atau sudah kedaluwarsa.
+      <div className="min-h-screen flex items-center justify-center bg-kertas px-4 font-sans text-tinta">
+        <div className="w-full max-w-md bg-white rounded-[2px] border border-garis p-8 text-center">
+          <h2 className="font-serif text-xl font-normal text-tinta mb-3">Tautan Tidak Valid</h2>
+          <p className="text-xs text-tinta-lembut mb-6 leading-relaxed">
+            Tautan atur ulang kata sandi ini tidak valid atau sudah kedaluwarsa. Silakan ajukan permintaan baru.
           </p>
           <Link
             to="/lupa-password"
-            className="inline-flex w-full py-2.5 px-4 bg-primary hover:bg-primary-600 text-white rounded-lg font-medium transition-colors justify-center"
+            className="inline-flex w-full py-2.5 px-4 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-sm font-medium transition-colors justify-center"
           >
-            Minta Link Baru
+            Minta Tautan Baru
           </Link>
         </div>
       </div>
@@ -97,19 +97,21 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-border p-8">
+    <div className="min-h-screen flex items-center justify-center bg-kertas px-4 py-12 font-sans text-tinta">
+      <div className="w-full max-w-md bg-white rounded-[2px] border border-garis p-8">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-primary mb-2">{APP_NAME}</h1>
-          <h2 className="text-xl font-semibold text-text">Reset Kata Sandi</h2>
-          <p className="text-sm text-muted mt-2">
-            Masukkan kata sandi baru untuk akunmu.
+          <Link to="/" className="inline-block font-serif text-2xl tracking-tight mb-2 text-tinta">
+            by.<span className="text-merah">marryland</span>
+          </Link>
+          <h1 className="font-serif text-2xl font-normal text-tinta mb-1">Atur Ulang Kata Sandi</h1>
+          <p className="text-xs text-tinta-lembut mt-1">
+            Buat kata sandi baru untuk akun fotografermu.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-text mb-1">
+            <label htmlFor="password" className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">
               Kata Sandi Baru
             </label>
             <input
@@ -117,7 +119,7 @@ export default function ResetPasswordPage() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-[2px] border border-garis bg-white text-tinta text-sm focus:border-merah focus:ring-1 focus:ring-merah outline-none transition-colors"
               placeholder="Minimal 8 karakter"
               required
               minLength={8}
@@ -125,7 +127,7 @@ export default function ResetPasswordPage() {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-text mb-1">
+            <label htmlFor="confirmPassword" className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">
               Konfirmasi Kata Sandi Baru
             </label>
             <input
@@ -133,7 +135,7 @@ export default function ResetPasswordPage() {
               id="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-[2px] border border-garis bg-white text-tinta text-sm focus:border-merah focus:ring-1 focus:ring-merah outline-none transition-colors"
               placeholder="Ulangi kata sandi baru"
               required
             />
@@ -142,10 +144,10 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={loading || !password || !confirmPassword}
-            className="w-full py-2.5 px-4 bg-primary hover:bg-primary-600 text-white rounded-lg font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full py-2.5 px-4 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center mt-2"
           >
             {loading ? (
-              <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               'Simpan Kata Sandi'
             )}

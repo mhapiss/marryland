@@ -1,0 +1,191 @@
+// src/content/schema/globalSchema.ts
+import { PageSchema, SiteSettingsData } from './types';
+
+export const DEFAULT_SITE_SETTINGS: SiteSettingsData = {
+  brand_name: 'by.marryland',
+  tagline: 'Dokumentasi visual pernikahan & perhelatan adat berstandar editorial.',
+  whatsapp_number: '6281234567890',
+  email: 'halo@marryland.id',
+  instagram: 'by.marryland',
+  default_wa_template: 'Halo by.marryland, saya ingin konsultasi mengenai jadwal liputan dan dokumentasi hari bahagia kami.',
+  seo_default_title: 'by.marryland | Studio Dokumentasi Pernikahan & Adat',
+  seo_default_description: 'Seleksi foto klien cepat, kurasi visual berstandar editorial tinggi, dan penghormatan tulus pada prosesi adat.',
+  footer_statement: 'Studio kurasi dokumentasi pernikahan dan perhelatan keluarga dengan pendekatan editorial dan penghormatan tulus pada tradisi.',
+  default_palette: 'merah-vintage',
+  default_font: 'gloock',
+  photo_frame_style: 'print',
+  logo_url: '',
+  nav_items: [
+    { label: 'Untuk Fotografer', href: '/' },
+    { label: 'Untuk Klien', href: '/untuk-klien' },
+    { label: 'Portofolio', href: '/portofolio' },
+    { label: 'Demo', href: '/demo' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Kontak', href: '/kontak' },
+  ],
+};
+
+export const GLOBAL_SETTINGS_SCHEMA: PageSchema = {
+  pageKey: 'global',
+  title: 'Pengaturan Global',
+  path: '*',
+  description: 'Pengaturan umum yang dipakai di seluruh halaman (nama studio, nomor WhatsApp, email, navigasi, footer, dan SEO bawaan).',
+  sections: [
+    {
+      id: 'brand',
+      label: 'Identitas & Logo',
+      allowToggleVisibility: false,
+      fields: [
+        {
+          key: 'brand_name',
+          label: 'Nama Studio / Brand',
+          type: 'text',
+          charLimit: 50,
+          description: 'Nama publik studio yang tampil di header dan footer.',
+          default: DEFAULT_SITE_SETTINGS.brand_name,
+        },
+        {
+          key: 'tagline',
+          label: 'Tagline Singkat',
+          type: 'text',
+          charLimit: 120,
+          description: 'Kalimat singkat identitas studio.',
+          default: DEFAULT_SITE_SETTINGS.tagline,
+        },
+        {
+          key: 'default_palette',
+          label: 'Palet Warna Bawaan Situs',
+          type: 'select',
+          options: [
+            { label: 'Merah Vintage (Default by.marryland)', value: 'merah-vintage' },
+            { label: 'Marun Tua', value: 'marun-tua' },
+            { label: 'Hijau Botol', value: 'hijau-botol' },
+            { label: 'Arang Monokrom', value: 'arang' },
+            { label: 'Biru Malam', value: 'biru-malam' },
+          ],
+          default: DEFAULT_SITE_SETTINGS.default_palette,
+        },
+        {
+          key: 'default_font',
+          label: 'Tipografi Bawaan',
+          type: 'select',
+          options: [
+            { label: 'Gloock + Hanken Grotesk (Default)', value: 'gloock' },
+            { label: 'Instrument Serif + Hanken Grotesk', value: 'instrument' },
+            { label: 'Bodoni Moda + Inter Tight', value: 'bodoni' },
+            { label: 'Newsreader + DM Sans', value: 'newsreader' },
+            { label: 'Fraunces + Hanken Grotesk (Retro Lembut)', value: 'fraunces' },
+          ],
+          default: DEFAULT_SITE_SETTINGS.default_font,
+        },
+        {
+          key: 'photo_frame_style',
+          label: 'Gaya Bingkai Foto',
+          type: 'select',
+          options: [
+            { label: 'Bingkai Cetakan (Print Margin 10px & Garis Tinta)', value: 'print' },
+            { label: 'Tanpa Bingkai (Rata Tepi / Normal)', value: 'none' },
+          ],
+          default: 'print',
+        },
+      ],
+      photoSlots: [
+        {
+          key: 'logo',
+          label: 'Logo Studio (Opsional)',
+          description: 'Unggah logo format PNG transparan atau WebP.',
+          suggestedAspect: 'free',
+          suggestedDimensions: 'Tinggi maks. 60px',
+          minCount: 0,
+          maxCount: 1,
+        },
+      ],
+    },
+    {
+      id: 'contact_channels',
+      label: 'Saluran Kontak Utama',
+      allowToggleVisibility: false,
+      fields: [
+        {
+          key: 'whatsapp_number',
+          label: 'Nomor WhatsApp Studio',
+          type: 'text',
+          charLimit: 20,
+          description: 'Format internasional tanpa tanda plus, contoh: 6281234567890. Digunakan oleh seluruh tombol WA di situs.',
+          default: DEFAULT_SITE_SETTINGS.whatsapp_number,
+        },
+        {
+          key: 'email',
+          label: 'Alamat Email',
+          type: 'text',
+          charLimit: 100,
+          description: 'Email resmi studio untuk korespondensi.',
+          default: DEFAULT_SITE_SETTINGS.email,
+        },
+        {
+          key: 'instagram',
+          label: 'Username Instagram',
+          type: 'text',
+          charLimit: 50,
+          description: 'Tanpa simbol @, contoh: by.marryland',
+          default: DEFAULT_SITE_SETTINGS.instagram,
+        },
+        {
+          key: 'default_wa_template',
+          label: 'Pesan Otomatis WhatsApp Bawaan',
+          type: 'textarea',
+          charLimit: 250,
+          description: 'Teks awal saat klien mengklik tombol WhatsApp umum.',
+          default: DEFAULT_SITE_SETTINGS.default_wa_template,
+        },
+      ],
+    },
+    {
+      id: 'navigation',
+      label: 'Menu Navigasi & Footer',
+      allowToggleVisibility: false,
+      fields: [
+        {
+          key: 'footer_statement',
+          label: 'Pernyataan Kuratorial Footer',
+          type: 'textarea',
+          charLimit: 300,
+          description: 'Teks kuratorial yang tampil di bagian bawah setiap halaman publik.',
+          default: DEFAULT_SITE_SETTINGS.footer_statement,
+        },
+        {
+          key: 'nav_items',
+          label: 'Daftar Tautan Navigasi',
+          type: 'list',
+          itemFields: [
+            { key: 'label', label: 'Label Menu', type: 'text', default: '' },
+            { key: 'href', label: 'URL / Rute', type: 'text', default: '' },
+            { key: 'visible', label: 'Tampilkan Menu?', type: 'boolean', default: true },
+          ],
+          default: DEFAULT_SITE_SETTINGS.nav_items,
+        },
+      ],
+    },
+    {
+      id: 'seo_defaults',
+      label: 'SEO Global',
+      allowToggleVisibility: false,
+      fields: [
+        {
+          key: 'seo_default_title',
+          label: 'Judul Halaman Bawaan',
+          type: 'text',
+          charLimit: 70,
+          default: DEFAULT_SITE_SETTINGS.seo_default_title,
+        },
+        {
+          key: 'seo_default_description',
+          label: 'Meta Description Bawaan',
+          type: 'textarea',
+          charLimit: 160,
+          default: DEFAULT_SITE_SETTINGS.seo_default_description,
+        },
+      ],
+    },
+  ],
+};

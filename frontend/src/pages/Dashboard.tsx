@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useRealtime } from '../hooks/useRealtime';
 import CreateGalleryForm from '../components/CreateGalleryForm';
@@ -147,7 +147,7 @@ const Dashboard: React.FC = () => {
   const generateWhatsAppLink = (gallery: Gallery) => {
     const studioSlug = user?.user_metadata?.studio_slug || 'studio';
     const domain = window.location.origin;
-    const message = `Halo ${gallery.client_name},\nGaleri foto kamu dari by.marryland sudah siap!\n\n📸 Pilih foto favorit kamu di sini:\n${domain}/${studioSlug}/${gallery.client_slug}\n\nSelamat menikmati momennya! ✨`;
+    const message = `Halo ${gallery.client_name},\nGaleri foto kamu dari by.marryland sudah siap!\n\nPilih foto favorit kamu di sini:\n${domain}/${studioSlug}/${gallery.client_slug}\n\nSelamat menikmati momennya!`;
     const phone = gallery.client_whatsapp.replace(/[^0-9]/g, '');
     return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   };
@@ -159,17 +159,13 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans text-text ambient-bg">
-      {/* ─────── Decorative Elements ─────── */}
-      <div className="deco-float w-64 h-64 bg-primary-100 top-20 -left-20 blur-3xl"></div>
-      <div className="deco-float-reverse w-96 h-96 bg-primary-200/50 top-1/2 -right-32 blur-[100px]"></div>
-
+    <div className="min-h-screen bg-kertas font-sans text-tinta">
       {/* Header */}
-      <header className="bg-white px-6 py-4 flex justify-between items-center border-b border-primary-100/40 sticky top-0 z-40">
+      <header className="bg-white px-6 py-4 flex justify-between items-center border-b border-garis sticky top-0 z-40">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-serif font-bold tracking-tight">by.<span className="text-primary">marryland</span></h1>
-          <span className="hidden sm:inline-block border border-primary-200 text-primary-700 bg-primary-50 text-[10px] px-2.5 py-0.5 rounded-full font-bold tracking-widest uppercase">
-            for photographers
+          <Link to="/" className="text-xl font-serif tracking-tight text-tinta">by.<span className="text-merah">marryland</span></Link>
+          <span className="hidden sm:inline-block border border-garis text-merah bg-kertas-tua/60 text-[10px] px-2.5 py-0.5 rounded-[2px] font-mono uppercase tracking-widest">
+            Untuk Fotografer
           </span>
         </div>
         <div className="flex items-center gap-5">
@@ -177,53 +173,54 @@ const Dashboard: React.FC = () => {
           {user?.email === 'admin@marryland.com' && (
             <button
               onClick={() => navigate('/admin')}
-              className="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-full font-bold hover:bg-red-100 transition-colors"
+              className="text-xs bg-merah/10 text-merah border border-merah/25 px-3 py-1.5 rounded-[2px] font-medium hover:bg-merah/20 transition-colors"
             >
-              Masuk Admin Panel
+              Panel Admin
             </button>
           )}
           {/* User email */}
-          <span className="text-sm text-muted hidden sm:inline truncate max-w-[200px]">
+          <span className="text-xs text-tinta-lembut hidden sm:inline truncate max-w-[200px] font-mono">
             {user?.email}
           </span>
           {/* Logout */}
           <button
             onClick={handleSignOut}
-            className="text-muted hover:text-red-500 transition-colors"
-            title="Logout"
+            className="text-tinta-lembut hover:text-merah transition-colors"
+            title="Keluar"
+            aria-label="Keluar"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
           </button>
         </div>
       </header>
 
       {/* Tabs */}
       <div className="max-w-4xl mx-auto px-6">
-        <div className="flex gap-8 border-b border-primary-100 mt-6">
+        <div className="flex gap-8 border-b border-garis mt-6">
           <button
-            className={`pb-3 text-sm font-semibold tracking-wide uppercase transition-colors relative ${
+            className={`pb-3 text-xs font-mono uppercase tracking-wider transition-colors relative ${
               activeTab === 'galeri'
-                ? 'text-primary'
-                : 'text-muted hover:text-text'
+                ? 'text-merah font-bold'
+                : 'text-tinta-lembut hover:text-tinta'
             }`}
             onClick={() => setActiveTab('galeri')}
           >
             Galeri
             {activeTab === 'galeri' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-merah"></div>
             )}
           </button>
           <button
-            className={`pb-3 text-sm font-semibold tracking-wide uppercase transition-colors relative ${
+            className={`pb-3 text-xs font-mono uppercase tracking-wider transition-colors relative ${
               activeTab === 'pengaturan'
-                ? 'text-primary'
-                : 'text-muted hover:text-text'
+                ? 'text-merah font-bold'
+                : 'text-tinta-lembut hover:text-tinta'
             }`}
             onClick={() => setActiveTab('pengaturan')}
           >
-            Pengaturan
+            Pengaturan Studio
             {activeTab === 'pengaturan' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-merah"></div>
             )}
           </button>
         </div>
@@ -239,15 +236,15 @@ const Dashboard: React.FC = () => {
 
             {/* Gallery List */}
             <div>
-              <h3 className="text-xl font-serif font-bold text-text mb-5">Semua Galeri</h3>
+              <h2 className="text-xl font-serif font-normal text-tinta mb-5">Semua Galeri Klien</h2>
               {loadingGalleries ? (
-                <div className="text-center text-muted py-12">Memuat galeri...</div>
+                <div className="text-center text-tinta-lembut py-12 text-sm">Memuat galeri...</div>
               ) : galleries.length === 0 ? (
-                <div className="card p-12 text-center text-muted border-dashed border-2 border-primary-200">
-                  Belum ada galeri. Buat galeri pertamamu di atas!
+                <div className="bg-white p-12 text-center text-tinta-lembut border border-dashed border-garis rounded-[2px] text-sm">
+                  Belum ada galeri aktif. Buat galeri pertamamu pada formulir di atas.
                 </div>
               ) : (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   {galleries.map((gallery) => (
                     <GalleryCard
                       key={gallery.id}

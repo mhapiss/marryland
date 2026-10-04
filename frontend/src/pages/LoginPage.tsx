@@ -33,7 +33,10 @@ export default function LoginPage() {
       // Check role and redirect accordingly
       if (data.user) {
         const ADMIN_EMAILS = ['admin@marryland.com'];
-        const isAdmin = ADMIN_EMAILS.includes(data.user.email || '');
+        const isAdmin =
+          ADMIN_EMAILS.includes(data.user.email || '') ||
+          data.user.user_metadata?.role === 'admin' ||
+          data.user.app_metadata?.role === 'admin';
 
         if (isAdmin) {
           navigate('/admin');
@@ -51,26 +54,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-sans text-text ambient-bg">
-      {/* ─────── Decorative Elements ─────── */}
-      <div className="deco-float w-64 h-64 bg-primary-100 top-10 -left-20 blur-3xl"></div>
-      <div className="deco-float-reverse w-96 h-96 bg-primary-200/50 bottom-10 -right-32 blur-[100px]"></div>
-
-      <div className="w-full max-w-[420px] card p-10 animate-fade-in relative z-10">
+    <div className="min-h-screen bg-kertas flex flex-col items-center justify-center p-6 font-sans text-tinta">
+      <div className="w-full max-w-[420px] bg-white border border-garis rounded-[2px] p-8 sm:p-10 relative z-10">
         
         {/* Header */}
-        <div className="flex flex-col items-center mb-10">
-          <Link to="/" className="font-serif text-2xl font-bold mb-4">
-            by.<span className="text-primary">marryland</span>
+        <div className="flex flex-col items-center mb-8">
+          <Link to="/" className="font-serif text-2xl tracking-tight mb-3 text-tinta">
+            by.<span className="text-merah">marryland</span>
           </Link>
-          <div className="text-[10px] font-bold tracking-[0.2em] text-primary bg-primary-50 px-3 py-1 rounded-full uppercase border border-primary-100">
-            FOR PHOTOGRAPHERS
+          <div className="text-[10px] font-mono tracking-[0.2em] text-merah bg-kertas-tua/60 px-3 py-1 rounded-[2px] uppercase border border-garis">
+            Untuk Fotografer
           </div>
         </div>
 
         {message && (
-          <div className="bg-primary-50 border border-primary-100 text-primary-700 p-4 rounded-xl text-sm mb-6 flex items-start gap-3">
-            <svg className="w-5 h-5 shrink-0 mt-0.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div className="bg-kertas-tua/40 border border-garis text-tinta p-3.5 rounded-[2px] text-xs mb-6 flex items-start gap-2.5">
+            <svg className="w-4 h-4 shrink-0 mt-0.5 text-merah" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span>{message}</span>
           </div>
         )}
@@ -79,54 +78,54 @@ export default function LoginPage() {
         <button 
           type="button"
           onClick={signInWithGoogle}
-          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-xl py-3 px-4 font-medium hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow mb-8"
+          className="w-full flex items-center justify-center gap-3 bg-white border border-garis rounded-[2px] py-2.5 px-4 text-sm font-medium text-tinta hover:bg-kertas transition-colors mb-6"
         >
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-4 h-4" alt="Google" />
           Masuk dengan Google
         </button>
 
-        <div className="flex items-center gap-4 mb-8">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <div className="text-[10px] font-bold text-muted tracking-widest uppercase">ATAU EMAIL</div>
-          <div className="flex-1 h-px bg-gray-200"></div>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex-1 h-px bg-garis"></div>
+          <div className="text-[10px] font-mono text-tinta-lembut tracking-widest uppercase">ATAU EMAIL</div>
+          <div className="flex-1 h-px bg-garis"></div>
         </div>
 
         {error && (
-          <div className="bg-red-50/80 border border-red-100 text-red-600 p-4 rounded-xl text-sm mb-6 flex items-start gap-3">
-            <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div className="bg-merah/5 border border-merah/25 text-merah p-3.5 rounded-[2px] text-xs mb-6 flex items-start gap-2.5">
+            <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span>{error}</span>
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="label">EMAIL</label>
+            <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="input"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
               placeholder="nama@email.com"
             />
           </div>
 
           <div>
-            <label className="label">PASSWORD</label>
+            <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Kata Sandi</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input pr-16"
-                placeholder="Masukkan password kamu"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] pr-16 focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
+                placeholder="Masukkan kata sandi"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-primary font-medium hover:text-primary-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-merah font-medium hover:text-merah-hover"
               >
                 {showPassword ? 'Tutup' : 'Lihat'}
               </button>
@@ -136,22 +135,22 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full mt-4"
+            className="w-full py-2.5 px-4 bg-merah hover:bg-merah-hover text-white text-sm font-medium rounded-[2px] transition-colors disabled:opacity-50 mt-2"
           >
-            {loading ? 'Sedang masuk...' : 'Masuk'}
+            {loading ? 'Sedang masuk...' : 'Masuk ke Dashboard'}
           </button>
         </form>
 
-        <div className="mt-8 text-center text-sm">
-          <Link to="/lupa-password" className="text-primary hover:text-primary-600 transition-colors font-medium">
-            Lupa password?
+        <div className="mt-6 text-center text-xs">
+          <Link to="/lupa-password" className="text-merah hover:text-merah-hover transition-colors font-medium">
+            Lupa kata sandi?
           </Link>
         </div>
       </div>
       
-      <div className="mt-8 text-center text-sm text-muted">
+      <div className="mt-6 text-center text-xs text-tinta-lembut">
         Belum punya akun?{' '}
-        <Link to="/register" className="text-primary font-semibold hover:text-primary-600 transition-colors">
+        <Link to="/register" className="text-merah font-medium hover:text-merah-hover transition-colors">
           Daftar di sini
         </Link>
       </div>

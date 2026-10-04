@@ -63,25 +63,25 @@ const AccountSettings: React.FC = () => {
 
   return (
     <>
-      <div className="card p-8">
+      <div className="bg-white border border-garis rounded-[2px] p-8 font-sans text-tinta">
         <div className="mb-8">
-          <h2 className="font-serif text-2xl font-bold text-text">Keamanan Akun</h2>
-          <p className="text-muted text-sm mt-1">Kelola email masuk dan ubah kata sandi kamu.</p>
+          <h2 className="font-serif text-2xl font-normal text-tinta">Keamanan Akun</h2>
+          <p className="text-tinta-lembut text-xs mt-1">Kelola email masuk dan ubah kata sandi kamu.</p>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Current email */}
-          <div className="p-5 bg-background rounded-xl border border-primary-100/30">
-            <p className="text-[11px] font-bold text-muted uppercase tracking-wider mb-1">Email Saat Ini</p>
-            <p className="text-base font-medium text-text flex items-center gap-2">
-              <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <div className="p-4 bg-kertas rounded-[2px] border border-garis">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-tinta-lembut mb-1">Email Terdaftar</p>
+            <p className="text-sm font-medium text-tinta flex items-center gap-2 font-mono">
+              <svg className="w-4 h-4 text-merah" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
               {user?.email}
             </p>
           </div>
 
           {/* Change email */}
           <div>
-            <h3 className="text-sm font-bold tracking-wider text-text uppercase mb-4">Ubah Email</h3>
+            <h3 className="text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-3">Ubah Alamat Email</h3>
             <form onSubmit={handleChangeEmail}>
               <div className="flex gap-3">
                 <input
@@ -89,33 +89,33 @@ const AccountSettings: React.FC = () => {
                   placeholder="email-baru@contoh.com"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  className="input flex-1"
+                  className="flex-1 px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
                 />
                 <button
                   type="submit"
                   disabled={emailLoading || !newEmail}
-                  className="btn-primary px-6 py-2.5"
+                  className="px-6 py-2.5 bg-merah hover:bg-merah-hover text-white text-xs font-medium rounded-[2px] transition-colors disabled:opacity-50"
                 >
-                  {emailLoading ? 'Menyimpan...' : 'Ganti'}
+                  {emailLoading ? 'Menyimpan...' : 'Ganti Email'}
                 </button>
               </div>
-              <p className="mt-2 text-[11px] text-muted">
-                Link konfirmasi akan dikirim ke email baru. Email lama tetap aktif sampai dikonfirmasi.
+              <p className="mt-2 text-[11px] text-tinta-lembut font-mono">
+                Tautan konfirmasi akan dikirim ke email baru. Email lama tetap aktif sampai diverifikasi.
               </p>
             </form>
           </div>
 
-          <div className="h-px bg-primary-100/30 my-8"></div>
+          <div className="border-b border-garis my-6"></div>
 
           {/* Change password */}
           <div>
-            <label className="label">Password Akun</label>
-            <p className="text-[11px] text-muted mb-4">Pastikan akun kamu aman dengan password yang kuat.</p>
+            <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1">Kata Sandi Akun</label>
+            <p className="text-[11px] text-tinta-lembut mb-3">Jaga keamanan akun studio kamu dengan kata sandi yang kuat.</p>
             <button
               onClick={() => setShowPasswordModal(true)}
-              className="btn-outline px-8"
+              className="px-6 py-2.5 border border-garis hover:border-merah text-tinta hover:text-merah text-xs font-medium rounded-[2px] transition-colors"
             >
-              Ubah Password
+              Ubah Kata Sandi
             </button>
           </div>
         </div>
@@ -125,52 +125,52 @@ const AccountSettings: React.FC = () => {
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowPasswordModal(false)} />
-          <div className="relative card p-8 w-full max-w-sm animate-slide-up shadow-2xl border-primary-200" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
+          <div className="relative bg-white rounded-[2px] border border-garis shadow-xl p-8 w-full max-w-sm font-sans text-tinta animate-slide-up" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
             <div className="flex items-center justify-between mb-6">
-              <h3 id="password-modal-title" className="font-serif text-xl font-bold text-text">Ubah Password</h3>
-              <button onClick={() => setShowPasswordModal(false)} className="p-2 text-muted hover:text-text rounded-full hover:bg-background transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <h3 id="password-modal-title" className="font-serif text-xl font-normal text-tinta">Ubah Kata Sandi</h3>
+              <button onClick={() => setShowPasswordModal(false)} className="p-1 text-tinta-lembut hover:text-merah transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
             </div>
             
-            <form onSubmit={handleChangePassword} className="space-y-5">
+            <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
-                <label className="label">Password Baru</label>
+                <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Kata Sandi Baru</label>
                 <input
                   type="password"
                   placeholder="Minimal 8 karakter"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   minLength={8}
-                  className="input"
+                  className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
                 />
               </div>
               
               <div>
-                <label className="label">Ulangi Password Baru</label>
+                <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-1.5">Ulangi Kata Sandi Baru</label>
                 <input
                   type="password"
-                  placeholder="Ketik ulang password"
+                  placeholder="Ketik ulang kata sandi baru"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="input"
+                  className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
                 />
               </div>
               
-              <div className="flex gap-3 pt-4 border-t border-primary-100/30">
+              <div className="flex gap-3 pt-4 border-t border-garis">
                 <button
                   type="button"
                   onClick={() => setShowPasswordModal(false)}
-                  className="flex-1 btn-outline"
+                  className="flex-1 py-2.5 px-3 border border-garis rounded-[2px] text-xs font-medium text-tinta hover:border-merah hover:text-merah transition-colors"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={passwordLoading}
-                  className="flex-1 btn-primary"
+                  className="flex-1 py-2.5 px-3 bg-merah hover:bg-merah-hover text-white text-xs font-medium rounded-[2px] transition-colors disabled:opacity-50"
                 >
-                  {passwordLoading ? '...' : 'Simpan'}
+                  {passwordLoading ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>
             </form>
