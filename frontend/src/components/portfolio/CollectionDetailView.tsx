@@ -321,51 +321,63 @@ export function CollectionDetailView({
                   <div className="grid grid-cols-12 gap-4 items-center">
                     <div className="col-span-7">
                       <div className="aspect-[3/4] rounded-[2px] overflow-hidden border border-[var(--collection-border)] shadow-soft bg-white">
-                        {aboutPhotos[0]?.image_url || heroPhoto?.image_url ? (
-                          <img
-                            src={aboutPhotos[0]?.image_url || heroPhoto?.image_url}
-                            alt="Tentang koleksi 1"
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
-                            Foto Kolase 1
-                          </div>
-                        )}
+                        {(() => {
+                          const p1 = aboutPhotos[0] || heroPhoto;
+                          return p1?.image_url ? (
+                            <img
+                              src={p1.image_url}
+                              alt="Tentang koleksi 1"
+                              className="w-full h-full object-cover"
+                              style={{ objectPosition: p1.focal || 'center' }}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
+                              Foto Kolase 1
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                     <div className="col-span-5 space-y-4">
                       <div className="aspect-[4/5] rounded-[2px] overflow-hidden border border-[var(--collection-border)] shadow-soft bg-white translate-y-3">
-                        {aboutPhotos[1]?.image_url || photos[1]?.image_url || heroPhoto?.image_url ? (
-                          <img
-                            src={aboutPhotos[1]?.image_url || photos[1]?.image_url || heroPhoto?.image_url}
-                            alt="Tentang koleksi 2"
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
-                            Foto Kolase 2
-                          </div>
-                        )}
+                        {(() => {
+                          const p2 = aboutPhotos[1] || photos[1] || heroPhoto;
+                          return p2?.image_url ? (
+                            <img
+                              src={p2.image_url}
+                              alt="Tentang koleksi 2"
+                              className="w-full h-full object-cover"
+                              style={{ objectPosition: p2.focal || 'center' }}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
+                              Foto Kolase 2
+                            </div>
+                          );
+                        })()}
                       </div>
                       <div className="aspect-[1/1] rounded-[2px] overflow-hidden border border-[var(--collection-border)] shadow-soft bg-white -translate-y-2">
-                        {aboutPhotos[2]?.image_url || photos[2]?.image_url || heroPhoto?.image_url ? (
-                          <img
-                            src={aboutPhotos[2]?.image_url || photos[2]?.image_url || heroPhoto?.image_url}
-                            alt="Tentang koleksi 3"
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
-                            Foto Kolase 3
-                          </div>
-                        )}
+                        {(() => {
+                          const p3 = aboutPhotos[2] || photos[2] || heroPhoto;
+                          return p3?.image_url ? (
+                            <img
+                              src={p3.image_url}
+                              alt="Tentang koleksi 3"
+                              className="w-full h-full object-cover"
+                              style={{ objectPosition: p3.focal || 'center' }}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
+                              Foto Kolase 3
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -373,34 +385,42 @@ export function CollectionDetailView({
                   // Variant B: 2 staggered equal columns
                   <div className="grid grid-cols-2 gap-5 items-start">
                     <div className="aspect-[3/4] rounded-[2px] overflow-hidden border border-[var(--collection-border)] shadow-soft bg-white">
-                      {aboutPhotos[0]?.image_url || heroPhoto?.image_url ? (
-                        <img
-                          src={aboutPhotos[0]?.image_url || heroPhoto?.image_url}
-                          alt="Tentang koleksi B1"
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
-                          Foto Kolase B1
-                        </div>
-                      )}
+                      {(() => {
+                        const p1 = aboutPhotos[0] || heroPhoto;
+                        return p1?.image_url ? (
+                          <img
+                            src={p1.image_url}
+                            alt="Tentang koleksi B1"
+                            className="w-full h-full object-cover"
+                            style={{ objectPosition: p1.focal || 'center' }}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
+                            Foto Kolase B1
+                          </div>
+                        );
+                      })()}
                     </div>
                     <div className="aspect-[3/4] rounded-[2px] overflow-hidden border border-[var(--collection-border)] shadow-soft bg-white translate-y-10">
-                      {aboutPhotos[1]?.image_url || photos[1]?.image_url || heroPhoto?.image_url ? (
-                        <img
-                          src={aboutPhotos[1]?.image_url || photos[1]?.image_url || heroPhoto?.image_url}
-                          alt="Tentang koleksi B2"
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
-                          Foto Kolase B2
-                        </div>
-                      )}
+                      {(() => {
+                        const p2 = aboutPhotos[1] || photos[1] || heroPhoto;
+                        return p2?.image_url ? (
+                          <img
+                            src={p2.image_url}
+                            alt="Tentang koleksi B2"
+                            className="w-full h-full object-cover"
+                            style={{ objectPosition: p2.focal || 'center' }}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center p-4 text-xs font-mono text-[var(--collection-ink-muted)]">
+                            Foto Kolase B2
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}

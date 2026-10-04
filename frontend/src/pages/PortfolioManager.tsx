@@ -46,7 +46,9 @@ import {
   Sparkles,
   X,
   Filter,
+  Crop,
 } from 'lucide-react';
+import ImageCropperModal from '../components/ImageCropperModal';
 
 interface UploadQueueItem {
   id: string;
@@ -105,6 +107,21 @@ export default function PortfolioManager() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [photoSlot, setPhotoSlot] = useState<PortfolioPhotoItem['slot']>('gallery');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Cropper Modal state
+  const [cropperState, setCropperState] = useState<{
+    open: boolean;
+    imageUrl: string;
+    fileName?: string;
+    targetType: 'queue' | 'existing';
+    queueItemId?: string;
+    photoItem?: PortfolioPhotoItem;
+    suggestedRatio?: number | null;
+  }>({
+    open: false,
+    imageUrl: '',
+    targetType: 'queue',
+  });
 
   // Validation modal state
   const [showValidationModal, setShowValidationModal] = useState(false);
@@ -657,6 +674,101 @@ export default function PortfolioManager() {
     } finally {
       setUploading(false);
       setUploadProgress('');
+    }
+  };
+
+  // Terapkan hasil potongan (crop) foto
+  const handleApplyCrop = async (
+    croppedBlob: Blob,
+    previewUrl: string,
+    width: number,
+    height: number
+  ) => {
+    if (cropperState.targetType === 'queue' && cropperState.queueItemId) {
+      // 1. Potong foto yang ada di antrean upload masal
+      const itemId = cropperState.queueItemId;
+      setUploadQueue((prev) =>
+        prev.map((item) => {
+          if (item.id === itemId) {
+            try {
+              URL.revokeObjectURL(item.previewUrl);
+            } catch {
+              // no-op
+            }
+            const cleanName = item.file.name.replace(/\.[^/.]+$/, '');
+            const newFile = new File([croppedBlob], `${cleanName}.webp`, {
+              type: 'image/webp',
+              lastModified: Date.now(),
+            });
+            const orientation: 'landscape' | 'portrait' | 'square' =
+              width > height ? 'landscape' : height > width ? 'portrait' : 'square';
+            return {
+              ...item,
+              file: newFile,
+              previewUrl,
+              width,
+              height,
+              orientation,
+            };
+          }
+          return item;
+        })
+      );
+      toast.success('Foto di antrean berhasil dipotong');
+    } else if (cropperState.targetType === 'existing' && cropperState.photoItem) {
+      // 2. Potong foto yang sudah tersimpan di database Supabase
+      const photo = cropperState.photoItem;
+      const fileName = `${Date.now()}-cropped-${Math.random().toString(36).slice(2, 8)}.webp`;
+      const storagePath = `portfolio/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('media-library')
+        .upload(fileName, croppedBlob, {
+          contentType: 'image/webp',
+          cacheControl: '31536000',
+          upsert: true,
+        });
+
+      if (uploadError) {
+        toast.error('Gagal mengunggah hasil potongan: ' + uploadError.message);
+        return;
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('media-library').getPublicUrl(fileName);
+
+      const { error: updateError } = await supabase
+        .from('portfolio_photos')
+        .update({
+          image_url: publicUrl,
+          storage_path: storagePath,
+          width,
+          height,
+        })
+        .eq('id', photo.id);
+
+      if (updateError) {
+        toast.error('Gagal memperbarui data foto: ' + updateError.message);
+        return;
+      }
+
+      setPhotos((prev) =>
+        prev.map((p) =>
+          p.id === photo.id
+            ? { ...p, image_url: publicUrl, storage_path: storagePath, width, height }
+            : p
+        )
+      );
+
+      if (photo.slot === 'hero' && selectedCollection) {
+        setSelectedCollection({
+          ...selectedCollection,
+          cover_url: publicUrl,
+        });
+      }
+
+      toast.success('Foto koleksi berhasil dipotong dan diperbarui');
     }
   };
 
@@ -1467,6 +1579,23 @@ export default function PortfolioManager() {
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
                           <button
                             type="button"
+                            onClick={() => {
+                              setCropperState({
+                                open: true,
+                                imageUrl: heroPhoto.image_url,
+                                fileName: heroPhoto.caption || 'Foto Hero',
+                                targetType: 'existing',
+                                photoItem: heroPhoto,
+                                suggestedRatio: 3 / 4,
+                              });
+                            }}
+                            className="px-3 py-1.5 bg-merah text-white rounded-[2px] text-xs font-medium hover:bg-merah-hover transition-colors flex items-center gap-1 shadow-sm"
+                          >
+                            <Crop className="w-3.5 h-3.5" />
+                            <span>Potong Foto</span>
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => setSlotPickerTarget('hero')}
                             className="px-3 py-1.5 bg-white text-tinta rounded-[2px] text-xs font-medium hover:bg-kertas-tua transition-colors"
                           >
@@ -1598,13 +1727,40 @@ export default function PortfolioManager() {
                             <span className="text-[11px] font-mono text-tinta-lembut capitalize">
                               Slot {idx + 1}
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => setSlotPickerTarget(slotKey)}
-                              className="text-xs text-merah font-medium hover:underline"
-                            >
-                              {photoInSlot ? 'Ganti' : 'Pilih Foto'}
-                            </button>
+                            <div className="flex items-center gap-2">
+                              {photoInSlot && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setCropperState({
+                                      open: true,
+                                      imageUrl: photoInSlot.image_url,
+                                      fileName: photoInSlot.caption || `Foto Kolase ${idx + 1}`,
+                                      targetType: 'existing',
+                                      photoItem: photoInSlot,
+                                      suggestedRatio:
+                                        slotKey === 'about_1'
+                                          ? 3 / 4
+                                          : slotKey === 'about_2'
+                                          ? 4 / 5
+                                          : 1,
+                                    });
+                                  }}
+                                  className="text-xs text-merah font-medium hover:underline flex items-center gap-0.5"
+                                  title="Potong foto agar pas dengan bingkai"
+                                >
+                                  <Crop className="w-3 h-3" />
+                                  <span>Potong</span>
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => setSlotPickerTarget(slotKey)}
+                                className="text-xs text-tinta-lembut hover:text-tinta font-medium hover:underline"
+                              >
+                                {photoInSlot ? 'Ganti' : 'Pilih Foto'}
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -2321,6 +2477,32 @@ export default function PortfolioManager() {
                           </span>
 
                           <div className="flex items-center gap-1">
+                            {/* Tombol Crop Foto Tersimpan */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCropperState({
+                                  open: true,
+                                  imageUrl: photo.image_url,
+                                  fileName: photo.caption || 'Foto Koleksi',
+                                  targetType: 'existing',
+                                  photoItem: photo,
+                                  suggestedRatio:
+                                    photo.slot === 'hero' || photo.slot === 'about_1'
+                                      ? 3 / 4
+                                      : photo.slot === 'about_2'
+                                      ? 4 / 5
+                                      : photo.slot === 'about_3'
+                                      ? 1
+                                      : null,
+                                });
+                              }}
+                              className="p-1 text-tinta-lembut hover:text-merah transition-colors"
+                              title="Potong (Crop) foto ini"
+                            >
+                              <Crop className="w-3.5 h-3.5" />
+                            </button>
+
                             {/* Fast slot assigner */}
                             <select
                               value={photo.slot || 'gallery'}
@@ -2594,13 +2776,39 @@ export default function PortfolioManager() {
                             {activeItem.file.name}
                           </h4>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setActiveFocalQueueId(null)}
-                          className="px-4 py-1.5 bg-white border border-garis hover:border-tinta rounded-[2px] text-xs font-medium text-tinta"
-                        >
-                          Selesai & Kembali ke Daftar
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCropperState({
+                                open: true,
+                                imageUrl: activeItem.previewUrl,
+                                fileName: activeItem.file.name,
+                                targetType: 'queue',
+                                queueItemId: activeItem.id,
+                                suggestedRatio:
+                                  activeItem.slot === 'hero' || activeItem.slot === 'about_1'
+                                    ? 3 / 4
+                                    : activeItem.slot === 'about_2'
+                                    ? 4 / 5
+                                    : activeItem.slot === 'about_3'
+                                    ? 1
+                                    : null,
+                              });
+                            }}
+                            className="px-3 py-1.5 bg-merah text-white rounded-[2px] text-xs font-medium hover:bg-merah-hover flex items-center gap-1 shadow-sm"
+                          >
+                            <Crop className="w-3.5 h-3.5" />
+                            <span>Potong (Crop)</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveFocalQueueId(null)}
+                            className="px-4 py-1.5 bg-white border border-garis hover:border-tinta rounded-[2px] text-xs font-medium text-tinta"
+                          >
+                            Selesai & Kembali ke Daftar
+                          </button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
@@ -2948,13 +3156,40 @@ export default function PortfolioManager() {
                               </div>
                             </div>
 
-                            <button
-                              type="button"
-                              onClick={() => setActiveFocalQueueId(item.id)}
-                              className="text-[11px] font-mono text-merah hover:underline text-left mt-1"
-                            >
-                              Atur Titik Fokus Foto →
-                            </button>
+                            <div className="flex items-center justify-between pt-2 border-t border-garis mt-1">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCropperState({
+                                    open: true,
+                                    imageUrl: item.previewUrl,
+                                    fileName: item.file.name,
+                                    targetType: 'queue',
+                                    queueItemId: item.id,
+                                    suggestedRatio:
+                                      item.slot === 'hero' || item.slot === 'about_1'
+                                        ? 3 / 4
+                                        : item.slot === 'about_2'
+                                        ? 4 / 5
+                                        : item.slot === 'about_3'
+                                        ? 1
+                                        : null,
+                                  });
+                                }}
+                                className="text-[11px] font-mono text-merah hover:underline flex items-center gap-1 font-medium"
+                              >
+                                <Crop className="w-3 h-3" />
+                                <span>Potong (Crop)</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => setActiveFocalQueueId(item.id)}
+                                className="text-[11px] font-mono text-tinta-lembut hover:text-tinta"
+                              >
+                                Fokus ({item.focal})
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -3043,6 +3278,16 @@ export default function PortfolioManager() {
         loading={isDeleting}
         onConfirm={handleDeleteCollection}
         onCancel={() => setDeleteTargetCollection(null)}
+      />
+
+      {/* IMAGE CROPPER MODAL (FITUR PEMOTONG FOTO INTERAKTIF) */}
+      <ImageCropperModal
+        open={cropperState.open}
+        imageUrl={cropperState.imageUrl}
+        fileName={cropperState.fileName}
+        suggestedRatio={cropperState.suggestedRatio}
+        onClose={() => setCropperState((prev) => ({ ...prev, open: false }))}
+        onApplyCrop={handleApplyCrop}
       />
     </div>
   );
