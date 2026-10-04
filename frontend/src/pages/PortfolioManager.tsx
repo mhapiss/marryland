@@ -466,7 +466,7 @@ export default function PortfolioManager() {
         alt: photoAlt || photoCaption || null,
         slot: photoSlot || 'gallery',
         collection_id: targetColId,
-        category: 'wedding',
+        category: 'pernikahan',
         focal: photoFocal,
         width,
         height,
