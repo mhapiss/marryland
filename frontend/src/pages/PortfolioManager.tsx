@@ -47,6 +47,8 @@ import {
   X,
   Filter,
   Crop,
+  Star,
+  Info,
 } from 'lucide-react';
 import ImageCropperModal from '../components/ImageCropperModal';
 
@@ -798,6 +800,52 @@ export default function PortfolioManager() {
       setSlotPickerTarget(null);
     } catch (err: any) {
       toast.error('Gagal mengatur slot foto: ' + err.message);
+    }
+  };
+
+  // Clean duplicate photos in current collection
+  const handleCleanDuplicates = async () => {
+    if (!selectedCollection || currentCollectionPhotos.length === 0) return;
+
+    const seenUrls = new Set<string>();
+    const duplicateIds: string[] = [];
+
+    // Prioritize keeping photos with specific slots over generic 'gallery'
+    const sorted = [...currentCollectionPhotos].sort((a, b) => {
+      const aRank = a.slot && a.slot !== 'gallery' ? 1 : 0;
+      const bRank = b.slot && b.slot !== 'gallery' ? 1 : 0;
+      return bRank - aRank;
+    });
+
+    for (const photo of sorted) {
+      if (seenUrls.has(photo.image_url)) {
+        duplicateIds.push(photo.id);
+      } else {
+        seenUrls.add(photo.image_url);
+      }
+    }
+
+    if (duplicateIds.length === 0) {
+      toast.info('Tidak ada foto kembar / duplikat yang terdeteksi di koleksi ini.');
+      return;
+    }
+
+    if (!window.confirm(`Ditemukan ${duplicateIds.length} foto kembar dengan URL yang sama. Hapus foto-foto duplikat ini untuk merapikan galeri?`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('portfolio_photos')
+        .delete()
+        .in('id', duplicateIds);
+
+      if (error) throw error;
+
+      setPhotos((prev) => prev.filter((p) => !duplicateIds.includes(p.id)));
+      toast.success(`${duplicateIds.length} foto duplikat berhasil dibersihkan`);
+    } catch (err: any) {
+      toast.error('Gagal membersihkan foto duplikat: ' + err.message);
     }
   };
 
@@ -2058,7 +2106,7 @@ export default function PortfolioManager() {
                       Kelola dan Unggah Foto Tambahan
                     </span>
                     <span className="text-[11px] text-tinta-lembut">
-                      Semua foto yang tidak ditetapkan ke slot hero atau tentang akan otomatis masuk ke grid galeri arsip ini.
+                      Semua foto yang diunggah ke koleksi ini otomatis tampil di Galeri Arsip Lengkap publik. Anda tetap dapat menetapkan foto pilihan sebagai Hero, Kolase Tentang, atau Pita Sorotan tanpa menghilangkannya dari galeri.
                     </span>
                   </div>
                   <button
@@ -2413,7 +2461,7 @@ export default function PortfolioManager() {
           {/* ========================================================================= */}
           {collectionTab === 'foto' && (
             <div>
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
                   <h3 className="font-serif text-xl font-normal text-tinta">Foto Dalam Koleksi Ini</h3>
                   <p className="text-xs text-tinta-lembut mt-1">
@@ -2421,14 +2469,36 @@ export default function PortfolioManager() {
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowPhotoModal(true)}
-                  className="bg-merah hover:bg-merah-hover text-white px-4 py-2 rounded-[2px] text-xs font-medium flex items-center gap-1.5 transition-colors min-h-[44px]"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Upload Foto ke Koleksi</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCleanDuplicates}
+                    className="border border-garis hover:border-red-400 hover:text-red-600 text-tinta-lembut px-3 py-2 rounded-[2px] text-xs font-medium flex items-center gap-1.5 transition-colors min-h-[44px]"
+                    title="Pindai dan bersihkan foto yang diunggah berulang kali"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Bersihkan Duplikat</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPhotoModal(true)}
+                    className="bg-merah hover:bg-merah-hover text-white px-4 py-2 rounded-[2px] text-xs font-medium flex items-center gap-1.5 transition-colors min-h-[44px]"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload Foto ke Koleksi</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-6 p-3.5 bg-merah/[0.04] border border-merah/20 rounded-[2px] flex items-start gap-3 text-xs text-tinta">
+                <Info className="w-4 h-4 text-merah shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-medium text-merah block mb-0.5">Semua Foto Otomatis Masuk Galeri Arsip Lengkap</span>
+                  <span className="text-tinta-lembut leading-relaxed">
+                    Setiap foto yang Anda unggah otomatis ditampilkan di Galeri Arsip publik. Anda dapat menandai foto tertentu sebagai <strong>Sorotan (Highlight)</strong> untuk pita bergulir infinity, atau memilihnya sebagai <strong>Hero</strong> dan <strong>Kolase Tentang</strong> tanpa menghilangkannya dari galeri.
+                  </span>
+                </div>
               </div>
 
               {currentCollectionPhotos.length === 0 ? (
@@ -2477,6 +2547,33 @@ export default function PortfolioManager() {
                           </span>
 
                           <div className="flex items-center gap-1">
+                            {/* Tombol Cepat Sorotan (Highlight) */}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleAssignPhotoToSlot(
+                                  photo.id,
+                                  photo.slot === 'highlight' ? 'gallery' : 'highlight'
+                                )
+                              }
+                              className={`p-1 rounded-[2px] transition-colors ${
+                                photo.slot === 'highlight'
+                                  ? 'text-amber-600 bg-amber-50 hover:bg-amber-100'
+                                  : 'text-tinta-lembut hover:text-amber-600'
+                              }`}
+                              title={
+                                photo.slot === 'highlight'
+                                  ? 'Lepas dari pita sorotan'
+                                  : 'Tandai sebagai sorotan pita bergulir'
+                              }
+                            >
+                              <Star
+                                className={`w-3.5 h-3.5 ${
+                                  photo.slot === 'highlight' ? 'fill-amber-500 text-amber-500' : ''
+                                }`}
+                              />
+                            </button>
+
                             {/* Tombol Crop Foto Tersimpan */}
                             <button
                               type="button"
@@ -2547,14 +2644,14 @@ export default function PortfolioManager() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setSlotPickerTarget(null)}
           />
-          <div className="relative bg-white rounded-[2px] border border-garis w-full max-w-2xl p-6 shadow-elevated z-10 max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-garis pb-3 mb-4">
+          <div className="relative bg-white rounded-[2px] border border-garis w-full max-w-3xl p-6 shadow-elevated z-10 max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-garis pb-3 mb-4 shrink-0">
               <div>
                 <h3 className="font-serif text-lg font-medium text-tinta">
                   Pilih Foto untuk Slot: <span className="text-merah uppercase font-mono">{slotPickerTarget}</span>
                 </h3>
                 <p className="text-xs text-tinta-lembut mt-0.5">
-                  Klik foto di bawah ini untuk mengalokasikannya ke slot tersebut.
+                  Klik foto di bawah untuk menetapkannya ke slot ini. Foto akan tetap tampil di Galeri Arsip Lengkap.
                 </p>
               </div>
               <button
@@ -2566,30 +2663,67 @@ export default function PortfolioManager() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto grid grid-cols-3 sm:grid-cols-4 gap-3 p-1">
-              {currentCollectionPhotos.map((p) => (
-                <div
-                  key={p.id}
-                  onClick={() => handleAssignPhotoToSlot(p.id, slotPickerTarget)}
-                  className={`group cursor-pointer rounded-[2px] overflow-hidden border transition-all ${
-                    p.slot === slotPickerTarget
-                      ? 'border-merah ring-2 ring-merah'
-                      : 'border-garis hover:border-merah'
-                  }`}
-                >
-                  <div className="aspect-[3/4] bg-[#f7f5f0] relative">
-                    <img src={p.image_url} alt="" className="w-full h-full object-cover" />
-                    {p.slot && (
-                      <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 text-white text-[9px] font-mono rounded">
-                        {p.slot}
-                      </span>
-                    )}
-                  </div>
+            <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+              {currentCollectionPhotos.length === 0 ? (
+                <div className="text-center py-12 text-tinta-lembut">
+                  <ImageIcon className="w-10 h-10 mx-auto mb-2 opacity-40" />
+                  <p className="text-xs">Belum ada foto yang diunggah ke koleksi ini.</p>
                 </div>
-              ))}
+              ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                  {currentCollectionPhotos.map((p) => {
+                    const isSelected = p.slot === slotPickerTarget;
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => {
+                          if (isSelected && slotPickerTarget === 'highlight') {
+                            handleAssignPhotoToSlot(p.id, 'gallery');
+                          } else {
+                            handleAssignPhotoToSlot(p.id, slotPickerTarget);
+                          }
+                        }}
+                        className={`group cursor-pointer rounded-[2px] overflow-hidden border transition-all relative flex flex-col ${
+                          isSelected
+                            ? 'border-merah ring-2 ring-merah bg-merah/5'
+                            : 'border-garis hover:border-merah bg-white'
+                        }`}
+                      >
+                        <div className="w-full aspect-[3/4] min-h-[130px] bg-[#f7f5f0] relative overflow-hidden">
+                          <img
+                            src={p.image_url}
+                            alt=""
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                          />
+
+                          {/* Badge slot saat ini */}
+                          {p.slot && p.slot !== 'gallery' && (
+                            <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-black/75 text-white text-[9px] font-mono rounded-[2px] uppercase">
+                              {p.slot}
+                            </span>
+                          )}
+
+                          {/* Indikator terpilih */}
+                          {isSelected && (
+                            <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-merah text-white flex items-center justify-center shadow-sm">
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            </div>
+                          )}
+
+                          <div className="absolute inset-x-0 bottom-0 p-1.5 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-[10px] text-white font-mono text-center">
+                              {isSelected ? 'Klik untuk Lepas' : 'Pilih Foto Ini'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-garis flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-garis flex items-center justify-between shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -2606,7 +2740,7 @@ export default function PortfolioManager() {
               <button
                 type="button"
                 onClick={() => setSlotPickerTarget(null)}
-                className="px-4 py-2 border border-garis rounded-[2px] text-xs font-medium text-tinta"
+                className="px-4 py-2 border border-garis rounded-[2px] text-xs font-medium text-tinta hover:bg-kertas-tua"
               >
                 Tutup
               </button>

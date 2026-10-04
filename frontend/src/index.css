@@ -133,10 +133,10 @@
 
 /* Pita Sorotan Infinity: bergulir halus non-stop tanpa bisa diinteraksi/dijeda */
 .marquee-track-continuous {
-  display: flex;
-  width: max-content;
+  display: flex !important;
+  width: max-content !important;
   will-change: transform;
-  animation: marqueeLeft 40s linear infinite !important;
+  animation: marqueeContinuous 30s linear infinite !important;
   animation-play-state: running !important;
   pointer-events: none;
   user-select: none;
@@ -146,6 +146,15 @@
 .marquee-track-continuous:focus,
 .marquee-track-continuous:focus-within {
   animation-play-state: running !important;
+}
+
+@keyframes marqueeContinuous {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 @keyframes marqueeRight {
@@ -168,8 +177,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track-right,
-  .marquee-track-left,
-  .marquee-track-continuous {
+  .marquee-track-left {
     animation: none !important;
     transform: none !important;
   }

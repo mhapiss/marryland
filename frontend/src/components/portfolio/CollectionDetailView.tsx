@@ -101,11 +101,10 @@ export function CollectionDetailView({
     return list;
   }, [highlightPhotos, photos]);
 
-  // Gallery items filtering
+  // Gallery items filtering: Galeri Arsip Lengkap menampilkan SELURUH karya foto dokumentasi koleksi
   const galleryPhotos = useMemo(() => {
-    const list = photos.filter((p) => p.slot === 'gallery' || !p.slot);
-    // If empty, use all photos except hero
-    const candidateList = list.length > 0 ? list : photos.slice(1);
+    // Seluruh foto koleksi otomatis masuk ke Galeri Arsip Lengkap
+    const candidateList = photos;
 
     if (activeEventSlug === 'semua') return candidateList;
     return candidateList.filter((p) => {
@@ -485,8 +484,20 @@ export function CollectionDetailView({
 
           {/* Pita Foto Bergulir Infinity: Berjalan terus menerus tanpa henti & tidak bisa diinteraksi */}
           {marqueePhotos.length > 0 ? (
-            <div className="w-full overflow-hidden marquee-mask pointer-events-none select-none py-2">
-              <div className="marquee-track-continuous gap-6 md:gap-8 items-center pointer-events-none select-none">
+            <div className="w-full overflow-hidden marquee-mask pointer-events-none select-none py-2 relative">
+              <style>{`
+                @keyframes continuousMarqueeScroll {
+                  0% { transform: translate3d(0, 0, 0); }
+                  100% { transform: translate3d(-50%, 0, 0); }
+                }
+                .continuous-infinity-track {
+                  display: flex !important;
+                  width: max-content !important;
+                  animation: continuousMarqueeScroll 35s linear infinite !important;
+                  will-change: transform;
+                }
+              `}</style>
+              <div className="continuous-infinity-track flex gap-6 md:gap-8 items-center pointer-events-none select-none">
                 {[...marqueePhotos, ...marqueePhotos].map((photo, idx) => {
                   const isLandscape =
                     photo.width && photo.height ? photo.width > photo.height : false;
