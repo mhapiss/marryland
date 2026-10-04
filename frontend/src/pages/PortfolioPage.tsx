@@ -82,6 +82,7 @@ export default function PortfolioPage() {
                           <img
                             src={
                               col.cover_url ||
+                              (col.content as any)?.cover_url ||
                               'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80'
                             }
                             alt={`Koleksi ${col.name}`}

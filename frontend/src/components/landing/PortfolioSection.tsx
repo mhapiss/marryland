@@ -59,6 +59,7 @@ export function PortfolioSection({ data }: PortfolioSectionProps) {
           const staggerClass = idx === 1 ? 'md:translate-y-12' : '';
           const coverPhoto =
             cat.cover_url ||
+            (cat.content as any)?.cover_url ||
             'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80';
 
           return (

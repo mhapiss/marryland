@@ -94,7 +94,7 @@ export default function PortfolioManager() {
   const [uploadProgress, setUploadProgress] = useState('');
 
   // Slot photo picker modal state
-  const [slotPickerTarget, setSlotPickerTarget] = useState<PortfolioPhotoItem['slot'] | null>(null);
+  const [slotPickerTarget, setSlotPickerTarget] = useState<PortfolioPhotoItem['slot'] | 'cover' | null>(null);
 
   // Delete modal state
   const [deleteTargetPhoto, setDeleteTargetPhoto] = useState<PortfolioPhotoItem | null>(null);
@@ -115,7 +115,7 @@ export default function PortfolioManager() {
     open: boolean;
     imageUrl: string;
     fileName?: string;
-    targetType: 'queue' | 'existing';
+    targetType: 'queue' | 'existing' | 'cover';
     queueItemId?: string;
     photoItem?: PortfolioPhotoItem;
     suggestedRatio?: number | null;
@@ -206,6 +206,16 @@ export default function PortfolioManager() {
     return currentCollectionPhotos.filter((p) => p.slot === 'highlight');
   }, [currentCollectionPhotos]);
 
+  const coverPhotoUrl = useMemo(() => {
+    if (!selectedCollection) return null;
+    return (
+      selectedCollection.cover_url ||
+      (selectedCollection.content as any)?.cover_url ||
+      heroPhoto?.image_url ||
+      null
+    );
+  }, [selectedCollection, heroPhoto]);
+
   // Dirty state calculation
   const isDirty = useMemo(() => {
     if (!selectedCollection || !initialCollectionStr) return false;
@@ -278,7 +288,10 @@ export default function PortfolioManager() {
         layout: selectedCollection.layout,
         content: {
           ...selectedCollection.content,
-          cover_url: heroPhoto ? heroPhoto.image_url : (selectedCollection.content as any)?.cover_url || null,
+          cover_url:
+            selectedCollection.cover_url ||
+            (selectedCollection.content as any)?.cover_url ||
+            (heroPhoto ? heroPhoto.image_url : null),
         },
         position: selectedCollection.position || 0,
         updated_at: new Date().toISOString(),
@@ -771,6 +784,38 @@ export default function PortfolioManager() {
       }
 
       toast.success('Foto koleksi berhasil dipotong dan diperbarui');
+    } else if (cropperState.targetType === 'cover') {
+      const fileName = `${Date.now()}-cover-${Math.random().toString(36).slice(2, 8)}.webp`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('media-library')
+        .upload(fileName, croppedBlob, {
+          contentType: 'image/webp',
+          cacheControl: '31536000',
+          upsert: true,
+        });
+
+      if (uploadError) {
+        toast.error('Gagal mengunggah foto sampul: ' + uploadError.message);
+        return;
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('media-library').getPublicUrl(fileName);
+
+      if (selectedCollection) {
+        setSelectedCollection({
+          ...selectedCollection,
+          cover_url: publicUrl,
+          content: {
+            ...selectedCollection.content,
+            cover_url: publicUrl,
+          },
+        });
+      }
+
+      toast.success('Foto sampul menu portofolio berhasil dipotong dan diperbarui');
     }
   };
 
@@ -2264,6 +2309,123 @@ export default function PortfolioManager() {
                 />
               </div>
 
+              {/* Foto Sampul Kartu Menu Portofolio */}
+              <div className="pt-6 border-t border-garis">
+                <div className="mb-3">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-tinta font-semibold">
+                    Foto Sampul Menu Direktori (/portofolio & Beranda)
+                  </label>
+                  <p className="text-xs text-tinta-lembut mt-0.5">
+                    Foto lanskap (rasio 16:9 / 16:10) yang tampil pada kartu pilihan koleksi di halaman direktori portofolio dan beranda.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 items-center bg-kertas-tua/30 p-4 rounded-[2px] border border-garis">
+                  {/* Preview Bingkai Kartu */}
+                  <div className="sm:col-span-6">
+                    <div className="aspect-[16/10] bg-[#f7f5f0] rounded-[2px] overflow-hidden border border-garis relative group shadow-sm">
+                      {coverPhotoUrl ? (
+                        <>
+                          <img
+                            src={coverPhotoUrl}
+                            alt="Sampul Menu"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
+                            <button
+                              type="button"
+                              onClick={() => setSlotPickerTarget('cover')}
+                              className="px-3 py-1.5 bg-white text-tinta rounded-[2px] text-xs font-medium hover:bg-kertas-tua shadow-sm"
+                            >
+                              Ganti Foto
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCropperState({
+                                  open: true,
+                                  imageUrl: coverPhotoUrl,
+                                  fileName: 'Sampul Menu ' + selectedCollection.name,
+                                  targetType: 'cover',
+                                  suggestedRatio: 16 / 9,
+                                });
+                              }}
+                              className="px-3 py-1.5 bg-merah text-white rounded-[2px] text-xs font-medium hover:bg-merah-hover shadow-sm flex items-center gap-1"
+                            >
+                              <Crop className="w-3.5 h-3.5" />
+                              <span>Potong 16:9</span>
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div
+                          onClick={() => setSlotPickerTarget('cover')}
+                          className="w-full h-full flex flex-col items-center justify-center text-center cursor-pointer p-4 hover:bg-merah/5 transition-colors"
+                        >
+                          <ImageIcon className="w-8 h-8 text-tinta-lembut opacity-40 mb-2" />
+                          <span className="text-xs font-medium text-tinta">Pilih Foto Sampul Menu</span>
+                          <span className="text-[10px] text-tinta-lembut font-mono mt-0.5">Rasio 16:9 / 16:10</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Kontrol Aksi Sampul */}
+                  <div className="sm:col-span-6 space-y-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setSlotPickerTarget('cover')}
+                      className="w-full px-4 py-2.5 bg-white border border-garis hover:border-merah text-tinta rounded-[2px] text-xs font-medium flex items-center justify-center gap-2 transition-colors min-h-[40px]"
+                    >
+                      <ImageIcon className="w-4 h-4 text-merah" />
+                      <span>Pilih dari Foto Koleksi Ini</span>
+                    </button>
+
+                    {heroPhoto && heroPhoto.image_url !== coverPhotoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCollection({
+                            ...selectedCollection,
+                            cover_url: heroPhoto.image_url,
+                            content: {
+                              ...selectedCollection.content,
+                              cover_url: heroPhoto.image_url,
+                            },
+                          });
+                          toast.success('Foto Hero disalin menjadi foto sampul menu');
+                        }}
+                        className="w-full px-4 py-2.5 bg-white border border-garis hover:border-tinta text-tinta rounded-[2px] text-xs font-medium flex items-center justify-center gap-2 transition-colors min-h-[40px]"
+                      >
+                        <Copy className="w-4 h-4 text-tinta-lembut" />
+                        <span>Gunakan Foto Hero Koleksi</span>
+                      </button>
+                    )}
+
+                    {coverPhotoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCollection({
+                            ...selectedCollection,
+                            cover_url: null,
+                            content: {
+                              ...selectedCollection.content,
+                              cover_url: null,
+                            },
+                          });
+                          toast.info('Foto sampul di-reset ke foto Hero otomatis');
+                        }}
+                        className="w-full px-3 py-2 text-xs text-red-600 hover:underline flex items-center justify-center gap-1 font-mono"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Reset ke Foto Hero Otomatis</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-mono uppercase tracking-wider text-tinta-lembut mb-2">
                   Status Publikasi
@@ -2648,10 +2810,15 @@ export default function PortfolioManager() {
             <div className="flex items-center justify-between border-b border-garis pb-3 mb-4 shrink-0">
               <div>
                 <h3 className="font-serif text-lg font-medium text-tinta">
-                  Pilih Foto untuk Slot: <span className="text-merah uppercase font-mono">{slotPickerTarget}</span>
+                  Pilih Foto untuk Slot:{' '}
+                  <span className="text-merah uppercase font-mono">
+                    {slotPickerTarget === 'cover' ? 'SAMPUL MENU PORTOFOLIO' : slotPickerTarget}
+                  </span>
                 </h3>
                 <p className="text-xs text-tinta-lembut mt-0.5">
-                  Klik foto di bawah untuk menetapkannya ke slot ini. Foto akan tetap tampil di Galeri Arsip Lengkap.
+                  {slotPickerTarget === 'cover'
+                    ? 'Klik foto di bawah untuk menjadikannya foto sampul kartu koleksi ini di menu /portofolio dan beranda.'
+                    : 'Klik foto di bawah untuk menetapkannya ke slot ini. Foto akan tetap tampil di Galeri Arsip Lengkap.'}
                 </p>
               </div>
               <button
@@ -2672,11 +2839,32 @@ export default function PortfolioManager() {
               ) : (
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                   {currentCollectionPhotos.map((p) => {
-                    const isSelected = p.slot === slotPickerTarget;
+                    const isSelected =
+                      slotPickerTarget === 'cover'
+                        ? selectedCollection?.cover_url === p.image_url ||
+                          (selectedCollection?.content as any)?.cover_url === p.image_url
+                        : p.slot === slotPickerTarget;
+
                     return (
                       <div
                         key={p.id}
                         onClick={() => {
+                          if (slotPickerTarget === 'cover') {
+                            if (selectedCollection) {
+                              setSelectedCollection({
+                                ...selectedCollection,
+                                cover_url: p.image_url,
+                                content: {
+                                  ...selectedCollection.content,
+                                  cover_url: p.image_url,
+                                },
+                              });
+                              toast.success('Foto sampul menu portofolio berhasil dipilih. Silakan klik Simpan.');
+                            }
+                            setSlotPickerTarget(null);
+                            return;
+                          }
+
                           if (isSelected && slotPickerTarget === 'highlight') {
                             handleAssignPhotoToSlot(p.id, 'gallery');
                           } else {
@@ -2727,7 +2915,7 @@ export default function PortfolioManager() {
               <button
                 type="button"
                 onClick={() => {
-                  setPhotoSlot(slotPickerTarget);
+                  setPhotoSlot(slotPickerTarget === 'cover' ? 'hero' : (slotPickerTarget || 'gallery'));
                   setShowPhotoModal(true);
                   setSlotPickerTarget(null);
                 }}

@@ -139,6 +139,7 @@ export interface PortfolioCollection {
     cta_heading?: string;
     cta_subheading?: string;
     wa_message_template?: string;
+    cover_url?: string | null;
   };
   cover_url?: string | null;
   position?: number;

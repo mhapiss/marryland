@@ -23,7 +23,28 @@ export function usePortfolioCollections() {
         .order('position', { ascending: true });
 
       if (!error && data && data.length > 0) {
-        setCollections(data);
+        // Ambil foto hero / foto pertama untuk tiap koleksi dari portfolio_photos
+        const { data: photos } = await supabase
+          .from('portfolio_photos')
+          .select('id, collection_id, image_url, slot')
+          .eq('is_published', true);
+
+        const enriched = data.map((col) => {
+          const colPhotos = photos ? photos.filter((p) => p.collection_id === col.id) : [];
+          const heroPhoto = colPhotos.find((p) => p.slot === 'hero') || colPhotos[0];
+          const resolvedCover =
+            (col.content as any)?.cover_url ||
+            col.cover_url ||
+            heroPhoto?.image_url ||
+            null;
+
+          return {
+            ...col,
+            cover_url: resolvedCover,
+          };
+        });
+
+        setCollections(enriched);
       } else {
         setCollections(DEFAULT_COLLECTIONS);
       }
