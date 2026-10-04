@@ -63,12 +63,31 @@ export default function PortfolioPage() {
                 const isEven = idx % 2 === 0;
                 const palette = PORTFOLIO_PALETTES[col.theme_palette] || PORTFOLIO_PALETTES['merah-vintage'];
 
+                // Dapatkan 3 foto pratinjau dengan ukuran sama persis
+                const previewList =
+                  col.preview_photos && col.preview_photos.length >= 3
+                    ? col.preview_photos.slice(0, 3)
+                    : [
+                        col.cover_url ||
+                          'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
+                        'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+                        'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+                      ];
+
+                // Tag prosesi adat yang relevan
+                const getProcessTags = (slug: string) => {
+                  if (slug === 'batak') return ['Martumpol', 'Pemberkatan', 'Mangulosi', 'Pesta Unjuk'];
+                  if (slug === 'minang') return ['Manjapuik', 'Akad Nikah', 'Baralek Gadang', 'Batandang'];
+                  if (slug === 'melayu') return ['Tepak Sirih', 'Malam Berinai', 'Akad Nikah', 'Resepsi'];
+                  return ['Lamaran', 'Akad / Ijab', 'Resepsi Adat'];
+                };
+
                 return (
                   <article
                     key={col.id || col.slug}
                     className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center pt-8 border-t border-garis"
                   >
-                    {/* Visual Photo (Alternates order) with frame-cetakan */}
+                    {/* Visual Kolase 3 Foto Potret (Triptych Sejajar - Ukuran Sama Semua) */}
                     <div
                       className={`lg:col-span-7 ${
                         isEven ? 'lg:order-1' : 'lg:order-2'
@@ -76,33 +95,52 @@ export default function PortfolioPage() {
                     >
                       <Link
                         to={`/portofolio/${col.slug}`}
-                        className="group block relative overflow-hidden rounded-[2px] frame-cetakan bg-kertas-tua/50"
+                        className="group block p-2 sm:p-2.5 bg-white/95 rounded-[2px] border border-garis shadow-sm hover:shadow-elevated hover:border-merah/50 transition-all duration-300"
+                        title={`Buka Dokumentasi Pernikahan Adat ${col.name}`}
                       >
-                        <div className="aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden">
-                          <img
-                            src={
-                              col.cover_url ||
-                              (col.content as any)?.cover_url ||
-                              'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80'
-                            }
-                            alt={`Koleksi ${col.name}`}
-                            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                            loading="lazy"
-                            decoding="async"
-                          />
+                        {/* Grid 3 Foto Potret (Rasio Aspek 3:4 Presisi Identik) */}
+                        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                          {previewList.map((photoUrl, photoIdx) => (
+                            <div
+                              key={photoIdx}
+                              className="relative aspect-[3/4] w-full overflow-hidden rounded-[2px] bg-kertas-tua border border-garis/60"
+                            >
+                              <img
+                                src={photoUrl}
+                                alt={`Dokumentasi Adat ${col.name} ${photoIdx + 1}`}
+                                className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                                loading="lazy"
+                                decoding="async"
+                              />
+
+                              {/* Vignette Halus */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-30 group-hover:opacity-10 transition-opacity" />
+
+                              {/* Label Nomor Foto Kecil */}
+                              <div className="absolute top-1.5 left-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                                <span className="text-[9px] font-mono px-1 py-0.5 bg-black/60 text-white rounded-[1px] backdrop-blur-xs">
+                                  0{photoIdx + 1}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
 
-                        {/* Subtle Editorial Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
+                        {/* Stempel Metadata Editorial Bawah */}
+                        <div className="mt-2.5 pt-2 border-t border-garis/60 flex items-center justify-between text-xs text-tinta-lembut font-mono">
+                          <div className="flex items-center gap-2">
+                            <span className="px-1.5 py-0.5 bg-kertas-tua text-tinta font-semibold rounded-[2px] border border-garis/70 text-[10px]">
+                              № 0{idx + 1}
+                            </span>
+                            <span className="font-sans font-medium text-tinta text-xs">
+                              Koleksi Adat {col.name}
+                            </span>
+                          </div>
 
-                        {/* Stamp */}
-                        <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 text-white">
-                          <span className="text-[10px] font-mono uppercase tracking-widest bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-[2px] block w-fit mb-1.5">
-                            Koleksi 0{idx + 1}
-                          </span>
-                          <span className="font-serif text-xl sm:text-2xl font-normal">
-                            Adat {col.name}
-                          </span>
+                          <div className="flex items-center gap-1.5 text-merah font-sans text-xs font-medium group-hover:translate-x-0.5 transition-transform">
+                            <span>{col.total_photos || 12}+ Foto • Buka Galeri</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </div>
                         </div>
                       </Link>
                     </div>
@@ -139,7 +177,7 @@ export default function PortfolioPage() {
 
                       {/* Process Tags */}
                       <div className="flex flex-wrap gap-2 mb-8">
-                        {['Lamaran', 'Akad / Ijab', 'Resepsi'].map((t) => (
+                        {getProcessTags(col.slug).map((t) => (
                           <span
                             key={t}
                             className="px-3 py-1 bg-kertas border border-garis rounded-[2px] text-xs text-tinta-lembut font-body"

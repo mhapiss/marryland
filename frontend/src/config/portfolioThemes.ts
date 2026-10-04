@@ -142,6 +142,8 @@ export interface PortfolioCollection {
     cover_url?: string | null;
   };
   cover_url?: string | null;
+  preview_photos?: string[];
+  total_photos?: number;
   position?: number;
   created_at?: string;
   updated_at?: string;
@@ -195,6 +197,11 @@ export const DEFAULT_COLLECTIONS: PortfolioCollection[] = [
     theme_font: 'editorial',
     position: 1,
     cover_url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=80',
+    preview_photos: [
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=800&q=80',
+    ],
     layout: {
       hero_side: 'left',
       collage_variant: 'A',
@@ -224,6 +231,11 @@ export const DEFAULT_COLLECTIONS: PortfolioCollection[] = [
     theme_font: 'default',
     position: 2,
     cover_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80',
+    preview_photos: [
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80',
+    ],
     layout: {
       hero_side: 'right',
       collage_variant: 'B',
@@ -253,6 +265,11 @@ export const DEFAULT_COLLECTIONS: PortfolioCollection[] = [
     theme_font: 'editorial',
     position: 3,
     cover_url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80',
+    preview_photos: [
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+    ],
     layout: {
       hero_side: 'left',
       collage_variant: 'A',

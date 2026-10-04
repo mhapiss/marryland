@@ -23,11 +23,12 @@ export function usePortfolioCollections() {
         .order('position', { ascending: true });
 
       if (!error && data && data.length > 0) {
-        // Ambil foto hero / foto pertama untuk tiap koleksi dari portfolio_photos
+        // Ambil foto koleksi untuk pratinjau triptych dan sampul
         const { data: photos } = await supabase
           .from('portfolio_photos')
-          .select('id, collection_id, image_url, slot')
-          .eq('is_published', true);
+          .select('id, collection_id, image_url, slot, order_index')
+          .eq('is_published', true)
+          .order('order_index', { ascending: true });
 
         const enriched = data.map((col) => {
           const colPhotos = photos ? photos.filter((p) => p.collection_id === col.id) : [];
@@ -38,9 +39,56 @@ export function usePortfolioCollections() {
             heroPhoto?.image_url ||
             null;
 
+          // Urutkan foto untuk preview kolase 3 foto:
+          // Utamakan slot potret unggulan (about_1, hero, about_2, about_3, highlight, gallery)
+          const slotPriority: Record<string, number> = {
+            about_1: 1,
+            hero: 2,
+            about_2: 3,
+            about_3: 4,
+            highlight: 5,
+            gallery: 6,
+          };
+
+          const sortedPhotos = [...colPhotos].sort((a, b) => {
+            const pa = slotPriority[a.slot || ''] || 99;
+            const pb = slotPriority[b.slot || ''] || 99;
+            return pa - pb;
+          });
+
+          // Kumpulkan URL unik
+          const uniqueUrls: string[] = [];
+          for (const p of sortedPhotos) {
+            if (p.image_url && !uniqueUrls.includes(p.image_url)) {
+              uniqueUrls.push(p.image_url);
+            }
+          }
+
+          // Fallback ke default photos jika foto dari database kurang dari 3
+          const fallbackCol = DEFAULT_COLLECTIONS.find(
+            (c) => c.slug === col.slug || c.id === col.id
+          );
+          const fallbackUrls = [
+            ...(fallbackCol?.preview_photos || []),
+            ...(DEFAULT_COLLECTION_PHOTOS[col.slug] || []).map((p) => p.image_url),
+            resolvedCover,
+          ].filter(Boolean) as string[];
+
+          for (const fb of fallbackUrls) {
+            if (uniqueUrls.length >= 3) break;
+            if (!uniqueUrls.includes(fb)) {
+              uniqueUrls.push(fb);
+            }
+          }
+
+          const preview_photos = uniqueUrls.slice(0, 3);
+          const total_photos = Math.max(colPhotos.length, fallbackCol?.total_photos || 12);
+
           return {
             ...col,
             cover_url: resolvedCover,
+            preview_photos,
+            total_photos,
           };
         });
 
