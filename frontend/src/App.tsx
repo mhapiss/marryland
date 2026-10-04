@@ -5,38 +5,54 @@ import { Toaster } from 'sonner';
 import { useAuth } from './hooks/useAuth';
 import ErrorBoundary from './components/ErrorBoundary';
 import OfflineBanner from './components/OfflineBanner';
+import { routeLoaders } from './lib/routeLoaders';
 
-// Code-split all routes
-const LandingPage = React.lazy(() => import('./pages/LandingPage'));
-const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
-const LoginPage = React.lazy(() => import('./pages/LoginPage'));
-const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const GallerySelection = React.lazy(() => import('./pages/GallerySelection'));
-const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
-const PortfolioManager = React.lazy(() => import('./pages/PortfolioManager'));
-const TermsPage = React.lazy(() => import('./pages/TermsPage'));
-const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'));
-const ContactPage = React.lazy(() => import('./pages/ContactPage'));
-const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage'));
-const ResetPasswordPage = React.lazy(() => import('./pages/ResetPasswordPage'));
-const HomeSettingsManager = React.lazy(() => import('./pages/HomeSettingsManager'));
-const ClientPage = React.lazy(() => import('./pages/ClientPage'));
-const FaqPage = React.lazy(() => import('./pages/FaqPage'));
-const PortfolioPage = React.lazy(() => import('./pages/PortfolioPage'));
-const ContentManager = React.lazy(() => import('./pages/ContentManager'));
-const MediaLibraryPage = React.lazy(() => import('./pages/MediaLibraryPage'));
-const CollectionDetailPage = React.lazy(() => import('./pages/CollectionDetailPage'));
-const DemoPage = React.lazy(() => import('./pages/DemoPage'));
-const AlbumPage = React.lazy(() => import('./pages/AlbumPage'));
-const CollectionPreviewPage = React.lazy(() => import('./pages/CollectionPreviewPage'));
-const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
+// Code-split all routes (loader dibagi dengan prefetch hover/fokus di src/lib/routeLoaders.ts)
+const LandingPage = React.lazy(routeLoaders.LandingPage);
+const RegisterPage = React.lazy(routeLoaders.RegisterPage);
+const LoginPage = React.lazy(routeLoaders.LoginPage);
+const Dashboard = React.lazy(routeLoaders.Dashboard);
+const GallerySelection = React.lazy(routeLoaders.GallerySelection);
+const AdminDashboard = React.lazy(routeLoaders.AdminDashboard);
+const PortfolioManager = React.lazy(routeLoaders.PortfolioManager);
+const TermsPage = React.lazy(routeLoaders.TermsPage);
+const PrivacyPage = React.lazy(routeLoaders.PrivacyPage);
+const ContactPage = React.lazy(routeLoaders.ContactPage);
+const ForgotPasswordPage = React.lazy(routeLoaders.ForgotPasswordPage);
+const ResetPasswordPage = React.lazy(routeLoaders.ResetPasswordPage);
+const HomeSettingsManager = React.lazy(routeLoaders.HomeSettingsManager);
+const ClientPage = React.lazy(routeLoaders.ClientPage);
+const FaqPage = React.lazy(routeLoaders.FaqPage);
+const PortfolioPage = React.lazy(routeLoaders.PortfolioPage);
+const ContentManager = React.lazy(routeLoaders.ContentManager);
+const MediaLibraryPage = React.lazy(routeLoaders.MediaLibraryPage);
+const CollectionDetailPage = React.lazy(routeLoaders.CollectionDetailPage);
+const DemoPage = React.lazy(routeLoaders.DemoPage);
+const AlbumPage = React.lazy(routeLoaders.AlbumPage);
+const CollectionPreviewPage = React.lazy(routeLoaders.CollectionPreviewPage);
+const NotFoundPage = React.lazy(routeLoaders.NotFoundPage);
 
+// Fallback ringan: tampilan sama dengan layar awal di index.html (latar kertas, nama merek di tengah)
+// supaya tidak berkedip saat berganti dari layar awal ke fallback ke halaman.
+// Teks "Memuat..." baru muncul bila pemuatan lebih dari 400 ms.
 function PageLoader() {
+  const [showHint, setShowHint] = React.useState(false);
+  React.useEffect(() => {
+    const t = window.setTimeout(() => setShowHint(true), 400);
+    return () => window.clearTimeout(t);
+  }, []);
+
   return (
-    <div className="flex items-center justify-center h-screen bg-kertas">
-      <div className="text-center">
-        <div className="w-8 h-8 border-2 border-merah border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-sm font-sans text-tinta-lembut">Memuat...</p>
+    <div className="flex items-center justify-center min-h-[100dvh] bg-kertas" role="status" aria-label="Memuat">
+      <div className="relative">
+        <span className="font-serif text-[1.75rem] tracking-[-0.01em] text-tinta">by.marryland</span>
+        <p
+          className={`absolute top-full left-1/2 -translate-x-1/2 mt-3 text-sm font-sans text-tinta-lembut whitespace-nowrap transition-opacity duration-300 ${
+            showHint ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          Memuat...
+        </p>
       </div>
     </div>
   );

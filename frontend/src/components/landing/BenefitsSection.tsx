@@ -59,7 +59,7 @@ export function BenefitsSection({ data }: BenefitsSectionProps) {
   ];
 
   return (
-    <Section id="manfaat" bg="kertas" doubleBorderTop doubleBorderBottom>
+    <Section id="manfaat" bg="kertas" doubleBorderTop doubleBorderBottom belowFold>
       {/* Header */}
       <div className="max-w-3xl mb-14 md:mb-16">
         <div className="flex items-center gap-3 mb-4">

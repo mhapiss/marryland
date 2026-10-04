@@ -26,7 +26,7 @@ export function StepsSection({ data }: StepsSectionProps) {
   const icons = [UploadCloud, Share2, CopyCheck];
 
   return (
-    <Section id="cara-kerja" bg="kertas-tua" doubleBorderTop doubleBorderBottom>
+    <Section id="cara-kerja" bg="kertas-tua" doubleBorderTop doubleBorderBottom belowFold>
       {/* Header */}
       <div className="max-w-2xl mb-14 md:mb-16">
         <div className="flex items-center gap-3 mb-4">

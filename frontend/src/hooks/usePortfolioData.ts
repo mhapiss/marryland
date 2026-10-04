@@ -10,26 +10,31 @@ import {
   DEFAULT_COLLECTION_PHOTOS,
 } from '../config/portfolioThemes';
 
+let cachedCollections: PortfolioCollection[] | null = null;
+
 export function usePortfolioCollections() {
-  const [collections, setCollections] = useState<PortfolioCollection[]>(DEFAULT_COLLECTIONS);
-  const [loading, setLoading] = useState(true);
+  const [collections, setCollections] = useState<PortfolioCollection[]>(cachedCollections || DEFAULT_COLLECTIONS);
+  const [loading, setLoading] = useState(!cachedCollections);
 
   const fetchCollections = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('portfolio_collections')
-        .select('*')
-        .eq('status', 'published')
-        .order('position', { ascending: true });
-
-      if (!error && data && data.length > 0) {
-        // Ambil foto koleksi untuk pratinjau triptych dan sampul
-        const { data: photos } = await supabase
+      const [colRes, photoRes] = await Promise.all([
+        supabase
+          .from('portfolio_collections')
+          .select('*')
+          .eq('status', 'published')
+          .order('position', { ascending: true }),
+        supabase
           .from('portfolio_photos')
           .select('id, collection_id, image_url, slot, order_index')
           .eq('is_published', true)
-          .order('order_index', { ascending: true });
+          .order('order_index', { ascending: true }),
+      ]);
 
+      const data = colRes.data;
+      const photos = photoRes.data;
+
+      if (!colRes.error && data && data.length > 0) {
         const enriched = data.map((col) => {
           const colPhotos = photos ? photos.filter((p) => p.collection_id === col.id) : [];
           const heroPhoto = colPhotos.find((p) => p.slot === 'hero') || colPhotos[0];
@@ -92,6 +97,7 @@ export function usePortfolioCollections() {
           };
         });
 
+        cachedCollections = enriched;
         setCollections(enriched);
       } else {
         setCollections(DEFAULT_COLLECTIONS);

@@ -7,6 +7,7 @@ interface SectionProps {
   bg?: 'kertas' | 'kertas-tua' | 'marun' | 'background' | 'ivory' | 'dark' | 'white';
   doubleBorderTop?: boolean;
   doubleBorderBottom?: boolean;
+  belowFold?: boolean;
   children: React.ReactNode;
 }
 
@@ -17,6 +18,7 @@ export function Section({
   bg = 'kertas',
   doubleBorderTop = false,
   doubleBorderBottom = false,
+  belowFold = false,
   children,
 }: SectionProps) {
   const bgClasses: Record<string, string> = {
@@ -32,9 +34,10 @@ export function Section({
   const currentBg = bgClasses[bg] || bgClasses.kertas;
   const borderTop = doubleBorderTop ? 'border-double-t' : '';
   const borderBottom = doubleBorderBottom ? 'border-double-b' : '';
+  const visibilityClass = belowFold ? 'content-visibility-auto' : '';
 
   return (
-    <section id={id} className={`py-16 md:py-28 relative ${currentBg} ${borderTop} ${borderBottom} ${className}`}>
+    <section id={id} className={`py-16 md:py-28 relative ${currentBg} ${borderTop} ${borderBottom} ${visibilityClass} ${className}`}>
       <div className={`max-w-[1200px] mx-auto px-5 sm:px-8 md:px-12 ${containerClassName}`}>
         {children}
       </div>

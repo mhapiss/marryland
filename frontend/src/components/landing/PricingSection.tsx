@@ -26,7 +26,7 @@ export function PricingSection({ data }: PricingSectionProps) {
   }
 
   return (
-    <Section id="harga" bg="kertas-tua">
+    <Section id="harga" bg="kertas-tua" belowFold>
       <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
         <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-merah block mb-2">
           INVESTASI TERJANGKAU

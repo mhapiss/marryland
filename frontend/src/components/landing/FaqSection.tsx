@@ -14,7 +14,7 @@ export function FaqSection({ data }: FaqSectionProps) {
   const displayItems = allItems.slice(0, 5);
 
   return (
-    <Section id="faq" bg="kertas-tua" doubleBorderTop doubleBorderBottom>
+    <Section id="faq" bg="kertas-tua" doubleBorderTop doubleBorderBottom belowFold>
       <div className="max-w-3xl mx-auto">
         <div className="mb-12 md:mb-16">
           <div className="flex items-center gap-3 mb-4">

@@ -22,9 +22,25 @@
   <meta property="twitter:title" content="by.marryland — Galeri Seleksi Foto Klien untuk Fotografer" />
   <meta property="twitter:description" content="Platform kurasi dan seleksi foto klien yang cepat, elegan, dan terintegrasi langsung dengan Google Drive untuk fotografer pernikahan dan wisuda." />
   <meta property="twitter:image" content="https://by-marryland.app/og-image.jpg" />
+
+  <!-- Koneksi awal: Supabase (data, auth, storage) dan origin gambar Google Drive / Unsplash -->
+  <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />
+  <link rel="dns-prefetch" href="%VITE_SUPABASE_URL%" />
+  <link rel="preconnect" href="https://drive.google.com" />
+  <link rel="dns-prefetch" href="https://drive.google.com" />
+  <link rel="preconnect" href="https://lh3.googleusercontent.com" />
+  <link rel="dns-prefetch" href="https://lh3.googleusercontent.com" />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+  <link rel="dns-prefetch" href="https://images.unsplash.com" />
+
+  <!-- Layar awal tanpa JS: latar sama dengan tema agar tidak ada kilatan putih -->
+  <style>
+    html, body { background-color: #F3EADB; margin: 0; }
+    #splash { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; background-color: #F3EADB; color: #2B1815; font-family: 'Gloock', 'Playfair Display', Georgia, serif; font-size: 1.75rem; letter-spacing: -0.01em; }
+  </style>
 </head>
 <body class="bg-kertas text-tinta font-sans antialiased min-h-[100dvh]">
-  <div id="root"></div>
+  <div id="root"><div id="splash" role="status" aria-label="Memuat">by.marryland</div></div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

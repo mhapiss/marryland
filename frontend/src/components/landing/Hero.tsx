@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CheckCircle2, Check, ArrowRight } from 'lucide-react';
+import { prefetchRoute } from '../../lib/routeLoaders';
 
 interface HeroProps {
   data?: any;
@@ -74,6 +75,8 @@ export function Hero({ data, demoSlug }: HeroProps) {
           <div className="flex flex-wrap items-center gap-4 mb-9 w-full sm:w-auto">
             <Link
               to="/register"
+              onMouseEnter={() => prefetchRoute('/register')}
+              onFocus={() => prefetchRoute('/register')}
               className="inline-flex items-center justify-center bg-merah hover:bg-marun text-kertas px-7 py-3.5 text-sm font-medium rounded-sm transition-colors min-h-[44px]"
             >
               {ctaPrimary}
@@ -81,6 +84,8 @@ export function Hero({ data, demoSlug }: HeroProps) {
 
             <button
               onClick={() => navigate(`/${demoSlug || 'demo'}`)}
+              onMouseEnter={() => prefetchRoute(`/${demoSlug || 'demo'}`)}
+              onFocus={() => prefetchRoute(`/${demoSlug || 'demo'}`)}
               className="inline-flex items-center justify-center border border-tinta/30 text-tinta hover:bg-tinta hover:text-kertas px-6 py-3.5 text-sm font-medium rounded-sm transition-colors min-h-[44px]"
             >
               {ctaDemo}
@@ -88,6 +93,8 @@ export function Hero({ data, demoSlug }: HeroProps) {
 
             <Link
               to="/login"
+              onMouseEnter={() => prefetchRoute('/login')}
+              onFocus={() => prefetchRoute('/login')}
               className="text-xs uppercase tracking-[0.14em] font-bold text-tinta hover:text-merah px-3 py-2 min-h-[44px] flex items-center transition-colors link-vintage"
             >
               {ctaLogin}

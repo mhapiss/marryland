@@ -75,6 +75,12 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* Section di bawah lipatan untuk optimasi render dan INP */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
 }
 
 /* Custom scrollbar */

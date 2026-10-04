@@ -25,7 +25,7 @@ export function PortfolioSection({ data }: PortfolioSectionProps) {
   ).slice(0, 4);
 
   return (
-    <Section id="portofolio" bg="kertas">
+    <Section id="portofolio" bg="kertas" belowFold>
       {/* Header: Left title, Right link */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 md:mb-16 pb-6 border-b border-garis">
         <div>

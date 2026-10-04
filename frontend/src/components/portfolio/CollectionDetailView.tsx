@@ -277,6 +277,7 @@ export function CollectionDetailView({
                           }
                         }}
                         decoding="async"
+                        fetchPriority="high"
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-garis">

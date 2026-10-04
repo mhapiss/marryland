@@ -25,7 +25,7 @@ export function FeaturedSection({ photos = [], data }: FeaturedSectionProps) {
   const displayPhotos = photos && photos.length >= 3 ? photos : null;
 
   return (
-    <section className="py-24 md:py-32 bg-marun text-kertas overflow-hidden border-t border-marun">
+    <section className="py-24 md:py-32 bg-marun text-kertas overflow-hidden border-t border-marun content-visibility-auto">
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 md:px-12 mb-14 md:mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
           <div className="flex items-center gap-3 mb-4">

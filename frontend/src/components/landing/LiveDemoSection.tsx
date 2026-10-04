@@ -20,7 +20,7 @@ export function LiveDemoSection({ photo, data }: LiveDemoSectionProps) {
   const ctaText = data?.cta_text || 'Buka Galeri Demo';
 
   return (
-    <Section id="demo" bg="kertas" doubleBorderTop doubleBorderBottom>
+    <Section id="demo" bg="kertas" doubleBorderTop doubleBorderBottom belowFold>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         
         {/* Left Column: Heading and CTA */}

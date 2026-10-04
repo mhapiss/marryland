@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Section } from './Section';
 import { ArrowRight, Eye } from 'lucide-react';
+import { prefetchRoute } from '../../lib/routeLoaders';
 
 interface CtaSectionProps {
   data?: any;
@@ -20,7 +21,7 @@ export function CtaSection({ data, demoSlug }: CtaSectionProps) {
   const ctaSecondary = data?.cta_secondary || 'Coba Galeri Demo';
 
   return (
-    <Section bg="kertas" className="!py-24 md:!py-32">
+    <Section bg="kertas" className="!py-24 md:!py-32" belowFold>
       <div className="bg-marun text-kertas rounded-[2px] p-8 md:p-16 text-center max-w-4xl mx-auto shadow-elevated relative overflow-hidden border border-garis/30">
         
         {/* Subtle background ambient line */}
@@ -41,6 +42,8 @@ export function CtaSection({ data, demoSlug }: CtaSectionProps) {
         <div className="flex flex-wrap justify-center items-center gap-4">
           <Link
             to="/register"
+            onMouseEnter={() => prefetchRoute('/register')}
+            onFocus={() => prefetchRoute('/register')}
             className="inline-flex items-center gap-2 bg-kertas text-marun hover:bg-white px-8 py-4 text-xs font-semibold tracking-wider uppercase rounded-[2px] transition-colors min-h-[44px] shadow-sm"
           >
             <span>{ctaPrimary}</span>
@@ -49,6 +52,8 @@ export function CtaSection({ data, demoSlug }: CtaSectionProps) {
 
           <button
             onClick={() => navigate(`/${demoSlug || 'demo'}`)}
+            onMouseEnter={() => prefetchRoute(`/${demoSlug || 'demo'}`)}
+            onFocus={() => prefetchRoute(`/${demoSlug || 'demo'}`)}
             className="inline-flex items-center gap-2 border border-kertas/40 text-kertas hover:bg-kertas/10 px-7 py-4 text-xs font-semibold tracking-wider uppercase rounded-[2px] transition-colors min-h-[44px]"
           >
             <Eye className="w-4 h-4" />

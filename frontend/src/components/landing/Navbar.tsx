@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useSiteSettings } from '../../hooks/useContent';
+import { prefetchRoute } from '../../lib/routeLoaders';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -55,6 +56,8 @@ export function Navbar() {
                 key={link.href}
                 to={link.href}
                 aria-current={isActive ? 'page' : undefined}
+                onMouseEnter={() => prefetchRoute(link.href)}
+                onFocus={() => prefetchRoute(link.href)}
                 className={`transition-colors font-medium text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah rounded-sm px-1.5 py-1 ${
                   isActive
                     ? 'text-merah font-bold border-b border-merah'
@@ -67,6 +70,8 @@ export function Navbar() {
           })}
           <Link
             to="/login"
+            onMouseEnter={() => prefetchRoute('/login')}
+            onFocus={() => prefetchRoute('/login')}
             className="border border-tinta/25 text-tinta hover:bg-tinta hover:text-kertas px-5 py-2 rounded-sm font-medium text-xs uppercase tracking-[0.14em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta min-h-[40px] flex items-center"
           >
             Masuk

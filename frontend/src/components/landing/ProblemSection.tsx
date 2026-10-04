@@ -24,7 +24,7 @@ export function ProblemSection({ data }: ProblemSectionProps) {
   const note = data?.note || 'Status: belum kelar dan rawan salah edit.';
 
   return (
-    <Section id="masalah" bg="kertas-tua" doubleBorderTop doubleBorderBottom>
+    <Section id="masalah" bg="kertas-tua" doubleBorderTop doubleBorderBottom belowFold>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         
         {/* Left Column: Heading and explanation */}
