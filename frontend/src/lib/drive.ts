@@ -148,7 +148,10 @@ export async function verifyDriveFolder(url: string, apiKey: string): Promise<Ve
     };
   }
 
-  if (!apiKey) {
+  const cleanApiKey = (apiKey || '').trim().replace(/^["']|["']$/g, '');
+  const cleanFolderId = (folderId || '').trim();
+
+  if (!cleanApiKey) {
     return {
       ok: false,
       errorType: 'UNKNOWN',
@@ -158,10 +161,32 @@ export async function verifyDriveFolder(url: string, apiKey: string): Promise<Ve
 
   try {
     const folderRes = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${folderId}?key=${apiKey}&fields=id,name,mimeType,trashed`
+      `https://www.googleapis.com/drive/v3/files/${cleanFolderId}?key=${cleanApiKey}&fields=id,name,mimeType,trashed&supportsAllDrives=true`
     );
 
     if (!folderRes.ok) {
+      const errBody = await folderRes.json().catch(() => null);
+      const googleErrMsg = errBody?.error?.message;
+      const errorReason = errBody?.error?.errors?.[0]?.reason || errBody?.error?.details?.[0]?.reason;
+
+      if (folderRes.status === 400) {
+        if (errorReason === 'API_KEY_INVALID' || googleErrMsg?.toLowerCase().includes('api key')) {
+          return {
+            ok: false,
+            errorType: 'UNKNOWN',
+            message:
+              'API Key Google Drive tidak valid atau dinonaktifkan di Google Cloud Console. Periksa konfigurasi VITE_GOOGLE_DRIVE_API_KEY.',
+          };
+        }
+        return {
+          ok: false,
+          errorType: 'INVALID_URL',
+          message: googleErrMsg
+            ? `Google Drive menolak permintaan (400): ${googleErrMsg}`
+            : 'Tautan atau ID folder Google Drive tidak valid (Bad Request). Pastikan tautan folder disalin dengan benar.',
+        };
+      }
+
       if (folderRes.status === 403 || folderRes.status === 404) {
         return {
           ok: false,
@@ -180,7 +205,9 @@ export async function verifyDriveFolder(url: string, apiKey: string): Promise<Ve
       return {
         ok: false,
         errorType: 'UNKNOWN',
-        message: `Google Drive merespons dengan status ${folderRes.status}. Coba beberapa saat lagi.`,
+        message: googleErrMsg
+          ? `Google Drive error (${folderRes.status}): ${googleErrMsg}`
+          : `Google Drive merespons dengan status ${folderRes.status}. Coba beberapa saat lagi.`,
       };
     }
 
@@ -203,7 +230,7 @@ export async function verifyDriveFolder(url: string, apiKey: string): Promise<Ve
 
     return {
       ok: true,
-      folderId,
+      folderId: cleanFolderId,
       folderName: folderData.name || 'Folder Klien',
     };
   } catch (err: any) {
@@ -241,9 +268,11 @@ export async function fetchAllDriveImages(
   let allFiles: any[] = [];
   let pageToken = '';
   let skippedCount = 0;
+  const cleanKey = (apiKey || '').trim().replace(/^["']|["']$/g, '');
+  const cleanFolderId = (folderId || '').trim();
 
   do {
-    const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=nextPageToken,files(id,name,mimeType,thumbnailLink,createdTime,imageMediaMetadata)&pageSize=1000${
+    const url = `https://www.googleapis.com/drive/v3/files?q='${cleanFolderId}'+in+parents+and+trashed=false&key=${cleanKey}&fields=nextPageToken,files(id,name,mimeType,thumbnailLink,createdTime,imageMediaMetadata)&pageSize=1000&supportsAllDrives=true&includeItemsFromAllDrives=true${
       pageToken ? `&pageToken=${pageToken}` : ''
     }`;
 
@@ -252,7 +281,9 @@ export async function fetchAllDriveImages(
       if (res.status === 429) {
         throw new Error('Batas kuota akses Google Drive tercapai sementara. Tunggu sebentar lalu coba lagi.');
       }
-      throw new Error(`Gagal mengambil daftar foto dari Google Drive (Status ${res.status}).`);
+      const errJson = await res.json().catch(() => null);
+      const msg = errJson?.error?.message;
+      throw new Error(msg ? `Gagal mengambil foto dari Google Drive: ${msg}` : `Gagal mengambil daftar foto dari Google Drive (Status ${res.status}).`);
     }
 
     const data = await res.json();

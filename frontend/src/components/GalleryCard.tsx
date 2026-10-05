@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   Clock,
   ExternalLink,
+  Sliders,
 } from 'lucide-react';
 
 interface Props {
@@ -196,25 +197,53 @@ export default function GalleryCard({
         </div>
       </div>
 
-      {/* Main Action Buttons */}
+      {/* Main Action Buttons: Berubah menurut status pilihan */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-        <button
-          type="button"
-          onClick={() => onViewSelections(gallery)}
-          className="w-full py-2.5 px-4 text-sm bg-white border border-garis hover:border-tinta hover:bg-kertas-tua text-tinta rounded-btn font-sans font-medium transition-colors duration-150 flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
-        >
-          <Images className="w-4 h-4 text-merah" />
-          <span>Lihat foto pilihan ({selectedCount})</span>
-        </button>
+        {selectedCount > 0 ? (
+          <>
+            {/* Setelah terkirim dan ada pilihan: Tombol Utama = "Siapkan file untuk edit" */}
+            <button
+              type="button"
+              onClick={() => onViewSelections(gallery)}
+              className="w-full py-2.5 px-4 text-sm bg-merah hover:bg-merah-hover active:bg-marun text-kertas rounded-btn font-sans font-medium transition-colors duration-150 flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
+            >
+              <Sliders className="w-4 h-4" />
+              <span>Siapkan file untuk edit ({selectedCount})</span>
+            </button>
 
-        <button
-          type="button"
-          onClick={() => onSendClientMessage(gallery)}
-          className="w-full py-2.5 px-4 text-sm bg-merah hover:bg-merah-hover active:bg-marun text-kertas rounded-btn font-sans font-medium transition-colors duration-150 flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
-        >
-          <Send className="w-4 h-4" />
-          <span>Kirim ke klien</span>
-        </button>
+            {/* Tombol Sekunder = "Kirim ke klien" */}
+            <button
+              type="button"
+              onClick={() => onSendClientMessage(gallery)}
+              className="w-full py-2.5 px-4 text-sm bg-white border border-garis hover:border-tinta hover:bg-kertas-tua text-tinta rounded-btn font-sans font-medium transition-colors duration-150 flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
+            >
+              <Send className="w-4 h-4 text-tinta-lembut" />
+              <span>Kirim ke klien</span>
+            </button>
+          </>
+        ) : (
+          <>
+            {/* Sebelum klien mengirim: Tombol Sekunder = "Lihat foto pilihan" */}
+            <button
+              type="button"
+              onClick={() => onViewSelections(gallery)}
+              className="w-full py-2.5 px-4 text-sm bg-white border border-garis hover:border-tinta hover:bg-kertas-tua text-tinta rounded-btn font-sans font-medium transition-colors duration-150 flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
+            >
+              <Images className="w-4 h-4 text-tinta-lembut" />
+              <span>Lihat foto pilihan (0)</span>
+            </button>
+
+            {/* Tombol Utama = "Kirim ke klien" */}
+            <button
+              type="button"
+              onClick={() => onSendClientMessage(gallery)}
+              className="w-full py-2.5 px-4 text-sm bg-merah hover:bg-merah-hover active:bg-marun text-kertas rounded-btn font-sans font-medium transition-colors duration-150 flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
+            >
+              <Send className="w-4 h-4" />
+              <span>Kirim ke klien</span>
+            </button>
+          </>
+        )}
       </div>
 
       {/* Action Row & Secondary Controls */}
