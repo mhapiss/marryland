@@ -68,7 +68,7 @@ export default function GalleryCard({
   const renderStatusChip = () => {
     if (isExpired && gallery.status !== 'completed') {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[2px] text-[10px] font-mono uppercase tracking-wider bg-merah/10 text-merah border border-merah/30">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-chip text-[10px] font-mono uppercase tracking-wider bg-merah/10 text-merah border border-merah/30">
           <Clock className="w-3 h-3" />
           Kedaluwarsa
         </span>
@@ -76,7 +76,7 @@ export default function GalleryCard({
     }
     if (gallery.status === 'completed') {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[2px] text-[10px] font-mono uppercase tracking-wider bg-green-900/10 text-green-800 border border-green-800/30">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-chip text-[10px] font-mono uppercase tracking-wider bg-green-900/10 text-green-800 border border-green-800/30">
           <Check className="w-3 h-3" />
           Pilihan Terkirim ({selectedCount} Foto)
         </span>
@@ -84,7 +84,7 @@ export default function GalleryCard({
     }
     if (selectedCount >= maxPhotos) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[2px] text-[10px] font-mono uppercase tracking-wider bg-green-900/10 text-green-800 border border-green-800/30">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-chip text-[10px] font-mono uppercase tracking-wider bg-green-900/10 text-green-800 border border-green-800/30">
           <Check className="w-3 h-3" />
           Kuota Penuh ({selectedCount}/{maxPhotos})
         </span>
@@ -92,14 +92,14 @@ export default function GalleryCard({
     }
     if (selectedCount > 0) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[2px] text-[10px] font-mono uppercase tracking-wider bg-kertas-tua text-tinta border border-garis">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-chip text-[10px] font-mono uppercase tracking-wider bg-kertas-tua text-tinta border border-garis">
           <span className="w-1.5 h-1.5 rounded-full bg-merah animate-pulse" />
           Sedang Memilih ({selectedCount}/{maxPhotos})
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[2px] text-[10px] font-mono uppercase tracking-wider bg-kertas text-tinta-lembut border border-garis">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-chip text-[10px] font-mono uppercase tracking-wider bg-kertas text-tinta-lembut border border-garis">
         Menunggu
       </span>
     );
@@ -133,7 +133,7 @@ export default function GalleryCard({
               {gallery.client_name}
             </h3>
             {gallery.album_enabled && (
-              <span className="text-[10px] font-mono px-2 py-0.5 bg-merah/5 text-merah border border-merah/20 rounded-[2px]">
+              <span className="text-[10px] font-mono px-2 py-0.5 bg-merah/5 text-merah border border-merah/20 rounded-chip">
                 Album Keluarga Aktif
               </span>
             )}
@@ -179,16 +179,16 @@ export default function GalleryCard({
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-5 bg-kertas rounded-[2px] p-3.5 border border-garis">
+      <div className="mb-5 bg-kertas rounded-chip p-3.5 border border-garis">
         <div className="flex items-center justify-between text-[11px] font-mono text-tinta-lembut uppercase tracking-wider mb-2">
           <span>Progres Pemilihan</span>
           <span className="text-merah font-bold">
             {selectedCount} dari {maxPhotos} foto ({Math.round(progressPercent)}%)
           </span>
         </div>
-        <div className="w-full bg-kertas-tua rounded-[2px] h-2 overflow-hidden">
+        <div className="w-full bg-kertas-tua rounded-chip h-2 overflow-hidden">
           <div
-            className={`h-full rounded-[2px] transition-all duration-700 ease-out ${
+            className={`h-full rounded-chip transition-all duration-700 ease-out ${
               isExpired ? 'bg-tinta-lembut' : 'bg-merah'
             }`}
             style={{ width: `${progressPercent}%` }}
@@ -201,31 +201,31 @@ export default function GalleryCard({
         <button
           type="button"
           onClick={() => onViewSelections(gallery)}
-          className="w-full py-2.5 px-4 text-xs sm:text-sm bg-white border border-garis hover:border-merah text-tinta hover:text-merah rounded-[2px] font-medium transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+          className="w-full py-2.5 px-4 text-sm bg-white border border-garis hover:border-tinta hover:bg-kertas-tua text-tinta rounded-btn font-sans font-medium transition-colors duration-150 flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
         >
           <Images className="w-4 h-4 text-merah" />
-          <span>Lihat Foto Pilihan ({selectedCount})</span>
+          <span>Lihat foto pilihan ({selectedCount})</span>
         </button>
 
         <button
           type="button"
           onClick={() => onSendClientMessage(gallery)}
-          className="w-full py-2.5 px-4 text-xs sm:text-sm bg-merah hover:bg-merah-hover text-white rounded-[2px] font-medium transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+          className="w-full py-2.5 px-4 text-sm bg-merah hover:bg-merah-hover active:bg-marun text-kertas rounded-btn font-sans font-medium transition-colors duration-150 flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
         >
           <Send className="w-4 h-4" />
-          <span>Kirim ke Klien</span>
+          <span>Kirim ke klien</span>
         </button>
       </div>
 
       {/* Action Row & Secondary Controls */}
       <div className="flex items-center justify-between pt-3 border-t border-garis">
         {/* Desktop Quick Actions */}
-        <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           {/* Salin link pilih foto */}
           <button
             type="button"
             onClick={handleCopySelect}
-            className="p-2 sm:px-3 sm:py-1.5 bg-kertas hover:bg-kertas-tua text-tinta text-xs font-mono rounded-[2px] border border-garis transition-colors flex items-center gap-1.5"
+            className="p-2 sm:px-3 sm:py-1.5 bg-kertas hover:bg-kertas-tua text-tinta text-xs font-sans font-medium rounded-btn border border-garis transition-colors duration-150 flex items-center gap-1.5 min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
             title="Salin tautan kurasi foto untuk klien"
             aria-label="Salin tautan kurasi foto"
           >
@@ -237,7 +237,7 @@ export default function GalleryCard({
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5 text-tinta-lembut" />
-                <span className="hidden sm:inline">Link Pilih</span>
+                <span className="hidden sm:inline">Link pilih</span>
               </>
             )}
           </button>
@@ -246,7 +246,7 @@ export default function GalleryCard({
           <button
             type="button"
             onClick={handleCopyAlbum}
-            className={`p-2 sm:px-3 sm:py-1.5 text-xs font-mono rounded-[2px] border transition-colors flex items-center gap-1.5 ${
+            className={`p-2 sm:px-3 sm:py-1.5 text-xs font-sans font-medium rounded-btn border transition-colors duration-150 flex items-center gap-1.5 min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta ${
               gallery.album_enabled
                 ? 'bg-kertas hover:bg-kertas-tua text-tinta border-garis'
                 : 'bg-kertas/50 hover:bg-kertas text-tinta-lembut/70 border-dashed border-garis'
@@ -271,7 +271,7 @@ export default function GalleryCard({
                   }`}
                 />
                 <span className="hidden sm:inline">
-                  {gallery.album_enabled ? 'Link Album' : 'Aktifkan Album'}
+                  {gallery.album_enabled ? 'Link album' : 'Aktifkan album'}
                 </span>
               </>
             )}
@@ -281,7 +281,7 @@ export default function GalleryCard({
           <button
             type="button"
             onClick={() => onOpenSettings(gallery)}
-            className="p-2 sm:px-3 sm:py-1.5 bg-white hover:bg-kertas text-tinta text-xs font-mono rounded-[2px] border border-garis transition-colors flex items-center gap-1.5"
+            className="p-2 sm:px-3 sm:py-1.5 bg-white hover:bg-kertas-tua text-tinta text-xs font-sans font-medium rounded-btn border border-garis transition-colors duration-150 flex items-center gap-1.5 min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
             title="Pengaturan galeri, album, dan pindai ulang Google Drive"
             aria-label="Pengaturan galeri"
           >
@@ -296,7 +296,7 @@ export default function GalleryCard({
           <button
             type="button"
             onClick={() => onDelete(gallery)}
-            className="hidden sm:flex items-center gap-1 p-2 text-tinta-lembut hover:text-merah transition-colors rounded-[2px]"
+            className="hidden sm:flex items-center gap-1 p-2 text-tinta-lembut hover:text-merah transition-colors rounded-btn min-h-[36px] min-w-[36px] justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah"
             title="Hapus galeri"
             aria-label="Hapus galeri"
           >
@@ -308,24 +308,24 @@ export default function GalleryCard({
             <button
               type="button"
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="p-2 text-tinta-lembut hover:text-tinta border border-garis rounded-[2px] min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="p-2 text-tinta-lembut hover:text-tinta border border-garis rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
               aria-label="Menu opsi lainnya"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
 
             {showMobileMenu && (
-              <div className="absolute right-0 bottom-full mb-2 w-56 bg-white border border-garis rounded-[2px] shadow-lg py-1.5 z-20 font-mono text-xs">
+              <div className="absolute right-0 bottom-full mb-2 w-56 bg-white border border-garis rounded-panel shadow-lg py-1.5 z-20 font-sans text-xs">
                 <button
                   type="button"
                   onClick={() => {
                     setShowMobileMenu(false);
                     onOpenSettings(gallery);
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-kertas flex items-center gap-2 text-tinta"
+                  className="w-full text-left px-4 py-2.5 hover:bg-kertas-tua flex items-center gap-2 text-tinta"
                 >
                   <Settings className="w-4 h-4 text-tinta-lembut" />
-                  <span>Pengaturan & Rescan Drive</span>
+                  <span>Pengaturan & rescan drive</span>
                 </button>
 
                 <button
@@ -334,11 +334,11 @@ export default function GalleryCard({
                     setShowMobileMenu(false);
                     handleCopyAlbum();
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-kertas flex items-center gap-2 text-tinta"
+                  className="w-full text-left px-4 py-2.5 hover:bg-kertas-tua flex items-center gap-2 text-tinta"
                 >
                   <BookOpen className="w-4 h-4 text-tinta-lembut" />
                   <span>
-                    {gallery.album_enabled ? 'Salin Link Album' : 'Aktifkan Album Keluarga'}
+                    {gallery.album_enabled ? 'Salin link album' : 'Aktifkan album keluarga'}
                   </span>
                 </button>
 
@@ -350,10 +350,10 @@ export default function GalleryCard({
                     setShowMobileMenu(false);
                     onDelete(gallery);
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-merah/10 flex items-center gap-2 text-merah"
+                  className="w-full text-left px-4 py-2.5 hover:bg-merah/10 flex items-center gap-2 text-merah"
                 >
                   <Trash2 className="w-4 h-4 text-merah" />
-                  <span>Hapus Galeri</span>
+                  <span>Hapus galeri</span>
                 </button>
               </div>
             )}

@@ -103,7 +103,7 @@ export function MediaPickerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-[2px] border border-garis w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-panel border border-garis w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden font-sans">
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-garis flex items-center justify-between bg-kertas-tua/50">
           <div>
@@ -115,7 +115,7 @@ export function MediaPickerModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-tinta-lembut hover:text-tinta rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-tinta-lembut hover:text-tinta rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <X className="w-5 h-5" />
           </button>
@@ -161,7 +161,7 @@ export function MediaPickerModal({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari foto berdasarkan nama atau alt..."
-                    className="w-full pl-9 pr-4 py-2 border border-garis rounded-[2px] text-xs bg-white text-tinta focus:outline-none focus:border-merah"
+                    className="w-full pl-9 pr-4 py-2 border border-garis rounded-input text-xs bg-white text-tinta focus:outline-none focus:border-merah"
                   />
                 </div>
 
@@ -235,9 +235,9 @@ export function MediaPickerModal({
                     type="button"
                     onClick={handleUploadNew}
                     disabled={isUploading}
-                    className="px-6 py-2.5 bg-merah text-white rounded-[2px] text-xs font-medium hover:bg-merah-hover disabled:opacity-50 transition-colors"
+                    className="px-6 py-2.5 bg-merah text-white rounded-btn text-xs font-sans font-medium hover:bg-merah-hover disabled:opacity-50 transition-colors min-h-[44px]"
                   >
-                    {isUploading ? 'Memproses WebP 3 Varian...' : 'Mulai Unggah'}
+                    {isUploading ? 'Memproses WebP 3 varian...' : 'Mulai unggah'}
                   </button>
                 )}
               </div>
@@ -303,7 +303,7 @@ export function MediaPickerModal({
                     value={altText}
                     onChange={(e) => setAltText(e.target.value)}
                     placeholder="Deskripsi foto..."
-                    className="w-full border border-garis rounded-[2px] px-3 py-1.5 text-xs bg-white text-tinta focus:outline-none focus:border-merah"
+                    className="w-full border border-garis rounded-input px-3 py-1.5 text-xs bg-white text-tinta focus:outline-none focus:border-merah"
                   />
                 </div>
 
@@ -316,14 +316,14 @@ export function MediaPickerModal({
                     value={caption}
                     onChange={(e) => setCaption(e.target.value)}
                     placeholder="Caption yang tampil di bawah foto..."
-                    className="w-full border border-garis rounded-[2px] px-3 py-1.5 text-xs bg-white text-tinta focus:outline-none focus:border-merah"
+                    className="w-full border border-garis rounded-input px-3 py-1.5 text-xs bg-white text-tinta focus:outline-none focus:border-merah"
                   />
                 </div>
               </div>
 
               {/* Multiple Usage Option */}
               {selectedAsset && (selectedAsset.usage_count || 0) > 1 && (
-                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-[2px] text-xs">
+                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-input text-xs">
                   <div className="flex items-start gap-2 text-amber-800 font-semibold mb-1">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>Foto ini dipakai di {selectedAsset.usage_count} tempat</span>
@@ -346,7 +346,7 @@ export function MediaPickerModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-garis rounded-[2px] text-xs font-medium text-tinta-lembut hover:text-tinta min-h-[44px]"
+                className="px-4 py-2 border border-garis rounded-btn text-xs font-sans font-medium text-tinta-lembut hover:text-tinta min-h-[44px]"
               >
                 Batal
               </button>
@@ -354,7 +354,7 @@ export function MediaPickerModal({
                 type="button"
                 onClick={handleApply}
                 disabled={!selectedAsset}
-                className="px-5 py-2 bg-merah text-white rounded-[2px] text-xs font-medium hover:bg-merah-hover disabled:opacity-50 min-h-[44px] transition-colors"
+                className="px-5 py-2 bg-merah text-white rounded-btn text-xs font-sans font-medium hover:bg-merah-hover disabled:opacity-50 min-h-[44px] transition-colors"
               >
                 Terapkan Foto
               </button>

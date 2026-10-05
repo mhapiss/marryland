@@ -88,7 +88,7 @@ export default function ContactPage() {
             </div>
 
             {(address || hours) && (
-              <div className="bg-kertas-tua/40 border border-garis rounded-[2px] p-6 space-y-4">
+              <div className="bg-kertas-tua/40 border border-garis rounded-panel p-6 space-y-4">
                 {address && (
                   <div className="flex items-start">
                     <MapPin className="w-5 h-5 text-merah mr-3 shrink-0 mt-0.5" />
@@ -113,7 +113,7 @@ export default function ContactPage() {
           </div>
 
           {/* Right: Message Form */}
-          <div className="lg:col-span-5 bg-kertas-tua/30 p-8 border border-garis rounded-[2px]">
+          <div className="lg:col-span-5 bg-kertas-tua/30 p-8 border border-garis rounded-panel">
             <span className="label-caps text-merah block mb-1">FORMULIR PESAN</span>
             <h3 className="font-serif text-2xl font-normal mb-6 text-tinta">Tulis Pesan Langsung</h3>
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -126,7 +126,7 @@ export default function ContactPage() {
                   required
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full border border-garis rounded-[2px] px-3.5 py-2.5 text-sm bg-kertas text-tinta focus:outline-none focus:ring-1 focus:ring-merah"
+                  className="w-full border border-garis rounded-input px-3.5 py-2.5 text-sm bg-kertas text-tinta focus:outline-none focus:ring-1 focus:ring-merah"
                   placeholder="Nama lengkap atau panggilan"
                 />
               </div>
@@ -139,7 +139,7 @@ export default function ContactPage() {
                   <button
                     type="button"
                     onClick={() => setMethod('wa')}
-                    className={`p-3 text-xs font-semibold rounded-[2px] border text-center transition-colors min-h-[44px] ${
+                    className={`p-3 text-xs font-sans font-medium rounded-btn border text-center transition-colors min-h-[44px] ${
                       method === 'wa'
                         ? 'border-merah bg-merah text-kertas font-bold'
                         : 'border-garis text-tinta-lembut hover:border-tinta/40 bg-kertas'
@@ -150,7 +150,7 @@ export default function ContactPage() {
                   <button
                     type="button"
                     onClick={() => setMethod('email')}
-                    className={`p-3 text-xs font-semibold rounded-[2px] border text-center transition-colors min-h-[44px] ${
+                    className={`p-3 text-xs font-sans font-medium rounded-btn border text-center transition-colors min-h-[44px] ${
                       method === 'email'
                         ? 'border-merah bg-merah text-kertas font-bold'
                         : 'border-garis text-tinta-lembut hover:border-tinta/40 bg-kertas'
@@ -170,14 +170,14 @@ export default function ContactPage() {
                   rows={4}
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full border border-garis rounded-[2px] px-3.5 py-2.5 text-sm bg-kertas text-tinta focus:outline-none focus:ring-1 focus:ring-merah"
+                  className="w-full border border-garis rounded-input px-3.5 py-2.5 text-sm bg-kertas text-tinta focus:outline-none focus:ring-1 focus:ring-merah"
                   placeholder="Tuliskan pertanyaan atau kebutuhan dokumentasimu..."
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-merah hover:bg-merah-hover text-kertas font-medium py-3 rounded-[2px] transition-colors min-h-[44px]"
+                className="w-full bg-merah hover:bg-merah-hover text-kertas font-sans font-medium py-3 rounded-btn transition-colors min-h-[44px]"
               >
                 Kirim Pesan Sekarang
               </button>

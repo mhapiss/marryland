@@ -180,7 +180,7 @@ export default function PortfolioPage() {
                         {getProcessTags(col.slug).map((t) => (
                           <span
                             key={t}
-                            className="px-3 py-1 bg-kertas border border-garis rounded-[2px] text-xs text-tinta-lembut font-body"
+                            className="px-3 py-1 bg-kertas border border-garis rounded-chip text-xs text-tinta-lembut font-body"
                           >
                             {t}
                           </span>
@@ -191,9 +191,9 @@ export default function PortfolioPage() {
                       <div>
                         <Link
                           to={`/portofolio/${col.slug}`}
-                          className="inline-flex items-center gap-2 px-6 py-3.5 bg-merah text-kertas rounded-[2px] font-medium text-sm hover:bg-merah-hover transition-all group min-h-[44px]"
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-merah hover:bg-merah-hover active:bg-marun text-kertas rounded-btn font-sans font-medium text-sm transition-colors duration-150 group min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
                         >
-                          <span>Buka Koleksi {col.name}</span>
+                          <span>Buka koleksi {col.name}</span>
                           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                         </Link>
                       </div>
@@ -220,9 +220,9 @@ export default function PortfolioPage() {
 
             <Link
               to="/kontak"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-merah text-kertas hover:bg-merah-hover rounded-[2px] font-medium text-sm whitespace-nowrap transition-all min-h-[44px]"
+              className="inline-flex items-center gap-2 px-7 py-3 bg-merah hover:bg-merah-hover active:bg-marun text-kertas rounded-btn font-sans font-medium text-sm whitespace-nowrap transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
             >
-              <span>Diskusikan Rencanamu</span>
+              <span>Diskusikan rencanamu</span>
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>

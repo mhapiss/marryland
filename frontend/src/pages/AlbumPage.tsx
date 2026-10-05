@@ -231,7 +231,7 @@ export default function AlbumPage() {
     const seconds = lockCountdown % 60;
     return (
       <div className="min-h-screen bg-kertas flex flex-col items-center justify-center p-6 font-sans text-tinta">
-        <div className="bg-white border border-garis rounded-[2px] shadow-soft max-w-md w-full p-8 text-center animate-in fade-in">
+        <div className="bg-white border border-garis rounded-panel shadow-soft max-w-md w-full p-8 text-center animate-in fade-in">
           <div className="w-12 h-12 rounded-full bg-merah/10 text-merah border border-merah/25 flex items-center justify-center mx-auto mb-4">
             <Clock className="w-6 h-6" />
           </div>
@@ -239,7 +239,7 @@ export default function AlbumPage() {
           <p className="text-xs text-tinta-lembut leading-relaxed mb-6 font-mono">
             {errorMessage} Silakan tunggu hingga waktu hitung mundur selesai sebelum mencoba kembali.
           </p>
-          <div className="p-4 bg-kertas rounded-[2px] border border-garis font-mono text-2xl font-bold text-merah tracking-widest mb-6">
+          <div className="p-4 bg-kertas rounded-panel border border-garis font-mono text-2xl font-bold text-merah tracking-widest mb-6">
             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
           </div>
           <p className="text-[11px] text-tinta-lembut font-mono">
@@ -254,7 +254,7 @@ export default function AlbumPage() {
   if (errorStatus === 'PIN_REQUIRED' || errorStatus === 'PIN_INCORRECT') {
     return (
       <div className="min-h-screen bg-kertas flex flex-col items-center justify-center p-6 font-sans text-tinta">
-        <div className="bg-white border border-garis rounded-[2px] shadow-soft max-w-sm w-full p-8 text-center animate-in fade-in">
+        <div className="bg-white border border-garis rounded-panel shadow-soft max-w-sm w-full p-8 text-center animate-in fade-in">
           <div className="w-12 h-12 rounded-full bg-kertas-tua text-merah border border-garis flex items-center justify-center mx-auto mb-4">
             <Lock className="w-6 h-6" />
           </div>
@@ -272,7 +272,7 @@ export default function AlbumPage() {
                 placeholder="• • • • • •"
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value.replace(/[^0-9]/g, ''))}
-                className="w-full text-center text-2xl tracking-[0.5em] px-4 py-3 bg-kertas border border-garis rounded-[2px] focus:outline-none focus:border-merah font-mono text-tinta"
+                className="w-full text-center text-2xl tracking-[0.5em] px-4 py-3 bg-kertas border border-garis rounded-input focus:outline-none focus:border-merah font-mono text-tinta"
               />
               {pinError && (
                 <p className="text-xs text-merah font-mono mt-2 flex items-center justify-center gap-1.5">
@@ -285,7 +285,7 @@ export default function AlbumPage() {
             <button
               type="submit"
               disabled={pinInput.length < 4 || isSubmittingPin}
-              className="w-full py-3 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium transition-colors disabled:opacity-50 min-h-[44px]"
+              className="w-full py-3 bg-merah hover:bg-merah-hover text-white rounded-btn text-xs font-sans font-medium transition-colors disabled:opacity-50 min-h-[44px]"
             >
               {isSubmittingPin ? 'Memverifikasi...' : 'Buka Album Foto'}
             </button>
@@ -303,7 +303,7 @@ export default function AlbumPage() {
   if (errorStatus || !album) {
     return (
       <div className="min-h-screen bg-kertas flex flex-col items-center justify-center p-6 text-center font-sans text-tinta">
-        <div className="bg-white border border-garis rounded-[2px] shadow-soft max-w-md w-full p-8 animate-in fade-in">
+        <div className="bg-white border border-garis rounded-panel shadow-soft max-w-md w-full p-8 animate-in fade-in">
           <div className="w-12 h-12 rounded-full bg-kertas-tua text-merah border border-garis flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-6 h-6" />
           </div>
@@ -313,7 +313,7 @@ export default function AlbumPage() {
           </p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium transition-colors min-h-[44px]"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-btn text-xs font-sans font-medium transition-colors min-h-[44px]"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Kembali ke Beranda</span>
@@ -338,7 +338,7 @@ export default function AlbumPage() {
           <button
             type="button"
             onClick={handleShare}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-kertas hover:bg-white border border-garis rounded-[2px] text-xs font-mono text-tinta hover:text-merah transition-colors min-h-[36px]"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-kertas hover:bg-white border border-garis rounded-btn text-xs font-sans font-medium text-tinta hover:text-merah transition-colors min-h-[44px]"
             title="Bagikan tautan album"
           >
             {copiedLink ? <Check className="w-3.5 h-3.5 text-sukses" /> : <Share2 className="w-3.5 h-3.5" />}

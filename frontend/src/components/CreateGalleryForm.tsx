@@ -303,7 +303,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
   };
 
   return (
-    <div className="bg-white border border-garis rounded-[2px] overflow-hidden font-sans text-tinta">
+    <div className="bg-white border border-garis rounded-panel overflow-hidden font-sans text-tinta">
       {/* Toggle Accordion Header */}
       <button
         type="button"
@@ -312,7 +312,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
         aria-expanded={isExpanded}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[2px] bg-kertas-tua text-merah border border-garis flex items-center justify-center">
+          <div className="w-8 h-8 rounded-chip bg-kertas-tua text-merah border border-garis flex items-center justify-center">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -344,12 +344,12 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
       >
         <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-6 border-t border-garis pt-6">
           {/* Section 1: Google Drive Folder */}
-          <div className="bg-kertas-tua/40 p-4 border border-garis rounded-[2px] space-y-3">
+          <div className="bg-kertas-tua/40 p-4 border border-garis rounded-chip space-y-3">
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-mono uppercase tracking-widest text-tinta font-bold">
                   Tautan Folder Google Drive{' '}
-                  <span className="text-[10px] text-merah bg-merah/10 border border-merah/25 px-1.5 py-0.5 rounded-[2px] ml-1.5 font-normal">
+                  <span className="text-[10px] text-merah bg-merah/10 border border-merah/25 px-1.5 py-0.5 rounded-chip ml-1.5 font-normal">
                     WAJIB
                   </span>
                 </label>
@@ -369,13 +369,13 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                       setFolderCheckResult({ status: 'idle' });
                     }
                   }}
-                  className="flex-1 px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
+                  className="flex-1 px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
                 />
                 <button
                   type="button"
                   onClick={() => handleCheckFolder()}
                   disabled={isCheckingFolder || !gdriveUrl.trim()}
-                  className="px-4 py-2.5 bg-white hover:bg-kertas border border-garis text-tinta text-xs font-mono font-medium rounded-[2px] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 min-h-[44px]"
+                  className="px-4 py-2.5 bg-white hover:bg-kertas-tua border border-garis text-tinta text-xs font-sans font-medium rounded-btn transition-colors duration-150 disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
                 >
                   {isCheckingFolder ? (
                     <>
@@ -385,7 +385,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                   ) : (
                     <>
                       <FolderSearch className="w-3.5 h-3.5 text-merah" />
-                      Cek Akses Folder
+                      Cek akses folder
                     </>
                   )}
                 </button>
@@ -394,7 +394,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
 
             {/* Folder Check Status Feedback */}
             {folderCheckResult.status === 'valid' && (
-              <div className="flex items-start gap-2.5 p-3 bg-white border border-green-700/30 text-xs rounded-[2px]">
+              <div className="flex items-start gap-2.5 p-3 bg-white border border-green-700/30 text-xs rounded-chip">
                 <CheckCircle2 className="w-4 h-4 text-green-700 shrink-0 mt-0.5" />
                 <div className="text-tinta">
                   <span className="font-semibold text-green-800">Folder berhasil diverifikasi!</span>
@@ -406,7 +406,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
             )}
 
             {folderCheckResult.status === 'invalid' && (
-              <div className="flex items-start justify-between gap-3 p-3 bg-white border border-merah/40 text-xs rounded-[2px]">
+              <div className="flex items-start justify-between gap-3 p-3 bg-white border border-merah/40 text-xs rounded-chip">
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 text-merah shrink-0 mt-0.5" />
                   <div>
@@ -433,7 +433,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
             <div>
               <label className="block text-xs font-mono uppercase tracking-widest text-tinta mb-1.5 font-bold">
                 Nomor WhatsApp Klien{' '}
-                <span className="text-[10px] text-merah bg-merah/10 border border-merah/25 px-1.5 py-0.5 rounded-[2px] ml-1.5 font-normal">
+                <span className="text-[10px] text-merah bg-merah/10 border border-merah/25 px-1.5 py-0.5 rounded-chip ml-1.5 font-normal">
                   WAJIB
                 </span>
               </label>
@@ -443,7 +443,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                   placeholder="08123456789 atau 628123456789"
                   value={clientWhatsapp}
                   onChange={(e) => setClientWhatsapp(e.target.value)}
-                  className={`w-full px-3.5 py-2.5 bg-white border text-tinta text-sm rounded-[2px] focus:outline-none transition-colors font-mono ${
+                  className={`w-full px-3.5 py-2.5 bg-white border text-tinta text-sm rounded-input focus:outline-none transition-colors font-mono ${
                     clientWhatsapp && !waValidation.isValid
                       ? 'border-merah focus:border-merah focus:ring-1 focus:ring-merah'
                       : 'border-garis focus:border-merah focus:ring-1 focus:ring-merah'
@@ -473,7 +473,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                 placeholder={folderCheckResult.folderName || 'Contoh: Dimas & Arini Wedding'}
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
               />
               <p className="text-[11px] text-tinta-lembut mt-1 font-mono">
                 Otomatis diisi dari nama folder Drive jika dikosongkan.
@@ -487,7 +487,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
             <div>
               <label className="block text-xs font-mono uppercase tracking-widest text-tinta mb-1.5 font-bold">
                 Batas Jumlah Pilihan Foto{' '}
-                <span className="text-[10px] text-merah bg-merah/10 border border-merah/25 px-1.5 py-0.5 rounded-[2px] ml-1.5 font-normal">
+                <span className="text-[10px] text-merah bg-merah/10 border border-merah/25 px-1.5 py-0.5 rounded-chip ml-1.5 font-normal">
                   WAJIB
                 </span>
               </label>
@@ -498,7 +498,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                   max={2000}
                   value={maxPhotos}
                   onChange={(e) => setMaxPhotos(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
+                  className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
                 />
                 <span className="text-xs font-mono text-tinta-lembut shrink-0">Foto</span>
               </div>
@@ -515,7 +515,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
               <select
                 value={deadlinePreset}
                 onChange={(e) => setDeadlinePreset(Number(e.target.value))}
-                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono cursor-pointer"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono cursor-pointer"
               >
                 {DEADLINE_OPTIONS.map((opt) => (
                   <option key={opt.days} value={opt.days}>
@@ -531,7 +531,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                     value={customDeadline}
                     onChange={(e) => setCustomDeadline(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-3.5 py-2 bg-white border border-garis text-tinta text-xs rounded-[2px] focus:outline-none focus:border-merah transition-colors font-mono"
+                    className="w-full px-3.5 py-2 bg-white border border-garis text-tinta text-xs rounded-input focus:outline-none focus:border-merah transition-colors font-mono"
                   />
                 </div>
               )}
@@ -565,7 +565,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                 type="date"
                 value={eventDate}
                 onChange={(e) => setEventDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
               />
             </div>
 
@@ -578,7 +578,7 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
                 placeholder="klien@email.com"
                 value={clientEmail}
                 onChange={(e) => setClientEmail(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
               />
             </div>
           </div>
@@ -593,12 +593,12 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
               value={highlightDescription}
               onChange={(e) => setHighlightDescription(e.target.value)}
               rows={2}
-              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors resize-none"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors resize-none"
             />
           </div>
 
           {/* Izin Unduh Saklar */}
-          <div className="flex items-center gap-3 p-3 bg-kertas rounded-[2px] border border-garis">
+          <div className="flex items-center gap-3 p-3 bg-kertas rounded-chip border border-garis">
             <input
               id="allow_download"
               type="checkbox"
@@ -634,15 +634,15 @@ const CreateGalleryForm: React.FC<Props> = ({ onGalleryCreated }) => {
             <button
               type="submit"
               disabled={!isFormValid || isLoading}
-              className="px-8 py-3 bg-merah hover:bg-merah-hover text-white text-sm font-medium rounded-[2px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px] shrink-0"
+              className="px-8 py-3 bg-merah hover:bg-merah-hover active:bg-marun text-kertas text-sm font-sans font-medium rounded-btn transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
             >
               {isLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>{syncStatus || 'Memproses Galeri...'}</span>
+                  <span>{syncStatus || 'Memproses galeri...'}</span>
                 </>
               ) : (
-                'Buat Galeri Sekarang'
+                'Buat galeri sekarang'
               )}
             </button>
           </div>

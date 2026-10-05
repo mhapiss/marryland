@@ -82,7 +82,7 @@ const SelectedPhotosModal: React.FC<Props> = ({ gallery, onClose }) => {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-[2px] border border-garis shadow-xl w-full max-w-lg mx-auto max-h-[80vh] flex flex-col font-sans text-tinta">
+      <div className="relative bg-white rounded-panel border border-garis shadow-xl w-full max-w-lg mx-auto max-h-[80vh] flex flex-col font-sans text-tinta">
         {/* Header */}
         <div className="p-6 border-b border-garis">
           <h3 className="text-xl font-serif font-normal text-tinta">Daftar Foto Terpilih</h3>
@@ -102,9 +102,9 @@ const SelectedPhotosModal: React.FC<Props> = ({ gallery, onClose }) => {
               {photos.map((photo, idx) => (
                 <div
                   key={photo.id}
-                  className="flex items-center gap-3 px-3 py-2 rounded-[2px] hover:bg-kertas transition-colors"
+                  className="flex items-center gap-3 px-3 py-2 rounded-chip hover:bg-kertas transition-colors"
                 >
-                  <span className="w-6 h-6 flex items-center justify-center bg-kertas-tua text-merah border border-garis text-xs font-mono rounded-[2px] shrink-0">
+                  <span className="w-6 h-6 flex items-center justify-center bg-kertas-tua text-merah border border-garis text-xs font-mono rounded-chip shrink-0">
                     {idx + 1}
                   </span>
                   <span className="text-sm text-tinta font-mono">
@@ -120,19 +120,19 @@ const SelectedPhotosModal: React.FC<Props> = ({ gallery, onClose }) => {
         <div className="p-6 border-t border-garis flex items-center gap-3">
           <button
             onClick={() => handleCopy('comma')}
-            className="flex-1 bg-merah hover:bg-merah-hover text-white py-2.5 rounded-[2px] text-xs sm:text-sm font-medium transition-colors"
+            className="flex-1 bg-merah hover:bg-merah-hover active:bg-marun text-kertas py-2.5 px-4 rounded-btn text-sm font-sans font-medium transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
           >
-            {copied === 'comma' ? 'Tersalin' : 'Salin utk Lightroom'}
+            {copied === 'comma' ? 'Tersalin' : 'Salin untuk Lightroom'}
           </button>
           <button
             onClick={handleDownloadTxt}
-            className="flex-1 border border-garis text-tinta hover:border-merah hover:text-merah py-2.5 rounded-[2px] text-xs sm:text-sm font-medium transition-colors"
+            className="flex-1 border border-garis text-tinta hover:border-tinta hover:bg-kertas-tua py-2.5 px-4 rounded-btn text-sm font-sans font-medium transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
           >
             Unduh .txt
           </button>
           <button
             onClick={onClose}
-            className="px-5 py-2.5 text-tinta-lembut hover:text-merah text-xs sm:text-sm font-medium transition-colors"
+            className="px-5 py-2.5 text-tinta-lembut hover:text-tinta hover:bg-kertas-tua text-sm font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
           >
             Tutup
           </button>

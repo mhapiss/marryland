@@ -50,10 +50,10 @@ export default function SubmitConfirmDialog({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white dark:bg-[#161618] border border-garis rounded-[2px] max-w-md w-full p-6 sm:p-8 font-sans text-tinta dark:text-white shadow-2xl animate-in zoom-in-95 duration-200"
+        className="bg-white dark:bg-[#161618] border border-garis rounded-panel max-w-md w-full p-6 sm:p-8 font-sans text-tinta dark:text-white shadow-2xl animate-in zoom-in-95 duration-200"
       >
         <div className="flex items-start gap-4 mb-5">
-          <div className="w-12 h-12 rounded-[2px] bg-kertas-tua dark:bg-white/10 text-merah border border-garis flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-chip bg-kertas-tua dark:bg-white/10 text-merah border border-garis flex items-center justify-center shrink-0">
             <Send className="w-6 h-6" />
           </div>
           <div>
@@ -73,26 +73,26 @@ export default function SubmitConfirmDialog({
 
           {/* Quota guidance note */}
           {remainingQuota > 0 && !isZeroSelected && (
-            <div className="p-3 bg-kertas-tua/60 dark:bg-white/5 border border-garis rounded-[2px] text-xs font-mono text-tinta-lembut dark:text-white/70">
+            <div className="p-3 bg-kertas-tua/60 dark:bg-white/5 border border-garis rounded-chip text-xs font-mono text-tinta-lembut dark:text-white/70">
               Kamu masih bisa memilih <strong className="text-merah">{remainingQuota} foto</strong> lagi sebelum mengirim.
             </div>
           )}
 
           {remainingQuota === 0 && (
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-[2px] text-xs font-mono text-emerald-800 dark:text-emerald-300">
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-chip text-xs font-mono text-emerald-800 dark:text-emerald-300">
               Kamu telah memilih seluruh kuota yang tersedia ({totalSelected} dari {maxSelectable} foto).
             </div>
           )}
 
           {isZeroSelected && (
-            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs rounded-[2px] flex items-center gap-2">
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs rounded-chip flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
               <span>Pilih minimal 1 foto sebelum mengirimkan pilihan.</span>
             </div>
           )}
 
           {isOffline && (
-            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs rounded-[2px] flex items-center gap-2">
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs rounded-chip flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
               <span>Koneksi internet terputus. Sambungkan kembali internet untuk mengirim pilihan.</span>
             </div>
@@ -104,16 +104,16 @@ export default function SubmitConfirmDialog({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-5 py-2.5 border border-garis text-xs font-mono rounded-[2px] hover:border-merah hover:text-merah transition-colors min-h-[44px]"
+            className="px-5 py-2.5 border border-garis text-sm font-sans font-medium rounded-btn hover:border-tinta hover:bg-kertas-tua transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
           >
-            Periksa Lagi
+            Periksa lagi
           </button>
 
           <button
             type="button"
             onClick={onConfirm}
             disabled={isSubmitting || isOffline || isZeroSelected}
-            className="px-6 py-2.5 bg-merah hover:bg-merah-hover text-white text-xs font-mono uppercase tracking-wider rounded-[2px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px]"
+            className="px-6 py-2.5 bg-merah hover:bg-merah-hover active:bg-marun text-kertas text-sm font-sans font-medium rounded-btn transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
           >
             {isSubmitting ? (
               <>
@@ -121,7 +121,7 @@ export default function SubmitConfirmDialog({
                 <span>Mengirim...</span>
               </>
             ) : (
-              <span>Ya, Kirim Pilihan</span>
+              <span>Ya, kirim pilihan</span>
             )}
           </button>
         </div>

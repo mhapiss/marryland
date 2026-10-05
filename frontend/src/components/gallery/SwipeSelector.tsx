@@ -153,7 +153,7 @@ export default function SwipeSelector({
 
   if (isFinished) {
     return (
-      <div className="max-w-md mx-auto my-12 p-8 bg-white dark:bg-[#1a1a1c] border border-garis rounded-[2px] text-center font-sans text-tinta dark:text-white">
+      <div className="max-w-md mx-auto my-12 p-8 bg-white dark:bg-[#1a1a1c] border border-garis rounded-panel text-center font-sans text-tinta dark:text-white">
         <div className="w-16 h-16 bg-kertas-tua dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 text-merah border border-garis">
           <CheckCircle2 className="w-8 h-8" />
         </div>
@@ -167,16 +167,16 @@ export default function SwipeSelector({
           <button
             type="button"
             onClick={onViewSelections}
-            className="w-full py-3 bg-merah hover:bg-merah-hover text-white text-xs font-mono uppercase tracking-wider rounded-[2px] transition-colors"
+            className="w-full py-3 bg-merah hover:bg-merah-hover active:bg-marun text-kertas text-sm font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
           >
-            Lihat & Kirim Pilihan
+            Lihat & kirim pilihan
           </button>
           <button
             type="button"
             onClick={() => setCurrentIndex(0)}
-            className="w-full py-2.5 bg-kertas dark:bg-white/5 hover:bg-kertas-tua border border-garis text-xs font-mono rounded-[2px] transition-colors text-tinta dark:text-white"
+            className="w-full py-2.5 bg-kertas dark:bg-white/5 hover:bg-kertas-tua border border-garis text-sm font-sans font-medium rounded-btn transition-colors duration-150 text-tinta dark:text-white min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
           >
-            Mulai Ulang dari Awal
+            Mulai ulang dari awal
           </button>
         </div>
       </div>

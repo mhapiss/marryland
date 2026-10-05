@@ -185,7 +185,7 @@ const Dashboard: React.FC = () => {
           <Link to="/" className="text-xl font-serif tracking-tight text-tinta">
             by.<span className="text-merah">marryland</span>
           </Link>
-          <span className="hidden sm:inline-block border border-garis text-merah bg-kertas-tua/60 text-[10px] px-2.5 py-0.5 rounded-[2px] font-mono uppercase tracking-widest">
+          <span className="hidden sm:inline-block border border-garis text-merah bg-kertas-tua/60 text-[10px] px-2.5 py-0.5 rounded-chip font-mono uppercase tracking-widest">
             Untuk Fotografer
           </span>
         </div>
@@ -193,9 +193,9 @@ const Dashboard: React.FC = () => {
           {user?.email === 'admin@marryland.com' && (
             <button
               onClick={() => navigate('/admin')}
-              className="text-xs bg-merah/10 text-merah border border-merah/25 px-3 py-1.5 rounded-[2px] font-medium hover:bg-merah/20 transition-colors"
+              className="text-xs bg-merah/10 text-merah border border-merah/25 px-3 py-1.5 rounded-btn font-sans font-medium hover:bg-merah/20 transition-colors duration-150 min-h-[36px]"
             >
-              Panel Admin
+              Panel admin
             </button>
           )}
           <span className="text-xs text-tinta-lembut hidden sm:inline truncate max-w-[200px] font-mono">
@@ -203,7 +203,7 @@ const Dashboard: React.FC = () => {
           </span>
           <button
             onClick={handleSignOut}
-            className="text-tinta-lembut hover:text-merah transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="text-tinta-lembut hover:text-merah transition-colors rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
             title="Keluar"
             aria-label="Keluar"
           >

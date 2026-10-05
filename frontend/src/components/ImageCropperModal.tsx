@@ -317,7 +317,7 @@ export default function ImageCropperModal({
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-[#1a1715] text-[#f7f5f0] border border-garis/40 rounded-[2px] w-full max-w-4xl p-5 sm:p-6 shadow-2xl z-10 max-h-[95vh] flex flex-col overflow-hidden">
+      <div className="relative bg-[#1a1715] text-[#f7f5f0] border border-garis/40 rounded-panel w-full max-w-4xl p-5 sm:p-6 shadow-2xl z-10 max-h-[95vh] flex flex-col overflow-hidden font-sans">
         {/* Header */}
         <div className="flex items-start justify-between pb-3 border-b border-white/10 shrink-0">
           <div>
@@ -336,7 +336,7 @@ export default function ImageCropperModal({
             type="button"
             onClick={onClose}
             disabled={isProcessing}
-            className="text-white/60 hover:text-white p-1 rounded-[2px] transition-colors"
+            className="text-white/60 hover:text-white p-2 rounded-btn transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Tutup pemotong"
           >
             <X className="w-5 h-5" />
@@ -362,7 +362,7 @@ export default function ImageCropperModal({
                   key={p.id}
                   type="button"
                   onClick={() => handleSelectPreset(p)}
-                  className={`px-3 py-1.5 rounded-[2px] text-xs font-mono whitespace-nowrap transition-all border ${
+                  className={`px-3 py-1.5 rounded-chip text-xs font-sans font-medium whitespace-nowrap transition-all border ${
                     isSelected
                       ? 'bg-merah text-white border-merah shadow-sm font-semibold'
                       : 'bg-white/5 hover:bg-white/10 border-white/10 text-white/80'
@@ -495,7 +495,7 @@ export default function ImageCropperModal({
             <button
               type="button"
               onClick={() => initCropBox(activeRatio, imgDimensions.dispW, imgDimensions.dispH)}
-              className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white/80 rounded-[2px] text-xs font-mono flex items-center gap-1.5"
+              className="px-3.5 py-2 bg-white/5 hover:bg-white/10 text-white/80 rounded-btn text-xs font-sans font-medium flex items-center gap-1.5 min-h-[44px]"
               title="Kembalikan posisi kotak ke tengah"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -506,7 +506,7 @@ export default function ImageCropperModal({
               type="button"
               onClick={onClose}
               disabled={isProcessing}
-              className="px-4 py-2 border border-white/20 hover:border-white/40 text-white/70 hover:text-white rounded-[2px] text-xs font-medium min-h-[40px]"
+              className="px-4 py-2 border border-white/20 hover:border-white/40 text-white/70 hover:text-white rounded-btn text-xs font-sans font-medium min-h-[44px]"
             >
               Batal
             </button>
@@ -515,12 +515,12 @@ export default function ImageCropperModal({
               type="button"
               onClick={handleApply}
               disabled={isProcessing || !imgLoaded}
-              className="px-5 py-2 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium min-h-[40px] shadow-sm disabled:opacity-40 flex items-center gap-1.5"
+              className="px-5 py-2 bg-merah hover:bg-merah-hover text-white rounded-btn text-xs font-sans font-medium min-h-[44px] shadow-sm disabled:opacity-40 flex items-center gap-1.5"
             >
               {isProcessing ? (
                 <>
                   <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Memotong Foto...</span>
+                  <span>Memotong foto...</span>
                 </>
               ) : (
                 <>

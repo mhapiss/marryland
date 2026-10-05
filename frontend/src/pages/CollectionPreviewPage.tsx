@@ -121,7 +121,7 @@ export default function CollectionPreviewPage() {
       {/* Top Banner indicating Preview Mode */}
       <div className="bg-merah text-white text-[11px] font-mono uppercase tracking-wider py-1 px-4 text-center sticky top-0 z-50 shadow-xs flex items-center justify-between">
         <span className="opacity-90">Mode Pratinjau Interaktif</span>
-        <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-[2px]">Klik bagian untuk mengubah formulir</span>
+        <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-chip font-sans font-medium">Klik bagian untuk mengubah formulir</span>
       </div>
 
       <CollectionDetailView

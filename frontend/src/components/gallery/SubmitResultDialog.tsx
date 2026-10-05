@@ -130,7 +130,7 @@ export default function SubmitResultDialog({
       <div
         ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
-        className="bg-white dark:bg-[#161618] border border-garis rounded-t-[4px] sm:rounded-[2px] max-w-lg w-full max-h-[92vh] flex flex-col font-sans text-tinta dark:text-white shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden"
+        className="bg-white dark:bg-[#161618] border border-garis rounded-t-panel sm:rounded-panel max-w-lg w-full max-h-[92vh] flex flex-col font-sans text-tinta dark:text-white shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden"
       >
         {/* Top Accent Strip */}
         <div
@@ -188,7 +188,7 @@ export default function SubmitResultDialog({
                 </p>
               </div>
 
-              <div className="p-3 bg-kertas-tua/50 dark:bg-white/5 border border-garis rounded-[2px] text-xs text-tinta-lembut dark:text-white/75 leading-relaxed">
+              <div className="p-3 bg-kertas-tua/50 dark:bg-white/5 border border-garis rounded-chip text-xs text-tinta-lembut dark:text-white/75 leading-relaxed">
                 Pilihan fotomu telah berhasil dikirim ke fotografer. Kamu tetap dapat melihat galeri ini dan memperbarui pilihan foto kapan saja jika diperlukan.
               </div>
 
@@ -202,11 +202,11 @@ export default function SubmitResultDialog({
                     Hanya Baca
                   </span>
                 </div>
-                <div className="max-h-44 overflow-y-auto border border-garis rounded-[2px] bg-white dark:bg-[#121214] p-2.5 space-y-1 font-mono text-xs text-tinta dark:text-white/90">
+                <div className="max-h-44 overflow-y-auto border border-garis rounded-input bg-white dark:bg-[#121214] p-2.5 space-y-1 font-mono text-xs text-tinta dark:text-white/90">
                   {selectedPhotos.map((p, idx) => (
                     <div
                       key={p.id || idx}
-                      className="flex items-center justify-between py-1 px-2 hover:bg-kertas-tua/30 dark:hover:bg-white/5 rounded-[2px]"
+                      className="flex items-center justify-between py-1 px-2 hover:bg-kertas-tua/30 dark:hover:bg-white/5 rounded-chip"
                     >
                       <span className="truncate pr-2">
                         <strong className="text-merah mr-1.5">{idx + 1}.</strong> {p.filename}
@@ -239,7 +239,7 @@ export default function SubmitResultDialog({
                 </p>
               </div>
 
-              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs rounded-[2px] leading-relaxed">
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs rounded-chip leading-relaxed">
                 <strong>Foto pilihanmu tidak hilang:</strong> Kamu dapat mencoba mengirim ulang, atau menyalin daftar nama file dan mengirimkannya langsung lewat WhatsApp agar proses tidak terhambat.
               </div>
 
@@ -248,7 +248,7 @@ export default function SubmitResultDialog({
                 <span className="text-[11px] font-mono uppercase tracking-wider text-tinta-lembut dark:text-white/60 block mb-2">
                   Daftar Foto Siap Kirim ({selectedPhotos.length})
                 </span>
-                <div className="max-h-36 overflow-y-auto border border-garis rounded-[2px] bg-white dark:bg-[#121214] p-2.5 space-y-1 font-mono text-xs text-tinta dark:text-white/90">
+                <div className="max-h-36 overflow-y-auto border border-garis rounded-input bg-white dark:bg-[#121214] p-2.5 space-y-1 font-mono text-xs text-tinta dark:text-white/90">
                   {selectedPhotos.map((p, idx) => (
                     <div key={p.id || idx} className="truncate py-0.5">
                       <strong className="text-merah mr-1.5">{idx + 1}.</strong> {p.filename}
@@ -270,11 +270,11 @@ export default function SubmitResultDialog({
           >
             {state === 'success' && (
               <>
-                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
                   <button
                     type="button"
                     onClick={handleCopyFilenames}
-                    className="flex-1 px-4 py-2.5 border border-garis bg-white dark:bg-[#161618] hover:border-merah text-xs font-mono rounded-[2px] flex items-center justify-center gap-2 transition-colors min-h-[44px]"
+                    className="flex-1 px-4 py-2.5 border border-garis bg-white dark:bg-[#161618] hover:border-tinta text-sm font-sans font-medium rounded-btn flex items-center justify-center gap-2 transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
                   >
                     {copied ? (
                       <>
@@ -284,7 +284,7 @@ export default function SubmitResultDialog({
                     ) : (
                       <>
                         <Copy className="w-4 h-4 text-tinta-lembut" />
-                        <span>Salin Daftar Foto</span>
+                        <span>Salin daftar foto</span>
                       </>
                     )}
                   </button>
@@ -294,10 +294,10 @@ export default function SubmitResultDialog({
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono rounded-[2px] flex items-center justify-center gap-2 transition-colors min-h-[44px]"
+                      className="flex-1 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-sans font-medium rounded-btn flex items-center justify-center gap-2 transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
                     >
                       <MessageCircle className="w-4 h-4" />
-                      <span>Kirim Juga Lewat WA</span>
+                      <span>Kirim juga lewat WA</span>
                     </a>
                   )}
                 </div>
@@ -305,7 +305,7 @@ export default function SubmitResultDialog({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-full py-3 bg-merah hover:bg-merah-hover text-white text-xs font-mono uppercase tracking-wider rounded-[2px] transition-colors min-h-[44px] shadow-sm font-semibold"
+                  className="w-full py-3 bg-merah hover:bg-merah-hover active:bg-marun text-kertas text-sm font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
                 >
                   Selesai
                 </button>
@@ -314,14 +314,14 @@ export default function SubmitResultDialog({
 
             {state === 'error' && (
               <>
-                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
                   <button
                     type="button"
                     onClick={handleCopyFilenames}
-                    className="flex-1 px-4 py-2.5 border border-garis bg-white dark:bg-[#161618] text-xs font-mono rounded-[2px] flex items-center justify-center gap-2 hover:border-merah transition-colors min-h-[44px]"
+                    className="flex-1 px-4 py-2.5 border border-garis bg-white dark:bg-[#161618] text-sm font-sans font-medium rounded-btn flex items-center justify-center gap-2 hover:border-tinta transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
                   >
                     <Copy className="w-4 h-4 text-tinta-lembut" />
-                    <span>Salin Daftar Foto</span>
+                    <span>Salin daftar foto</span>
                   </button>
 
                   {hasPhone && (
@@ -329,38 +329,38 @@ export default function SubmitResultDialog({
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono rounded-[2px] flex items-center justify-center gap-2 transition-colors min-h-[44px]"
+                      className="flex-1 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-sans font-medium rounded-btn flex items-center justify-center gap-2 transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
                     >
                       <MessageCircle className="w-4 h-4" />
-                      <span>Kirim Manual ke WA</span>
+                      <span>Kirim manual ke WA</span>
                     </a>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="flex-1 px-4 py-2.5 border border-garis text-xs font-mono rounded-[2px] text-tinta-lembut hover:text-tinta transition-colors min-h-[44px]"
+                    className="flex-1 px-4 py-2.5 border border-garis text-sm font-sans font-medium rounded-btn text-tinta-lembut hover:text-tinta hover:bg-kertas-tua transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
                   >
-                    Tutup Sementara
+                    Tutup sementara
                   </button>
 
                   <button
                     type="button"
                     onClick={onRetry}
                     disabled={isRetrying}
-                    className="flex-1 px-5 py-2.5 bg-merah hover:bg-merah-hover text-white text-xs font-mono uppercase tracking-wider rounded-[2px] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 min-h-[44px]"
+                    className="flex-1 px-5 py-2.5 bg-merah hover:bg-merah-hover active:bg-marun text-kertas text-sm font-sans font-medium rounded-btn transition-colors duration-150 disabled:opacity-50 flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
                   >
                     {isRetrying ? (
                       <>
                         <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>Mencoba Lagi...</span>
+                        <span>Mencoba lagi...</span>
                       </>
                     ) : (
                       <>
                         <RefreshCw className="w-4 h-4" />
-                        <span>Coba Kirim Lagi</span>
+                        <span>Coba kirim lagi</span>
                       </>
                     )}
                   </button>

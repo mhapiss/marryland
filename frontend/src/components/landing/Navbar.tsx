@@ -72,7 +72,7 @@ export function Navbar() {
             to="/login"
             onMouseEnter={() => prefetchRoute('/login')}
             onFocus={() => prefetchRoute('/login')}
-            className="border border-tinta/25 text-tinta hover:bg-tinta hover:text-kertas px-5 py-2 rounded-sm font-medium text-xs uppercase tracking-[0.14em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta min-h-[40px] flex items-center"
+            className="border border-tinta/35 text-tinta hover:bg-kertas-tua hover:border-tinta px-5 py-2 rounded-btn font-sans font-medium text-sm normal-case tracking-normal transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2 focus-visible:ring-offset-kertas min-h-[44px] flex items-center"
           >
             Masuk
           </Link>
@@ -80,7 +80,7 @@ export function Navbar() {
 
         {/* Mobile Hamburger Button */}
         <button
-          className="md:hidden text-tinta p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah"
+          className="md:hidden text-tinta p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 transition-colors duration-150"
           onClick={() => setMobileOpen(true)}
           aria-label="Buka menu navigasi"
         >
@@ -102,7 +102,7 @@ export function Navbar() {
             </span>
             <button
               onClick={() => setMobileOpen(false)}
-              className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-kertas hover:text-merah transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kertas"
+              className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-kertas hover:text-merah transition-colors duration-150 rounded-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kertas"
               aria-label="Tutup menu navigasi"
             >
               <X className="w-7 h-7 stroke-[1.5]" />

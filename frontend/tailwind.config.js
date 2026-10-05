@@ -60,6 +60,10 @@ module.exports = {
         '2xl': '2px',
         '3xl': '4px',
         full: '9999px',
+        btn: 'var(--radius-btn, 8px)',
+        chip: 'var(--radius-chip, 8px)',
+        input: 'var(--radius-input, 8px)',
+        panel: 'var(--radius-panel, 12px)',
       },
       boxShadow: {
         none: 'none',

@@ -107,15 +107,15 @@ export default function SendClientMessageModal({
       onClick={onClose}
     >
       <div
-        className="relative bg-white border border-garis rounded-[2px] shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col font-sans text-tinta"
+        className="relative bg-white border border-garis rounded-panel shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col font-sans text-tinta"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="p-6 border-b border-garis flex items-start justify-between bg-kertas-tua/40">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-merah bg-merah/10 border border-merah/25 px-2 py-0.5 rounded-[2px]">
-                Siap Kirim
+              <span className="text-[10px] font-sans font-medium text-merah bg-merah/10 border border-merah/25 px-2 py-0.5 rounded-chip">
+                Siap kirim
               </span>
               <span className="text-xs font-mono text-tinta-lembut">
                 Klien: {gallery.client_name} ({gallery.client_whatsapp})
@@ -129,7 +129,7 @@ export default function SendClientMessageModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-[2px] min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-merah/20"
             aria-label="Tutup dialog"
           >
             <X className="w-5 h-5" />
@@ -152,7 +152,7 @@ export default function SendClientMessageModal({
               rows={8}
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              className="w-full p-4 bg-kertas border border-garis rounded-[2px] text-xs sm:text-sm text-tinta focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah font-mono leading-relaxed resize-y"
+              className="w-full p-4 bg-kertas border border-garis rounded-input text-xs sm:text-sm text-tinta focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah font-mono leading-relaxed resize-y"
               placeholder="Tulis pesan untuk klien..."
             />
           </div>
@@ -162,11 +162,11 @@ export default function SendClientMessageModal({
             <button
               type="button"
               onClick={() => handleCopy(linkPilih, 'link_pilih')}
-              className="flex items-center justify-between px-3.5 py-2.5 bg-kertas hover:bg-white border border-garis rounded-[2px] text-xs font-mono text-tinta hover:text-merah transition-colors min-h-[44px]"
+              className="flex items-center justify-between px-3.5 py-2.5 bg-kertas hover:bg-white border border-garis rounded-btn text-xs font-sans font-medium text-tinta hover:text-merah transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-merah/20"
             >
               <div className="flex items-center gap-2 truncate">
                 <LinkIcon className="w-3.5 h-3.5 text-merah shrink-0" />
-                <span className="truncate">Salin Tautan Pilih Foto</span>
+                <span className="truncate">Salin tautan pilih foto</span>
               </div>
               {copiedType === 'link_pilih' ? (
                 <Check className="w-4 h-4 text-sukses shrink-0" />
@@ -179,11 +179,11 @@ export default function SendClientMessageModal({
               <button
                 type="button"
                 onClick={() => handleCopy(linkAlbum, 'link_album')}
-                className="flex items-center justify-between px-3.5 py-2.5 bg-kertas hover:bg-white border border-garis rounded-[2px] text-xs font-mono text-tinta hover:text-merah transition-colors min-h-[44px]"
+                className="flex items-center justify-between px-3.5 py-2.5 bg-kertas hover:bg-white border border-garis rounded-btn text-xs font-sans font-medium text-tinta hover:text-merah transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-merah/20"
               >
                 <div className="flex items-center gap-2 truncate">
                   <Sparkles className="w-3.5 h-3.5 text-merah shrink-0" />
-                  <span className="truncate">Salin Tautan Album Keluarga</span>
+                  <span className="truncate">Salin tautan album keluarga</span>
                 </div>
                 {copiedType === 'link_album' ? (
                   <Check className="w-4 h-4 text-sukses shrink-0" />
@@ -192,7 +192,7 @@ export default function SendClientMessageModal({
                 )}
               </button>
             ) : (
-              <div className="flex items-center px-3.5 py-2.5 bg-kertas/50 border border-garis/60 rounded-[2px] text-[11px] font-mono text-tinta-lembut">
+              <div className="flex items-center px-3.5 py-2.5 bg-kertas/50 border border-garis/60 rounded-btn text-[11px] font-sans text-tinta-lembut">
                 Album keluarga belum diaktifkan di galeri ini
               </div>
             )}
@@ -204,17 +204,17 @@ export default function SendClientMessageModal({
           <button
             type="button"
             onClick={() => handleCopy(messageText, 'pesan')}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-garis hover:border-merah text-tinta hover:text-merah text-xs font-medium rounded-[2px] transition-colors min-h-[44px]"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-garis hover:border-merah text-tinta hover:text-merah text-xs font-sans font-medium rounded-btn transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-merah/20"
           >
             {copiedType === 'pesan' ? (
               <>
                 <Check className="w-4 h-4 text-sukses" />
-                <span>Pesan Tersalin!</span>
+                <span>Pesan tersalin!</span>
               </>
             ) : (
               <>
                 <Copy className="w-4 h-4" />
-                <span>Salin Seluruh Pesan</span>
+                <span>Salin seluruh pesan</span>
               </>
             )}
           </button>
@@ -223,7 +223,7 @@ export default function SendClientMessageModal({
             <button
               type="button"
               onClick={onClose}
-              className="w-full sm:w-auto px-5 py-2.5 border border-garis rounded-[2px] text-xs font-medium text-tinta-lembut hover:text-tinta transition-colors min-h-[44px]"
+              className="w-full sm:w-auto px-5 py-2.5 border border-garis rounded-btn text-xs font-sans font-medium text-tinta-lembut hover:text-tinta transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-merah/20"
             >
               Tutup
             </button>
@@ -231,7 +231,7 @@ export default function SendClientMessageModal({
             <button
               type="button"
               onClick={handleSendWhatsApp}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-merah hover:bg-merah-hover text-white text-xs font-medium rounded-[2px] transition-colors shadow-sm min-h-[44px]"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-merah hover:bg-merah-hover text-white text-xs font-sans font-medium rounded-btn transition-colors shadow-sm min-h-[44px] focus:outline-none focus:ring-2 focus:ring-merah/20"
             >
               <Send className="w-4 h-4" />
               <span>Kirim lewat WhatsApp</span>

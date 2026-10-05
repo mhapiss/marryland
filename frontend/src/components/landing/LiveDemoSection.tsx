@@ -43,7 +43,7 @@ export function LiveDemoSection({ photo, data }: LiveDemoSectionProps) {
 
           <button
             onClick={() => navigate(`/${demoSlug || 'demo'}`)}
-            className="inline-flex items-center gap-2 bg-merah hover:bg-marun text-kertas px-7 py-3.5 text-sm font-medium rounded-sm transition-colors min-h-[44px]"
+            className="inline-flex items-center gap-2 bg-merah hover:bg-merah-hover active:bg-marun text-kertas px-7 py-3 text-[15px] font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
           >
             <span>{ctaText}</span>
             <ArrowUpRight className="w-4 h-4" />

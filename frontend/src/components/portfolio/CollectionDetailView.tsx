@@ -232,9 +232,9 @@ export function CollectionDetailView({
                   <a
                     href="#galeri"
                     onClick={(e) => handleLinkClick(e, 'galeri')}
-                    className="inline-flex items-center gap-2 px-7 py-3.5 bg-[var(--collection-dark)] text-[var(--collection-dark-text)] rounded-[2px] font-medium text-sm hover:opacity-90 transition-all min-h-[44px]"
+                    className="inline-flex items-center gap-2 px-7 py-3 bg-[var(--collection-dark)] text-[var(--collection-dark-text)] rounded-btn font-sans font-medium text-sm hover:opacity-90 transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--collection-dark)] focus-visible:ring-offset-2"
                   >
-                    <span>Lihat Galeri Foto</span>
+                    <span>Lihat galeri foto</span>
                     <ArrowDown className="w-4 h-4" />
                   </a>
 
@@ -248,10 +248,10 @@ export function CollectionDetailView({
                         onSelectRegion?.('cta_section');
                       }
                     }}
-                    className="inline-flex items-center gap-2 px-7 py-3.5 border border-[var(--collection-border)] text-[var(--collection-ink)] bg-white/60 hover:bg-white rounded-[2px] font-medium text-sm transition-all min-h-[44px]"
+                    className="inline-flex items-center gap-2 px-7 py-3 border border-[var(--collection-border)] text-[var(--collection-ink)] bg-white/60 hover:bg-white rounded-btn font-sans font-medium text-sm transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--collection-ink)] focus-visible:ring-offset-2"
                   >
                     <MessageCircle className="w-4 h-4 text-[var(--collection-accent)]" />
-                    <span>Konsultasi Liputan</span>
+                    <span>Konsultasi liputan</span>
                   </a>
                 </div>
               </div>
@@ -629,7 +629,7 @@ export function CollectionDetailView({
                       setActiveEventSlug('semua');
                       setDisplayLimit(24);
                     }}
-                    className={`px-4 py-2 text-xs uppercase tracking-wider font-semibold rounded-[2px] whitespace-nowrap transition-colors min-h-[44px] ${
+                    className={`px-4 py-2 text-xs font-sans font-medium rounded-chip whitespace-nowrap transition-colors duration-150 min-h-[44px] ${
                       activeEventSlug === 'semua'
                         ? 'bg-[var(--collection-dark)] text-[var(--collection-dark-text)]'
                         : 'bg-white border border-[var(--collection-border)] text-[var(--collection-ink-muted)] hover:text-[var(--collection-ink)]'
@@ -651,7 +651,7 @@ export function CollectionDetailView({
                           setActiveEventSlug(evt.slug);
                           setDisplayLimit(24);
                         }}
-                        className={`px-4 py-2 text-xs uppercase tracking-wider font-semibold rounded-[2px] whitespace-nowrap transition-colors min-h-[44px] ${
+                        className={`px-4 py-2 text-xs font-sans font-medium rounded-chip whitespace-nowrap transition-colors duration-150 min-h-[44px] ${
                           isSelected
                             ? 'bg-[var(--collection-dark)] text-[var(--collection-dark-text)]'
                             : 'bg-white border border-[var(--collection-border)] text-[var(--collection-ink-muted)] hover:text-[var(--collection-ink)]'
@@ -722,9 +722,9 @@ export function CollectionDetailView({
                 <button
                   type="button"
                   onClick={() => setDisplayLimit((prev) => prev + 24)}
-                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-white border border-[var(--collection-border)] text-[var(--collection-ink)] hover:bg-[var(--collection-muted-paper)] rounded-[2px] font-medium text-sm transition-all min-h-[44px]"
+                  className="inline-flex items-center gap-2 px-8 py-3 bg-white border border-[var(--collection-border)] text-[var(--collection-ink)] hover:bg-[var(--collection-muted-paper)] rounded-btn font-sans font-medium text-sm transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--collection-ink)] focus-visible:ring-offset-2"
                 >
-                  <span>Muat Lebih Banyak ({galleryPhotos.length - displayLimit} tersisa)</span>
+                  <span>Muat lebih banyak ({galleryPhotos.length - displayLimit} tersisa)</span>
                   <ArrowDown className="w-4 h-4" />
                 </button>
               </div>
@@ -766,7 +766,7 @@ export function CollectionDetailView({
                   onSelectRegion?.('cta_section');
                 }
               }}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[var(--collection-dark)] text-[var(--collection-dark-text)] rounded-[2px] font-medium text-base hover:opacity-90 shadow-elevated transition-all min-h-[44px]"
+              className="inline-flex items-center gap-3 px-8 py-3.5 bg-[var(--collection-dark)] text-[var(--collection-dark-text)] rounded-btn font-sans font-medium text-base hover:opacity-90 shadow-elevated transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--collection-dark)] focus-visible:ring-offset-2"
             >
               <MessageCircle className="w-5 h-5 text-[var(--collection-accent)]" />
               <span>Hubungi via WhatsApp</span>

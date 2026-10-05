@@ -1032,13 +1032,13 @@ export default function PortfolioManager() {
           <Link to="/" className="text-xl font-serif font-normal tracking-tight text-tinta">
             by.<span className="text-merah">marryland</span>
           </Link>
-          <span className="border border-garis text-merah bg-kertas-tua text-[10px] px-2.5 py-0.5 rounded-[2px] font-mono uppercase">
+          <span className="border border-garis text-merah bg-kertas-tua text-[10px] px-2.5 py-0.5 rounded-chip font-sans font-medium uppercase">
             ADMIN PORTOFOLIO
           </span>
         </div>
 
         <div className="flex items-center gap-5">
-          <Link to="/admin" className="text-sm font-mono text-tinta-lembut hover:text-merah transition-colors">
+          <Link to="/admin" className="text-sm font-sans font-medium text-tinta-lembut hover:text-merah transition-colors">
             ← Dashboard Admin
           </Link>
           <button
@@ -1046,7 +1046,7 @@ export default function PortfolioManager() {
               signOut();
               navigate('/login');
             }}
-            className="text-tinta-lembut hover:text-merah font-mono transition-colors text-sm"
+            className="text-tinta-lembut hover:text-merah font-sans font-medium transition-colors text-sm"
           >
             Keluar
           </button>
@@ -1107,7 +1107,7 @@ export default function PortfolioManager() {
                 <button
                   type="button"
                   onClick={handleCreateCollection}
-                  className="bg-merah hover:bg-merah-hover text-white px-5 py-2.5 rounded-[2px] text-sm font-medium flex items-center gap-2 min-h-[44px] shadow-sm transition-all"
+                  className="bg-merah hover:bg-merah-hover text-white px-5 py-2.5 rounded-btn text-sm font-sans font-medium flex items-center gap-2 min-h-[44px] shadow-sm transition-all"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah Koleksi Adat</span>
@@ -1151,7 +1151,7 @@ export default function PortfolioManager() {
                           {/* Status Badge */}
                           <div className="absolute top-3 left-3">
                             <span
-                              className={`px-2.5 py-1 text-[10px] uppercase font-mono tracking-wider rounded-[2px] border ${
+                              className={`px-2.5 py-1 text-[10px] uppercase font-sans font-medium tracking-wider rounded-chip border ${
                                 col.status === 'published'
                                   ? 'bg-kertas-tua text-tinta border-garis font-semibold'
                                   : 'bg-neutral-800/80 text-white border-transparent'
@@ -1195,7 +1195,7 @@ export default function PortfolioManager() {
                             href={`/portofolio/${col.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 text-tinta-lembut hover:text-merah transition-colors"
+                            className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
                             title="Buka Halaman Publik"
                           >
                             <ExternalLink className="w-4 h-4" />
@@ -1203,7 +1203,7 @@ export default function PortfolioManager() {
                           <button
                             type="button"
                             onClick={() => handleDuplicateCollection(col)}
-                            className="p-2 text-tinta-lembut hover:text-merah transition-colors"
+                            className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
                             title="Duplikasi Koleksi"
                           >
                             <Copy className="w-4 h-4" />
@@ -1211,7 +1211,7 @@ export default function PortfolioManager() {
                           <button
                             type="button"
                             onClick={() => setDeleteTargetCollection(col)}
-                            className="p-2 text-tinta-lembut hover:text-merah transition-colors"
+                            className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
                             title="Hapus Koleksi"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -1221,7 +1221,7 @@ export default function PortfolioManager() {
                         <button
                           type="button"
                           onClick={() => handleSelectCollection(col)}
-                          className="px-4 py-1.5 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium flex items-center gap-1.5 transition-colors"
+                          className="px-4 py-2 bg-merah hover:bg-merah-hover text-white rounded-btn text-xs font-sans font-medium flex items-center gap-1.5 transition-colors min-h-[44px]"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                           <span>Buka Editor</span>
@@ -1250,7 +1250,7 @@ export default function PortfolioManager() {
                       type="text"
                       value={newEvName}
                       onChange={(e) => setNewEvName(e.target.value)}
-                      className="w-full border border-garis rounded-[2px] px-3.5 py-2 text-sm bg-white text-tinta focus:outline-none focus:border-merah"
+                      className="w-full border border-garis rounded-input px-3.5 py-2 text-sm bg-white text-tinta focus:outline-none focus:border-merah"
                       placeholder="Contoh: Akad Nikah"
                     />
                   </div>
@@ -1260,7 +1260,7 @@ export default function PortfolioManager() {
                       type="text"
                       value={newEvSlug}
                       onChange={(e) => setNewEvSlug(e.target.value)}
-                      className="w-full border border-garis rounded-[2px] px-3.5 py-2 text-sm bg-white text-tinta font-mono focus:outline-none focus:border-merah"
+                      className="w-full border border-garis rounded-input px-3.5 py-2 text-sm bg-white text-tinta font-mono focus:outline-none focus:border-merah"
                       placeholder="akad"
                     />
                   </div>
@@ -1272,7 +1272,7 @@ export default function PortfolioManager() {
                     type="text"
                     value={newEvDesc}
                     onChange={(e) => setNewEvDesc(e.target.value)}
-                    className="w-full border border-garis rounded-[2px] px-3.5 py-2 text-sm bg-white text-tinta focus:outline-none focus:border-merah"
+                    className="w-full border border-garis rounded-input px-3.5 py-2 text-sm bg-white text-tinta focus:outline-none focus:border-merah"
                     placeholder="Deskripsi satu kalimat..."
                   />
                 </div>
@@ -1280,7 +1280,7 @@ export default function PortfolioManager() {
                 <button
                   type="button"
                   onClick={handleAddEventType}
-                  className="bg-merah hover:bg-merah-hover text-white px-5 py-2.5 rounded-[2px] text-xs font-medium flex items-center gap-1.5 transition-colors min-h-[44px]"
+                  className="bg-merah hover:bg-merah-hover text-white px-5 py-2.5 rounded-btn text-xs font-sans font-medium flex items-center gap-1.5 transition-colors min-h-[44px]"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Simpan Jenis Acara</span>
@@ -2806,7 +2806,7 @@ export default function PortfolioManager() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setSlotPickerTarget(null)}
           />
-          <div className="relative bg-white rounded-[2px] border border-garis w-full max-w-3xl p-6 shadow-elevated z-10 max-h-[85vh] flex flex-col">
+          <div className="relative bg-white rounded-panel border border-garis w-full max-w-3xl p-6 shadow-elevated z-10 max-h-[85vh] flex flex-col font-sans">
             <div className="flex items-center justify-between border-b border-garis pb-3 mb-4 shrink-0">
               <div>
                 <h3 className="font-serif text-lg font-medium text-tinta">
@@ -2824,7 +2824,7 @@ export default function PortfolioManager() {
               <button
                 type="button"
                 onClick={() => setSlotPickerTarget(null)}
-                className="p-1 text-tinta-lembut hover:text-tinta"
+                className="p-2 text-tinta-lembut hover:text-tinta rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2946,7 +2946,7 @@ export default function PortfolioManager() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowValidationModal(false)}
           />
-          <div className="relative bg-white rounded-[2px] border border-garis w-full max-w-md p-6 shadow-elevated z-10">
+          <div className="relative bg-white rounded-panel border border-garis w-full max-w-md p-6 shadow-elevated z-10 font-sans">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-700">
                 <AlertCircle className="w-5 h-5" />
@@ -2959,7 +2959,7 @@ export default function PortfolioManager() {
               </div>
             </div>
 
-            <div className="space-y-2.5 my-4 bg-kertas-tua/40 p-4 rounded-[2px] border border-garis">
+            <div className="space-y-2.5 my-4 bg-kertas-tua/40 p-4 rounded-input border border-garis">
               {publishingRequirements.map((req) => (
                 <div key={req.id} className="flex items-start gap-2.5 text-xs">
                   {req.passed ? (
@@ -2980,7 +2980,7 @@ export default function PortfolioManager() {
               <button
                 type="button"
                 onClick={() => setShowValidationModal(false)}
-                className="px-5 py-2 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium"
+                className="px-5 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-btn text-xs font-sans font-medium min-h-[44px]"
               >
                 Saya Mengerti, Lengkapi Dulu
               </button>
@@ -2998,7 +2998,7 @@ export default function PortfolioManager() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={handleClosePhotoModal}
           />
-          <div className="relative bg-white rounded-[2px] border border-garis w-full max-w-4xl p-6 shadow-elevated z-10 max-h-[92vh] flex flex-col overflow-hidden">
+          <div className="relative bg-white rounded-panel border border-garis w-full max-w-4xl p-6 shadow-elevated z-10 max-h-[92vh] flex flex-col overflow-hidden font-sans">
             {/* Header Modal */}
             <div className="flex items-start justify-between pb-4 border-b border-garis shrink-0">
               <div>
@@ -3011,7 +3011,7 @@ export default function PortfolioManager() {
                 type="button"
                 onClick={handleClosePhotoModal}
                 disabled={uploading}
-                className="text-tinta-lembut hover:text-tinta p-1 rounded-[2px] disabled:opacity-40"
+                className="text-tinta-lembut hover:text-tinta p-2 rounded-btn disabled:opacity-40 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Tutup modal"
               >
                 <X className="w-5 h-5" />
@@ -3549,7 +3549,7 @@ export default function PortfolioManager() {
                   type="button"
                   onClick={handleClosePhotoModal}
                   disabled={uploading}
-                  className="px-4 py-2 border border-garis rounded-[2px] text-xs font-medium text-tinta-lembut hover:text-tinta min-h-[44px] disabled:opacity-40"
+                  className="px-4 py-2 border border-garis rounded-btn text-xs font-sans font-medium text-tinta-lembut hover:text-tinta min-h-[44px] disabled:opacity-40"
                 >
                   Batal
                 </button>
@@ -3557,7 +3557,7 @@ export default function PortfolioManager() {
                   type="button"
                   onClick={handleBatchPhotoUpload}
                   disabled={uploading || uploadQueue.filter((q) => q.selected).length === 0}
-                  className="px-6 py-2 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium min-h-[44px] shadow-sm disabled:opacity-40 flex items-center gap-2"
+                  className="px-6 py-2 bg-merah hover:bg-merah-hover text-white rounded-btn text-xs font-sans font-medium min-h-[44px] shadow-sm disabled:opacity-40 flex items-center gap-2"
                 >
                   {uploading ? (
                     <>

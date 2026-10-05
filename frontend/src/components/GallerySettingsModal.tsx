@@ -167,13 +167,13 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
       onClick={onClose}
     >
       <div
-        className="relative bg-white border border-garis rounded-[2px] shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col font-sans text-tinta"
+        className="relative bg-white border border-garis rounded-panel shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col font-sans text-tinta"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="p-6 border-b border-garis flex items-center justify-between bg-kertas-tua/40">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-merah bg-merah/10 border border-merah/25 px-2 py-0.5 rounded-[2px]">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-merah bg-merah/10 border border-merah/25 px-2 py-0.5 rounded-chip">
               Pengaturan Galeri
             </span>
             <h2 className="text-xl sm:text-2xl font-serif font-normal text-tinta mt-1">
@@ -184,7 +184,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-[2px] min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
             aria-label="Tutup dialog"
           >
             <X className="w-5 h-5" />
@@ -201,11 +201,11 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                 type="button"
                 onClick={handleRescan}
                 disabled={isRescanning}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-kertas hover:bg-white border border-garis rounded-[2px] text-xs font-mono text-tinta hover:text-merah transition-colors disabled:opacity-50 min-h-[36px]"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-kertas hover:bg-kertas-tua border border-garis rounded-btn text-xs font-sans font-medium text-tinta hover:text-merah transition-colors duration-150 disabled:opacity-50 min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
                 title="Pindai file baru di Google Drive"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isRescanning ? 'animate-spin text-merah' : ''}`} />
-                <span>{isRescanning ? 'Memindai...' : 'Pindai Ulang Drive'}</span>
+                <span>{isRescanning ? 'Memindai...' : 'Pindai ulang Drive'}</span>
               </button>
             </h3>
 
@@ -219,7 +219,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                   min={1}
                   value={maxPhotos}
                   onChange={(e) => setMaxPhotos(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah font-mono"
+                  className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah font-mono"
                 />
               </div>
 
@@ -231,7 +231,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                   type="date"
                   value={deadlineDate}
                   onChange={(e) => setDeadlineDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah font-mono"
+                  className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah font-mono"
                 />
               </div>
             </div>
@@ -276,7 +276,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
             </div>
 
             {albumEnabled && (
-              <div className="space-y-5 bg-kertas/60 p-4 border border-garis rounded-[2px] animate-in fade-in duration-200">
+              <div className="space-y-5 bg-kertas/60 p-4 border border-garis rounded-chip animate-in fade-in duration-200">
                 {/* Tautan Album & Buat Ulang Token */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
@@ -288,7 +288,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                       onClick={() => setShowRegenerateConfirm(true)}
                       className="text-[11px] font-mono text-merah hover:underline"
                     >
-                      Buat Ulang Tautan
+                      Buat ulang tautan
                     </button>
                   </div>
 
@@ -297,12 +297,12 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                       type="text"
                       readOnly
                       value={albumLink}
-                      className="w-full px-3 py-2 bg-white border border-garis text-tinta text-xs font-mono rounded-[2px] select-all"
+                      className="w-full px-3 py-2 bg-white border border-garis text-tinta text-xs font-mono rounded-input select-all"
                     />
                     <button
                       type="button"
                       onClick={handleCopyAlbumLink}
-                      className="px-3 py-2 bg-white hover:bg-kertas border border-garis text-tinta text-xs font-mono rounded-[2px] transition-colors shrink-0 flex items-center gap-1.5 min-h-[38px]"
+                      className="px-3 py-2 bg-white hover:bg-kertas-tua border border-garis text-tinta text-xs font-sans font-medium rounded-btn transition-colors duration-150 shrink-0 flex items-center gap-1.5 min-h-[38px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
                     >
                       {copiedLink ? <Check className="w-4 h-4 text-sukses" /> : <Copy className="w-4 h-4" />}
                       <span>{copiedLink ? 'Tersalin' : 'Salin'}</span>
@@ -322,7 +322,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                       placeholder={gallery.album_pin_hash ? '•••••• (Sudah aktif)' : 'Contoh: 1234'}
                       value={albumPin}
                       onChange={(e) => setAlbumPin(e.target.value.replace(/[^0-9]/g, ''))}
-                      className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah font-mono tracking-widest"
+                      className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah font-mono tracking-widest"
                     />
                     {gallery.album_pin_hash && (
                       <button
@@ -346,7 +346,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                       type="date"
                       value={albumExpiresAt}
                       onChange={(e) => setAlbumExpiresAt(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah font-mono"
+                      className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah font-mono"
                     />
                   </div>
                 </div>
@@ -357,7 +357,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                     Cakupan Foto yang Ditampilkan di Album
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label className="flex items-center gap-2 p-3 bg-white border border-garis rounded-[2px] cursor-pointer">
+                    <label className="flex items-center gap-2 p-3 bg-white border border-garis rounded-chip cursor-pointer">
                       <input
                         type="radio"
                         name="album_scope"
@@ -367,7 +367,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                       />
                       <span className="text-xs text-tinta">Semua Foto di Google Drive</span>
                     </label>
-                    <label className="flex items-center gap-2 p-3 bg-white border border-garis rounded-[2px] cursor-pointer">
+                    <label className="flex items-center gap-2 p-3 bg-white border border-garis rounded-chip cursor-pointer">
                       <input
                         type="radio"
                         name="album_scope"
@@ -393,8 +393,8 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
                   </span>
                 </label>
 
-                {/* KETERBATASAN JUJUR (Sesuai Aturan Transparansi Teknis) */}
-                <div className="p-3.5 bg-kertas-tua/50 border border-garis rounded-[2px] text-xs text-tinta-lembut space-y-1 font-mono leading-relaxed">
+                {/* KETERBATASAN JUJUR */}
+                <div className="p-3.5 bg-kertas-tua/50 border border-garis rounded-chip text-xs text-tinta-lembut space-y-1 font-mono leading-relaxed">
                   <div className="flex items-center gap-1.5 text-merah font-semibold uppercase tracking-wider text-[11px]">
                     <ShieldAlert className="w-4 h-4 shrink-0" />
                     <span>Transparansi Teknis & Keamanan</span>
@@ -413,7 +413,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 border border-garis rounded-[2px] text-xs font-medium text-tinta-lembut hover:text-tinta transition-colors min-h-[44px]"
+            className="px-5 py-2.5 border border-garis rounded-btn text-sm font-sans font-medium text-tinta-lembut hover:text-tinta hover:bg-kertas-tua transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta"
           >
             Batal
           </button>
@@ -421,9 +421,9 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
             type="button"
             onClick={handleSave}
             disabled={isLoading}
-            className="px-7 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium transition-colors disabled:opacity-50 min-h-[44px]"
+            className="px-7 py-2.5 bg-merah hover:bg-merah-hover active:bg-marun text-kertas rounded-btn text-sm font-sans font-medium transition-colors duration-150 disabled:opacity-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
           >
-            {isLoading ? 'Menyimpan...' : 'Simpan Pengaturan'}
+            {isLoading ? 'Menyimpan...' : 'Simpan pengaturan'}
           </button>
         </div>
       </div>

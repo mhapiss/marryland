@@ -168,13 +168,13 @@ export default function DemoPage() {
                   <div className="text-right">
                     <button
                       onClick={(e) => toggleSelect(photo.id, e)}
-                      className={`px-3 py-1.5 rounded-[2px] text-xs font-semibold transition-colors shadow-sm ${
+                      className={`px-3 py-1.5 rounded-btn text-xs font-sans font-medium transition-colors duration-150 shadow-none ${
                         isSelected
                           ? 'bg-merah-tanda text-kertas hover:bg-merah'
                           : 'bg-merah text-kertas hover:bg-merah-hover'
                       }`}
                     >
-                      {isSelected ? 'Batal Pilih' : 'Pilih Foto'}
+                      {isSelected ? 'Batal pilih' : 'Pilih foto'}
                     </button>
                   </div>
 
@@ -193,7 +193,7 @@ export default function DemoPage() {
         <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
             <div>
-              <span className="text-xs text-tinta-lembut block">Progress Pilihan Foto:</span>
+              <span className="text-xs text-tinta-lembut block">Progress pilihan foto:</span>
               <span className="font-serif text-xl font-normal text-tinta">
                 {selectedIds.length}{' '}
                 <span className="text-sm font-sans font-normal text-tinta-lembut">
@@ -202,7 +202,7 @@ export default function DemoPage() {
               </span>
             </div>
 
-            <div className="w-32 bg-kertas-tua border border-garis rounded-[2px] h-2.5 overflow-hidden">
+            <div className="w-32 bg-kertas-tua border border-garis rounded-chip h-2.5 overflow-hidden">
               <div
                 className="bg-merah-tanda h-full transition-all duration-300"
                 style={{ width: `${(selectedIds.length / MAX_SELECTABLE) * 100}%` }}
@@ -213,9 +213,9 @@ export default function DemoPage() {
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={() => setShowReview(true)}
-              className="flex-1 sm:flex-none border border-tinta/40 text-tinta hover:bg-kertas-tua px-5 py-2.5 text-xs font-semibold rounded-[2px] transition-colors min-h-[44px]"
+              className="flex-1 sm:flex-none border border-tinta/35 text-tinta hover:bg-kertas-tua hover:border-tinta px-5 py-2.5 text-sm font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
             >
-              Tinjau Pilihan ({selectedIds.length})
+              Tinjau pilihan ({selectedIds.length})
             </button>
 
             <button
@@ -227,9 +227,9 @@ export default function DemoPage() {
                 setIsSubmitted(true);
                 toast.success('Simulasi selesai! Pilihan foto sukses terkirim.');
               }}
-              className="flex-1 sm:flex-none bg-merah hover:bg-merah-hover text-kertas px-6 py-2.5 text-xs font-semibold rounded-[2px] transition-colors min-h-[44px] flex items-center justify-center gap-2"
+              className="flex-1 sm:flex-none bg-merah hover:bg-merah-hover active:bg-marun text-kertas px-6 py-2.5 text-sm font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
             >
-              <span>{isSubmitted ? 'Terkirim (Simulasi Selesai)' : 'Kirim Pilihan'}</span>
+              <span>{isSubmitted ? 'Terkirim (simulasi selesai)' : 'Kirim pilihan'}</span>
               <Send className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -260,14 +260,18 @@ export default function DemoPage() {
       {/* Review Modal */}
       {showReview && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-kertas border border-garis rounded-[2px] w-full max-w-xl p-6 shadow-elevated">
+          <div className="bg-kertas border border-garis rounded-panel w-full max-w-xl p-6 shadow-elevated">
             <div className="flex justify-between items-center pb-4 mb-4 border-b border-garis">
               <div>
                 <h3 className="font-serif text-xl font-normal text-tinta">Ringkasan Foto Terpilih</h3>
                 <p className="text-xs text-tinta-lembut">Total: {selectedIds.length} dari {MAX_SELECTABLE} foto</p>
               </div>
-              <button onClick={() => setShowReview(false)} className="p-2 min-h-[44px]">
-                <X className="w-5 h-5 text-tinta-lembut" />
+              <button
+                onClick={() => setShowReview(false)}
+                className="w-11 h-11 flex items-center justify-center rounded-btn text-tinta-lembut hover:text-tinta hover:bg-kertas-tua transition-colors"
+                aria-label="Tutup ringkasan"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -276,14 +280,15 @@ export default function DemoPage() {
                 const photo = photos.find((p) => p.id === id);
                 if (!photo) return null;
                 return (
-                  <div key={id} className="aspect-square relative rounded-[2px] overflow-hidden bg-[#f7f5f0] border border-garis">
+                  <div key={id} className="aspect-square relative rounded-chip overflow-hidden bg-[#f7f5f0] border border-garis">
                     <img src={photo.url} alt="" className="w-full h-full object-cover" />
                     <button
                       onClick={() => toggleSelect(id)}
-                      className="absolute top-1 right-1 bg-merah-tanda text-kertas w-5 h-5 rounded-full flex items-center justify-center text-[10px]"
+                      className="absolute top-1 right-1 bg-merah-tanda hover:bg-merah text-kertas w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors"
                       title="Hapus"
+                      aria-label="Hapus dari pilihan"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 );
@@ -293,9 +298,9 @@ export default function DemoPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowReview(false)}
-                className="flex-1 border border-tinta/40 text-tinta hover:bg-kertas-tua py-2.5 text-xs font-medium rounded-[2px] transition-colors min-h-[44px]"
+                className="flex-1 border border-tinta/35 text-tinta hover:bg-kertas-tua hover:border-tinta py-2.5 px-4 text-sm font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
               >
-                Tutup Ringkasan
+                Tutup ringkasan
               </button>
               <button
                 onClick={() => {
@@ -303,9 +308,9 @@ export default function DemoPage() {
                   setIsSubmitted(true);
                   toast.success('Pilihan foto berhasil disimulasikan!');
                 }}
-                className="flex-1 bg-merah hover:bg-merah-hover text-kertas py-2.5 text-xs font-semibold rounded-[2px] transition-colors min-h-[44px]"
+                className="flex-1 bg-merah hover:bg-merah-hover active:bg-marun text-kertas py-2.5 px-4 text-sm font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
               >
-                Kirim Sekarang
+                Kirim sekarang
               </button>
             </div>
           </div>

@@ -147,7 +147,7 @@ const AdminDashboard: React.FC = () => {
     };
     const labels: Record<string, string> = { active: 'Aktif', completed: 'Selesai', draft: 'Draft' };
     return (
-      <span className={`px-2.5 py-0.5 rounded-[2px] text-xs font-mono border ${styles[status] || styles.draft}`}>
+      <span className={`px-2.5 py-0.5 rounded-chip text-xs font-sans font-medium border ${styles[status] || styles.draft}`}>
         {labels[status] || status}
       </span>
     );
@@ -170,16 +170,16 @@ const AdminDashboard: React.FC = () => {
           <Link to="/" className="text-xl font-serif tracking-tight text-tinta">
             by.<span className="text-merah">marryland</span>
           </Link>
-          <span className="border border-garis text-merah bg-kertas-tua/60 text-[10px] px-2.5 py-0.5 rounded-[2px] font-mono tracking-widest uppercase">
+          <span className="border border-garis text-merah bg-kertas-tua/60 text-[10px] px-2.5 py-0.5 rounded-chip font-sans font-medium tracking-widest uppercase">
             ADMIN
           </span>
         </div>
         <div className="flex items-center gap-5">
-          <Link to="/dashboard" className="text-xs font-mono text-tinta-lembut hover:text-merah transition-colors hidden sm:inline">
+          <Link to="/dashboard" className="text-xs font-sans font-medium text-tinta-lembut hover:text-merah transition-colors hidden sm:inline">
             Dashboard Fotografer &rarr;
           </Link>
           <span className="text-xs font-mono text-tinta-lembut hidden sm:inline truncate max-w-[200px]">{user?.email}</span>
-          <button onClick={handleSignOut} className="text-tinta-lembut hover:text-merah transition-colors" title="Keluar" aria-label="Keluar">
+          <button onClick={handleSignOut} className="p-2 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center text-tinta-lembut hover:text-merah transition-colors" title="Keluar" aria-label="Keluar">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
           </button>
         </div>
@@ -282,7 +282,7 @@ const AdminDashboard: React.FC = () => {
                               Bergabung {new Date(p.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </div>
                           </div>
-                          <span className="text-xs font-mono text-tinta bg-kertas-tua border border-garis px-2 py-0.5 rounded-[2px]">{p.gallery_count} galeri</span>
+                          <span className="text-xs font-mono text-tinta bg-kertas-tua border border-garis px-2 py-0.5 rounded-chip">{p.gallery_count} galeri</span>
                         </div>
                       ))}
                     </div>
@@ -353,7 +353,7 @@ const AdminDashboard: React.FC = () => {
                               <div className="font-medium text-tinta">{p.full_name}</div>
                             </td>
                             <td className="px-5 py-4 text-center">
-                              <span className="bg-kertas-tua text-tinta border border-garis px-2.5 py-0.5 rounded-[2px] text-xs font-mono font-medium">{p.gallery_count}</span>
+                              <span className="bg-kertas-tua text-tinta border border-garis px-2.5 py-0.5 rounded-chip text-xs font-mono font-medium">{p.gallery_count}</span>
                             </td>
                             <td className="px-5 py-4 text-right text-tinta-lembut font-mono text-xs">
                               {new Date(p.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}

@@ -73,7 +73,7 @@ export default function SelectedPhotosPanel({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-[2px] min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-tinta-lembut hover:text-merah transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Tutup panel pilihan"
           >
             <X className="w-5 h-5" />
@@ -160,7 +160,7 @@ export default function SelectedPhotosPanel({
             </span>
           </div>
 
-          <div className="w-full sm:w-auto flex flex-wrap sm:flex-nowrap items-center gap-2">
+          <div className="w-full sm:w-auto flex flex-wrap sm:flex-nowrap items-center gap-2.5">
             {selectedPhotosList.length > 0 && (
               <button
                 type="button"
@@ -172,10 +172,10 @@ export default function SelectedPhotosPanel({
                     setTimeout(() => setCopied(false), 2000);
                   }
                 }}
-                className="flex-1 sm:flex-none px-3.5 py-2.5 border border-garis text-xs font-mono rounded-[2px] hover:border-merah transition-colors min-h-[44px] flex items-center justify-center gap-1.5"
+                className="flex-1 sm:flex-none px-3.5 py-2.5 border border-garis text-sm font-sans font-medium rounded-btn hover:border-merah hover:bg-kertas transition-colors duration-150 min-h-[44px] flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
                 title="Salin daftar foto terpilih"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-tinta-lembut" />}
+                {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-tinta-lembut" />}
                 <span>{copied ? 'Tersalin' : 'Salin'}</span>
               </button>
             )}
@@ -183,19 +183,19 @@ export default function SelectedPhotosPanel({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 sm:flex-none px-4 py-2.5 border border-garis text-xs font-mono rounded-[2px] hover:border-merah hover:text-merah transition-colors min-h-[44px]"
+              className="flex-1 sm:flex-none px-4 py-2.5 border border-garis text-sm font-sans font-medium rounded-btn hover:border-tinta hover:bg-kertas-tua transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
             >
-              Kembali Memilih
+              Kembali memilih
             </button>
 
             <button
               type="button"
               onClick={onSubmit}
               disabled={selectedPhotosList.length === 0}
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-merah hover:bg-merah-hover text-white text-xs font-mono uppercase tracking-wider rounded-[2px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px]"
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-merah hover:bg-merah-hover active:bg-marun text-kertas text-sm font-sans font-medium rounded-btn transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
             >
               <Send className="w-4 h-4" />
-              <span>Kirim Pilihan</span>
+              <span>Kirim pilihan</span>
             </button>
           </div>
         </div>

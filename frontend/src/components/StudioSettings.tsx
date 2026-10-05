@@ -211,7 +211,7 @@ const StudioSettings: React.FC = () => {
   };
 
   return (
-    <div className="bg-white border border-garis rounded-[2px] p-6 sm:p-8 font-sans text-tinta">
+    <div className="bg-white border border-garis rounded-panel p-6 sm:p-8 font-sans text-tinta">
       <div className="mb-8">
         <h2 className="font-serif text-2xl font-normal text-tinta">Identitas Studio</h2>
         <p className="text-tinta-lembut text-xs mt-1">
@@ -231,7 +231,7 @@ const StudioSettings: React.FC = () => {
             placeholder="Contoh: Sanggar Foto Marryland"
             value={form.studio_name}
             onChange={handleChange}
-            className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
+            className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
           />
         </div>
 
@@ -241,7 +241,7 @@ const StudioSettings: React.FC = () => {
             Nama Studio di Link
           </label>
           <div className="flex items-center">
-            <span className="bg-kertas border border-garis border-r-0 px-3.5 py-2.5 rounded-l-[2px] text-tinta-lembut text-xs shrink-0 font-mono">
+            <span className="bg-kertas border border-garis border-r-0 px-3.5 py-2.5 rounded-l-input text-tinta-lembut text-xs shrink-0 font-mono">
               by-marryland.app/
             </span>
             <input
@@ -250,7 +250,7 @@ const StudioSettings: React.FC = () => {
               placeholder="slug-studio"
               value={form.studio_slug}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-r-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-r-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
             />
           </div>
         </div>
@@ -262,11 +262,11 @@ const StudioSettings: React.FC = () => {
           </label>
           <div className="flex items-center gap-5">
             {logoPreview ? (
-              <div className="w-20 h-20 bg-kertas rounded-[2px] border border-garis p-2">
+              <div className="w-20 h-20 bg-kertas rounded-input border border-garis p-2">
                 <img src={logoPreview} alt="Logo" className="w-full h-full object-contain" />
               </div>
             ) : (
-              <div className="w-20 h-20 bg-kertas rounded-[2px] flex items-center justify-center text-tinta-lembut border border-dashed border-garis">
+              <div className="w-20 h-20 bg-kertas rounded-input flex items-center justify-center text-tinta-lembut border border-dashed border-garis">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -278,7 +278,7 @@ const StudioSettings: React.FC = () => {
               </div>
             )}
             <div>
-              <label className="inline-flex items-center justify-center bg-white border border-garis text-tinta text-xs px-4 py-2 rounded-[2px] hover:border-merah hover:text-merah transition-colors font-medium cursor-pointer">
+              <label className="inline-flex items-center justify-center bg-white border border-garis text-tinta text-xs px-4 py-2.5 rounded-btn hover:border-merah hover:text-merah transition-colors font-medium cursor-pointer min-h-[44px]">
                 Unggah Logo
                 <input type="file" accept="image/png" className="hidden" onChange={handleLogoUpload} />
               </label>
@@ -300,7 +300,7 @@ const StudioSettings: React.FC = () => {
             placeholder="08123456789 atau 628123456789"
             value={form.whatsapp_number}
             onChange={handleChange}
-            className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
+            className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors font-mono"
           />
         </div>
 
@@ -309,7 +309,7 @@ const StudioSettings: React.FC = () => {
           <label className="block text-xs font-mono uppercase tracking-widest text-tinta-lembut mb-2">
             Warna Aksen Galeri Klien
           </label>
-          <div className="flex gap-4 flex-wrap bg-kertas p-4 rounded-[2px] border border-garis">
+          <div className="flex gap-4 flex-wrap bg-kertas p-4 rounded-input border border-garis">
             {ACCENT_COLORS.map((color) => (
               <button
                 key={color.value}
@@ -360,7 +360,7 @@ const StudioSettings: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPreview(!showPreview)}
-                className="text-xs px-3 py-1.5 bg-kertas hover:bg-kertas-tua border border-garis text-tinta rounded-[2px] font-mono flex items-center gap-1.5 transition-colors"
+                className="text-xs px-3.5 py-2 bg-kertas hover:bg-kertas-tua border border-garis text-tinta rounded-btn font-sans font-medium flex items-center gap-1.5 transition-colors min-h-[44px]"
               >
                 <Eye className="w-3.5 h-3.5 text-merah" />
                 {showPreview ? 'Sembunyikan Pratinjau' : 'Pratinjau Contoh'}
@@ -368,7 +368,7 @@ const StudioSettings: React.FC = () => {
               <button
                 type="button"
                 onClick={handleResetTemplates}
-                className="text-xs px-3 py-1.5 bg-white hover:bg-kertas border border-garis text-tinta-lembut hover:text-merah rounded-[2px] font-mono flex items-center gap-1.5 transition-colors"
+                className="text-xs px-3.5 py-2 bg-white hover:bg-kertas border border-garis text-tinta-lembut hover:text-merah rounded-btn font-sans font-medium flex items-center gap-1.5 transition-colors min-h-[44px]"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 Reset ke Bawaan
@@ -377,7 +377,7 @@ const StudioSettings: React.FC = () => {
           </div>
 
           {/* Variable Chips */}
-          <div className="bg-kertas-tua/40 p-4 border border-garis rounded-[2px] mb-5">
+          <div className="bg-kertas-tua/40 p-4 border border-garis rounded-panel mb-5">
             <span className="text-[11px] font-mono uppercase tracking-wider text-tinta-lembut block mb-2 font-semibold">
               Sisipkan Variabel (Klik untuk menambahkan ke bagian aktif):
             </span>
@@ -387,7 +387,7 @@ const StudioSettings: React.FC = () => {
                   key={v.key}
                   type="button"
                   onClick={() => insertVariable(v.key)}
-                  className="px-2.5 py-1 bg-white hover:bg-merah/10 hover:border-merah/30 border border-garis text-tinta text-xs font-mono rounded-[2px] transition-colors flex items-center gap-1 group"
+                  className="px-2.5 py-1.5 bg-white hover:bg-merah/10 hover:border-merah/30 border border-garis text-tinta text-xs font-mono rounded-chip transition-colors flex items-center gap-1 group"
                   title={v.desc}
                 >
                   <span className="text-merah font-bold">+</span>
@@ -402,7 +402,7 @@ const StudioSettings: React.FC = () => {
 
           {/* Validation Warnings */}
           {hasTemplateWarnings && (
-            <div className="p-3 bg-amber-50 border border-amber-300 text-amber-900 text-xs rounded-[2px] mb-4 space-y-1">
+            <div className="p-3 bg-amber-50 border border-amber-300 text-amber-900 text-xs rounded-input mb-4 space-y-1">
               {mainValidation.warnings.map((w, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
                   <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
@@ -420,11 +420,11 @@ const StudioSettings: React.FC = () => {
 
           {/* Live Preview Box */}
           {showPreview && (
-            <div className="mb-6 p-4 bg-kertas rounded-[2px] border border-garis space-y-2">
+            <div className="mb-6 p-4 bg-kertas rounded-panel border border-garis space-y-2">
               <span className="text-[11px] font-mono uppercase tracking-wider text-merah font-bold block">
                 Pratinjau Pesan yang Akan Diterima Klien:
               </span>
-              <pre className="whitespace-pre-wrap font-sans text-xs text-tinta bg-white p-3.5 border border-garis rounded-[2px] leading-relaxed max-h-56 overflow-y-auto">
+              <pre className="whitespace-pre-wrap font-sans text-xs text-tinta bg-white p-3.5 border border-garis rounded-input leading-relaxed max-h-56 overflow-y-auto">
                 {previewText}
               </pre>
             </div>
@@ -447,7 +447,7 @@ const StudioSettings: React.FC = () => {
                 onFocus={() => setActiveFocus('main')}
                 onChange={(e) => setMainTemplate(e.target.value.slice(0, 1500))}
                 rows={5}
-                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-xs font-mono rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors leading-relaxed"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-xs font-mono rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors leading-relaxed"
                 placeholder="Tulis pesan utama kurasi..."
               />
             </div>
@@ -467,7 +467,7 @@ const StudioSettings: React.FC = () => {
                 onFocus={() => setActiveFocus('album')}
                 onChange={(e) => setAlbumTemplate(e.target.value.slice(0, 600))}
                 rows={3}
-                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-xs font-mono rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors leading-relaxed"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-xs font-mono rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors leading-relaxed"
                 placeholder="Tulis paragraf album keluarga..."
               />
             </div>
@@ -479,7 +479,7 @@ const StudioSettings: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading || hasTemplateWarnings}
-            className="w-full sm:w-auto px-8 py-2.5 bg-merah hover:bg-merah-hover text-white text-sm font-medium rounded-[2px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-8 py-2.5 bg-merah hover:bg-merah-hover text-white text-sm font-sans font-medium rounded-btn min-h-[44px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Menyimpan...' : 'Simpan Pengaturan'}
           </button>

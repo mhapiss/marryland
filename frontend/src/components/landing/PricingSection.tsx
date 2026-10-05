@@ -62,7 +62,7 @@ export function PricingSection({ data }: PricingSectionProps) {
                     {pkg.name}
                   </h3>
                   {isHighlighted && (
-                    <span className="text-[10px] bg-merah/10 text-merah font-mono px-2 py-0.5 rounded-[2px] border border-merah/25">
+                    <span className="text-[10px] bg-merah/10 text-merah font-sans font-medium px-2 py-0.5 rounded-chip border border-merah/25">
                       Disorot
                     </span>
                   )}
@@ -87,13 +87,13 @@ export function PricingSection({ data }: PricingSectionProps) {
 
               <Link
                 to="/register"
-                className={`w-full py-3 text-center text-xs font-mono uppercase tracking-wider rounded-[2px] transition-colors min-h-[44px] flex items-center justify-center ${
+                className={`w-full py-3 text-center text-sm font-sans font-medium rounded-btn transition-colors min-h-[44px] flex items-center justify-center ${
                   isHighlighted
-                    ? 'bg-merah text-white hover:bg-merah-hover font-medium'
-                    : 'border border-garis text-merah hover:bg-kertas-tua font-medium'
+                    ? 'bg-merah text-white hover:bg-merah-hover'
+                    : 'border border-garis text-tinta hover:bg-kertas-tua'
                 }`}
               >
-                Pilih Paket
+                Pilih paket
               </Link>
             </div>
           );

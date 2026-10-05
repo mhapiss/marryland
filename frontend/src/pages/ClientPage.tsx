@@ -276,21 +276,21 @@ export default function ClientPage() {
               <div className="flex flex-wrap items-center gap-4 mb-10 w-full sm:w-auto">
                 <Link
                   to="/demo"
-                  className="inline-flex items-center justify-center bg-merah hover:bg-merah-hover text-kertas px-7 py-3.5 text-sm font-medium tracking-wide rounded-[2px] transition-colors min-h-[44px]"
+                  className="inline-flex items-center justify-center bg-merah hover:bg-merah-hover text-kertas px-7 py-3.5 text-sm font-sans font-medium tracking-wide rounded-btn transition-colors min-h-[44px]"
                 >
                   {clientData.cta_demo || 'Coba Demo'}
                 </Link>
 
                 <a
                   href="#cara-memilih"
-                  className="inline-flex items-center justify-center border border-tinta/40 text-tinta hover:bg-kertas-tua px-6 py-3.5 text-sm font-medium tracking-wide rounded-[2px] transition-colors min-h-[44px]"
+                  className="inline-flex items-center justify-center border border-tinta/40 text-tinta hover:bg-kertas-tua px-6 py-3.5 text-sm font-sans font-medium tracking-wide rounded-btn transition-colors min-h-[44px]"
                 >
                   {clientData.cta_steps || 'Lihat Cara Memilih'}
                 </a>
               </div>
 
               {/* Box: "Sudah punya link galeri dari fotografermu?" */}
-              <div className="w-full max-w-md bg-kertas-tua/40 border border-garis rounded-[2px] p-6">
+              <div className="w-full max-w-md bg-kertas-tua/40 border border-garis rounded-panel p-6">
                 <label className="block text-xs font-semibold text-tinta mb-1 uppercase tracking-wider">
                   {clientData.link_box_title || 'Sudah punya link galeri dari fotografermu?'}
                 </label>
@@ -304,11 +304,11 @@ export default function ClientPage() {
                     value={galleryLinkInput}
                     onChange={(e) => setGalleryLinkInput(e.target.value)}
                     placeholder={clientData.link_box_placeholder || 'misal: studio/andi-ani'}
-                    className="flex-1 border border-garis rounded-[2px] px-3.5 py-2.5 text-xs bg-kertas text-tinta placeholder:text-tinta-lembut/70 focus:outline-none focus:ring-1 focus:ring-merah"
+                    className="flex-1 border border-garis rounded-input px-3.5 py-2.5 text-xs bg-kertas text-tinta placeholder:text-tinta-lembut/70 focus:outline-none focus:ring-1 focus:ring-merah"
                   />
                   <button
                     type="submit"
-                    className="bg-merah hover:bg-merah-hover text-kertas text-xs font-semibold px-4 py-2.5 rounded-[2px] shrink-0 transition-colors min-h-[40px]"
+                    className="bg-merah hover:bg-merah-hover text-kertas text-xs font-sans font-medium px-4 py-2.5 rounded-btn shrink-0 transition-colors min-h-[44px]"
                   >
                     {clientData.link_box_btn || 'Buka Galeri'}
                   </button>
@@ -479,11 +479,11 @@ export default function ClientPage() {
                 value={driveFolderInput}
                 onChange={(e) => setDriveFolderInput(e.target.value)}
                 placeholder="Tempel tautan folder Google Drive publik di sini..."
-                className="flex-1 border border-garis rounded-[2px] px-4 py-3 text-sm bg-kertas text-tinta placeholder:text-tinta-lembut/70 focus:outline-none focus:ring-1 focus:ring-merah"
+                className="flex-1 border border-garis rounded-input px-4 py-3 text-sm bg-kertas text-tinta placeholder:text-tinta-lembut/70 focus:outline-none focus:ring-1 focus:ring-merah"
               />
               <button
                 type="submit"
-                className="bg-merah hover:bg-merah-hover text-kertas text-sm font-semibold px-6 py-3 rounded-[2px] transition-colors shrink-0 min-h-[44px]"
+                className="bg-merah hover:bg-merah-hover text-kertas text-sm font-sans font-medium px-6 py-3 rounded-btn transition-colors shrink-0 min-h-[44px]"
               >
                 Coba Sekarang
               </button>

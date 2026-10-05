@@ -536,7 +536,7 @@ export default function PhotoViewer({
               type="button"
               onClick={() => onToggleSelection(currentPhoto.id)}
               disabled={isLimitReached}
-              className={`px-3 py-1 text-xs font-mono rounded-[2px] transition-colors flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 text-xs font-sans font-medium rounded-btn transition-colors duration-150 flex items-center gap-1.5 ${
                 isSelected
                   ? 'bg-merah text-white ring-1 ring-merah-tanda'
                   : 'bg-white/10 hover:bg-white/20 text-white'
@@ -552,7 +552,7 @@ export default function PhotoViewer({
             <button
               type="button"
               onClick={handleDownload}
-              className="p-2 text-white/70 hover:text-white transition-colors rounded-[2px] min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="p-2 text-white/70 hover:text-white transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
               title="Unduh foto"
               aria-label="Unduh foto"
             >
@@ -564,7 +564,7 @@ export default function PhotoViewer({
           <button
             type="button"
             onClick={toggleFullscreenMode}
-            className="p-2 text-white/70 hover:text-white transition-colors rounded-[2px] min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-white/70 hover:text-white transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
             title={isFullscreen ? 'Keluar Layar Penuh (F)' : 'Layar Penuh (F)'}
             aria-label={isFullscreen ? 'Keluar Layar Penuh' : 'Layar Penuh'}
           >
@@ -575,7 +575,7 @@ export default function PhotoViewer({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-white/70 hover:text-merah transition-colors rounded-[2px] min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-white/70 hover:text-merah transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
             title="Tutup (Esc)"
             aria-label="Tutup penampil foto"
           >
@@ -692,16 +692,16 @@ export default function PhotoViewer({
                 }}
                 disabled={isLimitReached}
                 aria-pressed={isSelected}
-                className={`px-6 py-2.5 rounded-[2px] font-mono text-xs uppercase tracking-wider transition-all min-h-[44px] flex items-center justify-center gap-2 ${
+                className={`px-6 py-2.5 rounded-btn font-sans font-medium text-sm transition-colors duration-150 min-h-[44px] flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
                   isLimitReached
                     ? 'bg-white/10 text-white/40 cursor-not-allowed border border-white/10'
                     : isSelected
-                    ? 'bg-merah hover:bg-merah-hover text-white ring-2 ring-merah-tanda'
-                    : 'bg-white/15 hover:bg-white/25 text-white border border-white/20'
+                    ? 'bg-merah hover:bg-merah-hover active:bg-marun text-white ring-2 ring-merah-tanda'
+                    : 'bg-white/15 hover:bg-white/25 active:bg-white/30 text-white border border-white/20'
                 }`}
               >
                 {isLimitReached ? (
-                  <span>Batas Kuota Tercapai</span>
+                  <span>Batas kuota tercapai</span>
                 ) : isSelected ? (
                   <>
                     <Check className="w-4 h-4" />
@@ -709,8 +709,8 @@ export default function PhotoViewer({
                   </>
                 ) : (
                   <>
-                    <Check className="w-4 h-4 opacity-50" />
-                    <span>Pilih Foto Ini</span>
+                    <Check className="w-4 h-4 opacity-70" />
+                    <span>Pilih foto ini</span>
                   </>
                 )}
               </button>

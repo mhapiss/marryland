@@ -47,7 +47,7 @@ export default function CollectionDetailPage() {
         </p>
         <Link
           to="/portofolio"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-merah text-kertas rounded-[2px] font-medium text-sm hover:bg-merah-hover transition-colors min-h-[44px]"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-merah text-kertas rounded-btn font-sans font-medium text-sm hover:bg-merah-hover transition-colors min-h-[44px]"
         >
           <span>Kembali ke Semua Koleksi</span>
           <ArrowUpRight className="w-4 h-4" />

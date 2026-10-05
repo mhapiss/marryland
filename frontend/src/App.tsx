@@ -32,6 +32,11 @@ const AlbumPage = React.lazy(routeLoaders.AlbumPage);
 const CollectionPreviewPage = React.lazy(routeLoaders.CollectionPreviewPage);
 const NotFoundPage = React.lazy(routeLoaders.NotFoundPage);
 
+// Halaman uji desain khusus lingkungan pengembangan (DEV only)
+const DevUiPage = import.meta.env.DEV
+  ? React.lazy(() => import('./pages/dev/DevUiPage'))
+  : null;
+
 // Fallback ringan: tampilan sama dengan layar awal di index.html (latar kertas, nama merek di tengah)
 // supaya tidak berkedip saat berganti dari layar awal ke fallback ke halaman.
 // Teks "Memuat..." baru muncul bila pemuatan lebih dari 400 ms.
@@ -133,6 +138,11 @@ const App: React.FC = () => {
             {/* Legal pages */}
             <Route path="/syarat-ketentuan" element={<TermsPage />} />
             <Route path="/kebijakan-privasi" element={<PrivacyPage />} />
+
+            {/* DEV-only UI playground */}
+            {import.meta.env.DEV && DevUiPage && (
+              <Route path="/dev/ui" element={<DevUiPage />} />
+            )}
 
             {/* Protected dashboard (photographer) */}
             <Route

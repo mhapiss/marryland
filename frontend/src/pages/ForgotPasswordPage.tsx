@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-kertas px-4 py-12 font-sans text-tinta">
-      <div className="w-full max-w-md bg-white rounded-[2px] border border-garis p-8">
+      <div className="w-full max-w-md bg-white rounded-panel border border-garis p-8">
         <div className="text-center mb-8">
           <Link to="/" className="inline-block font-serif text-2xl tracking-tight mb-2 text-tinta">
             by.<span className="text-merah">marryland</span>
@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-[2px] border border-garis bg-white text-tinta text-sm focus:border-merah focus:ring-1 focus:ring-merah outline-none transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-input border border-garis bg-white text-tinta text-sm focus:border-merah focus:ring-1 focus:ring-merah outline-none transition-colors"
               placeholder="nama@email.com"
               required
             />
@@ -65,12 +65,12 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading || !email}
-            className="w-full py-2.5 px-4 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full py-2.5 px-4 bg-merah hover:bg-merah-hover active:bg-marun text-kertas rounded-btn text-sm font-sans font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
           >
             {loading ? (
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              'Kirim Tautan Pemulihan'
+              'Kirim tautan pemulihan'
             )}
           </button>
         </form>

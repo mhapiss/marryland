@@ -673,7 +673,7 @@ export default function GallerySelection() {
             <button
               type="button"
               onClick={toggleTheme}
-              className={`p-2 rounded-[2px] border transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center ${
+              className={`p-2 rounded-btn border transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center ${
                 theme === 'dark'
                   ? 'border-white/15 bg-white/5 hover:bg-white/10 text-white'
                   : 'border-garis bg-white hover:bg-kertas text-tinta'
@@ -883,7 +883,7 @@ export default function GallerySelection() {
                 placeholder="Cari nama file foto..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full pl-9 pr-8 py-2 text-xs font-mono rounded-[2px] border transition-colors focus:outline-none focus:border-merah ${
+                className={`w-full pl-9 pr-8 py-2 text-sm font-sans rounded-input border transition-colors focus:outline-none focus:border-merah ${
                   theme === 'dark'
                     ? 'bg-white/5 border-white/10 text-white placeholder-white/30'
                     : 'bg-white border-garis text-tinta placeholder-tinta-lembut/50'
@@ -893,7 +893,7 @@ export default function GallerySelection() {
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 p-1"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 p-1 rounded-btn"
                   aria-label="Hapus pencarian"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -905,7 +905,7 @@ export default function GallerySelection() {
             <div className="flex items-center gap-2 flex-wrap">
               {/* Thumbnail Size Selector (Kecil, Sedang, Besar) */}
               <div
-                className={`inline-flex p-0.5 border rounded-[2px] text-xs font-mono ${
+                className={`inline-flex p-0.5 border rounded-chip text-xs font-sans font-medium ${
                   theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-white border-garis'
                 }`}
                 role="group"
@@ -914,10 +914,10 @@ export default function GallerySelection() {
                 <button
                   type="button"
                   onClick={() => handleThumbnailSizeChange('small')}
-                  className={`px-2.5 py-1 rounded-[2px] transition-colors min-h-[32px] ${
+                  className={`px-3 py-1.5 rounded-chip transition-colors duration-150 min-h-[36px] ${
                     thumbnailSize === 'small'
-                      ? 'bg-merah text-white font-semibold'
-                      : 'opacity-60 hover:opacity-100'
+                      ? 'bg-merah text-white font-medium'
+                      : 'opacity-70 hover:opacity-100'
                   }`}
                   title="Ukuran thumbnail kecil"
                 >
@@ -926,10 +926,10 @@ export default function GallerySelection() {
                 <button
                   type="button"
                   onClick={() => handleThumbnailSizeChange('medium')}
-                  className={`px-2.5 py-1 rounded-[2px] transition-colors min-h-[32px] ${
+                  className={`px-3 py-1.5 rounded-chip transition-colors duration-150 min-h-[36px] ${
                     thumbnailSize === 'medium'
-                      ? 'bg-merah text-white font-semibold'
-                      : 'opacity-60 hover:opacity-100'
+                      ? 'bg-merah text-white font-medium'
+                      : 'opacity-70 hover:opacity-100'
                   }`}
                   title="Ukuran thumbnail sedang"
                 >
@@ -938,10 +938,10 @@ export default function GallerySelection() {
                 <button
                   type="button"
                   onClick={() => handleThumbnailSizeChange('large')}
-                  className={`px-2.5 py-1 rounded-[2px] transition-colors min-h-[32px] ${
+                  className={`px-3 py-1.5 rounded-chip transition-colors duration-150 min-h-[36px] ${
                     thumbnailSize === 'large'
-                      ? 'bg-merah text-white font-semibold'
-                      : 'opacity-60 hover:opacity-100'
+                      ? 'bg-merah text-white font-medium'
+                      : 'opacity-70 hover:opacity-100'
                   }`}
                   title="Ukuran thumbnail besar"
                 >
@@ -951,17 +951,17 @@ export default function GallerySelection() {
 
               {/* Orientation Buttons */}
               <div
-                className={`inline-flex p-0.5 border rounded-[2px] text-xs font-mono ${
+                className={`inline-flex p-0.5 border rounded-chip text-xs font-sans font-medium ${
                   theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-white border-garis'
                 }`}
               >
                 <button
                   type="button"
                   onClick={() => setOrientationFilter('all')}
-                  className={`px-2.5 py-1 rounded-[2px] transition-colors ${
+                  className={`px-3 py-1.5 rounded-chip transition-colors duration-150 min-h-[36px] ${
                     orientationFilter === 'all'
-                      ? 'bg-merah text-white font-semibold'
-                      : 'opacity-60 hover:opacity-100'
+                      ? 'bg-merah text-white font-medium'
+                      : 'opacity-70 hover:opacity-100'
                   }`}
                 >
                   Semua
@@ -969,10 +969,10 @@ export default function GallerySelection() {
                 <button
                   type="button"
                   onClick={() => setOrientationFilter('portrait')}
-                  className={`px-2.5 py-1 rounded-[2px] transition-colors ${
+                  className={`px-3 py-1.5 rounded-chip transition-colors duration-150 min-h-[36px] ${
                     orientationFilter === 'portrait'
-                      ? 'bg-merah text-white font-semibold'
-                      : 'opacity-60 hover:opacity-100'
+                      ? 'bg-merah text-white font-medium'
+                      : 'opacity-70 hover:opacity-100'
                   }`}
                 >
                   Potret
@@ -980,10 +980,10 @@ export default function GallerySelection() {
                 <button
                   type="button"
                   onClick={() => setOrientationFilter('landscape')}
-                  className={`px-2.5 py-1 rounded-[2px] transition-colors ${
+                  className={`px-3 py-1.5 rounded-chip transition-colors duration-150 min-h-[36px] ${
                     orientationFilter === 'landscape'
-                      ? 'bg-merah text-white font-semibold'
-                      : 'opacity-60 hover:opacity-100'
+                      ? 'bg-merah text-white font-medium'
+                      : 'opacity-70 hover:opacity-100'
                   }`}
                 >
                   Lanskap
@@ -995,7 +995,7 @@ export default function GallerySelection() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className={`px-3 py-2 text-xs font-mono rounded-[2px] border transition-colors focus:outline-none focus:border-merah cursor-pointer ${
+                  className={`px-3 py-2 text-xs font-sans rounded-input border transition-colors focus:outline-none focus:border-merah cursor-pointer min-h-[36px] ${
                     theme === 'dark'
                       ? 'bg-[#1a1a1c] border-white/10 text-white'
                       : 'bg-white border-garis text-tinta'
@@ -1014,7 +1014,7 @@ export default function GallerySelection() {
                   <select
                     value={selectedFolder}
                     onChange={(e) => setSelectedFolder(e.target.value)}
-                    className={`px-3 py-2 text-xs font-mono rounded-[2px] border transition-colors focus:outline-none focus:border-merah cursor-pointer ${
+                    className={`px-3 py-2 text-xs font-sans rounded-input border transition-colors focus:outline-none focus:border-merah cursor-pointer min-h-[36px] ${
                       theme === 'dark'
                         ? 'bg-[#1a1a1c] border-white/10 text-white'
                         : 'bg-white border-garis text-tinta'
@@ -1178,27 +1178,27 @@ export default function GallerySelection() {
             </div>
 
             {/* Progress bar */}
-            <div className="hidden sm:block w-32 h-2 bg-black/10 dark:bg-white/10 rounded-[2px] overflow-hidden">
+            <div className="hidden sm:block w-32 h-2 bg-black/10 dark:bg-white/10 rounded-chip overflow-hidden">
               <div
-                className="h-full bg-merah rounded-[2px] transition-all duration-300"
+                className="h-full bg-merah rounded-chip transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setShowSelectedPanel(true)}
-              className={`px-4 py-2.5 rounded-[2px] text-xs font-mono transition-colors min-h-[44px] flex items-center gap-1.5 border ${
+              className={`px-4 py-2.5 rounded-btn text-sm font-sans font-medium transition-colors duration-150 min-h-[44px] flex items-center gap-2 border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2 ${
                 theme === 'dark'
-                  ? 'border-white/15 bg-white/5 hover:bg-white/10'
-                  : 'border-garis bg-kertas hover:bg-kertas-tua'
+                  ? 'border-white/20 bg-white/5 hover:bg-white/10 text-white'
+                  : 'border-garis bg-kertas hover:bg-kertas-tua text-tinta'
               }`}
             >
-              <span>Lihat Pilihan</span>
-              <span className="px-1.5 py-0.5 rounded-[2px] bg-merah/10 text-merah font-bold text-[10px]">
+              <span>Lihat pilihan</span>
+              <span className="px-1.5 py-0.5 rounded-chip bg-merah/10 text-merah font-semibold text-xs">
                 {totalSelected}
               </span>
             </button>
@@ -1207,10 +1207,10 @@ export default function GallerySelection() {
               type="button"
               onClick={() => setShowConfirmSubmit(true)}
               disabled={totalSelected === 0}
-              className="px-6 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-mono uppercase tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 min-h-[44px] shadow-sm font-semibold"
+              className="px-6 py-2.5 bg-merah hover:bg-merah-hover active:bg-marun text-kertas rounded-btn text-sm font-sans font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
             >
               <Send className="w-4 h-4" />
-              <span>{hasBeenSubmitted ? 'Perbarui Pilihan' : 'Kirim Pilihan'}</span>
+              <span>{hasBeenSubmitted ? 'Perbarui pilihan' : 'Kirim pilihan'}</span>
             </button>
           </div>
         </div>

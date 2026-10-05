@@ -322,7 +322,7 @@ export default function ContentManager() {
           <Link to="/" className="text-xl font-serif font-normal tracking-tight text-tinta">
             by.<span className="text-merah">marryland</span>
           </Link>
-          <span className="border border-garis text-merah bg-kertas-tua text-[10px] px-2.5 py-0.5 rounded-[2px] font-mono uppercase">
+          <span className="border border-garis text-merah bg-kertas-tua text-[10px] px-2.5 py-0.5 rounded-chip font-sans font-medium uppercase">
             PUSAT KONTEN TERSINKRON
           </span>
         </div>
@@ -330,11 +330,11 @@ export default function ContentManager() {
         <div className="flex items-center gap-4">
           <Link
             to="/admin/media"
-            className="text-xs font-medium text-merah hover:underline px-3 py-1.5 border border-garis rounded-[2px]"
+            className="text-xs font-sans font-medium text-merah hover:underline px-3 py-1.5 border border-garis rounded-btn min-h-[44px] flex items-center"
           >
             Pustaka Media
           </Link>
-          <Link to="/admin" className="text-xs text-tinta-lembut hover:text-tinta">
+          <Link to="/admin" className="text-xs font-sans font-medium text-tinta-lembut hover:text-tinta">
             ← Dashboard
           </Link>
         </div>
@@ -798,12 +798,12 @@ export default function ContentManager() {
       <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-garis px-6 py-3.5 flex items-center justify-between z-30">
         <div className="flex items-center gap-3">
           {isDirty ? (
-            <span className="flex items-center gap-1.5 text-xs text-merah font-mono bg-merah/10 px-2.5 py-1 rounded-[2px] border border-merah/25">
+            <span className="flex items-center gap-1.5 text-xs text-merah font-sans font-medium bg-merah/10 px-2.5 py-1 rounded-chip border border-merah/25">
               <span className="w-2 h-2 rounded-full bg-merah animate-pulse" />
               Ada perubahan yang belum disimpan
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-xs text-tinta font-mono bg-kertas-tua px-2.5 py-1 rounded-[2px] border border-garis">
+            <span className="flex items-center gap-1.5 text-xs text-tinta font-sans font-medium bg-kertas-tua px-2.5 py-1 rounded-chip border border-garis">
               <Check className="w-3.5 h-3.5 text-merah" />
               Semua perubahan tersimpan (Versi #{serverVersion})
             </span>
@@ -815,7 +815,7 @@ export default function ContentManager() {
             type="button"
             onClick={loadPageContent}
             disabled={!isDirty || saving}
-            className="px-4 py-2 border border-garis text-xs font-medium text-tinta-lembut hover:text-tinta rounded-[2px] disabled:opacity-40 min-h-[44px]"
+            className="px-4 py-2 border border-garis text-xs font-sans font-medium text-tinta-lembut hover:text-tinta rounded-btn disabled:opacity-40 min-h-[44px]"
           >
             Batalkan
           </button>
@@ -824,7 +824,7 @@ export default function ContentManager() {
             type="button"
             onClick={() => handleSave(false)}
             disabled={!isDirty || saving}
-            className="px-6 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium flex items-center gap-2 disabled:opacity-40 min-h-[44px] transition-all"
+            className="px-6 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-btn text-xs font-sans font-medium flex items-center gap-2 disabled:opacity-40 min-h-[44px] transition-all"
           >
             <Save className="w-4 h-4" />
             <span>{saving ? 'Menyimpan...' : 'Simpan Perubahan'}</span>

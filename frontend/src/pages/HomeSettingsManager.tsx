@@ -500,7 +500,7 @@ export default function HomeSettingsManager() {
                   </div>
 
                   <div className="mt-6 flex flex-wrap items-center gap-3">
-                    <label className="inline-block px-5 py-2.5 bg-merah text-white rounded-[2px] text-xs font-medium cursor-pointer hover:bg-merah-hover transition-colors min-h-[44px]">
+                    <label className="inline-flex items-center justify-center px-5 py-2.5 bg-merah text-white rounded-btn text-xs font-sans font-medium cursor-pointer hover:bg-merah-hover transition-colors min-h-[44px]">
                       Unggah Foto Baru
                       <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={e => handlePhotoUpload(activeSection, e)} />
                     </label>
@@ -508,7 +508,7 @@ export default function HomeSettingsManager() {
                     <button
                       type="button"
                       onClick={openPortfolioPicker}
-                      className="px-5 py-2.5 bg-white border border-garis text-tinta rounded-[2px] text-xs font-medium hover:bg-kertas-tua/60 transition-colors min-h-[44px]"
+                      className="px-5 py-2.5 bg-white border border-garis text-tinta rounded-btn text-xs font-sans font-medium hover:bg-kertas-tua/60 transition-colors min-h-[44px]"
                     >
                       Pilih dari Foto Portofolio
                     </button>
@@ -523,7 +523,7 @@ export default function HomeSettingsManager() {
       {/* Modal Dialog: Pilih dari Portofolio */}
       {isPickerOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-4xl max-h-[85vh] rounded-[2px] border border-garis shadow-2xl flex flex-col">
+          <div className="bg-white w-full max-w-4xl max-h-[85vh] rounded-panel border border-garis shadow-2xl flex flex-col font-sans">
             <div className="p-4 sm:p-5 border-b border-garis flex items-center justify-between">
               <div>
                 <h3 className="font-serif text-lg text-tinta">Pilih Foto dari Portofolio</h3>
@@ -534,7 +534,7 @@ export default function HomeSettingsManager() {
               <button
                 type="button"
                 onClick={() => setIsPickerOpen(false)}
-                className="p-2 text-tinta-lembut hover:text-merah text-sm font-mono"
+                className="p-2 text-tinta-lembut hover:text-merah text-sm font-sans font-medium rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 ✕ Tutup
               </button>
@@ -566,7 +566,7 @@ export default function HomeSettingsManager() {
                       </div>
                       <div className="p-2 bg-white flex flex-col justify-between flex-1">
                         <div>
-                          <span className="text-[10px] font-mono uppercase bg-kertas-tua px-1.5 py-0.5 rounded-[2px] text-tinta-lembut block w-fit mb-1">
+                          <span className="text-[10px] font-sans font-medium uppercase bg-kertas-tua px-1.5 py-0.5 rounded-chip text-tinta-lembut block w-fit mb-1">
                             {opt.category || 'Portofolio'}
                           </span>
                           <p className="text-[11px] font-serif line-clamp-1 text-tinta">
@@ -576,7 +576,7 @@ export default function HomeSettingsManager() {
                         <button
                           type="button"
                           onClick={() => selectPhotoFromPortfolio(opt)}
-                          className="mt-2 w-full py-1.5 bg-merah text-white text-[11px] font-medium rounded-[2px] hover:bg-merah-hover transition-colors"
+                          className="mt-2 w-full py-1.5 bg-merah text-white text-[11px] font-sans font-medium rounded-btn hover:bg-merah-hover transition-colors min-h-[36px]"
                         >
                           + Pilih Foto Ini
                         </button>
@@ -591,7 +591,7 @@ export default function HomeSettingsManager() {
               <button
                 type="button"
                 onClick={() => setIsPickerOpen(false)}
-                className="px-5 py-2 bg-kertas-tua border border-garis text-tinta text-xs font-medium rounded-[2px] hover:bg-garis transition-colors"
+                className="px-5 py-2.5 bg-kertas-tua border border-garis text-tinta text-xs font-sans font-medium rounded-btn hover:bg-garis transition-colors min-h-[44px]"
               >
                 Selesai
               </button>
@@ -608,7 +608,7 @@ export default function HomeSettingsManager() {
         <button 
           onClick={saveChanges} 
           disabled={!isDirty || saving}
-          className={`px-6 py-2.5 rounded-[2px] text-xs font-medium text-white transition-colors min-h-[44px] ${!isDirty || saving ? 'bg-garis text-tinta-lembut cursor-not-allowed' : 'bg-merah hover:bg-merah-hover'}`}
+          className={`px-6 py-2.5 rounded-btn text-xs font-sans font-medium text-white transition-colors min-h-[44px] ${!isDirty || saving ? 'bg-garis text-tinta-lembut cursor-not-allowed' : 'bg-merah hover:bg-merah-hover'}`}
         >
           {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
         </button>

@@ -36,14 +36,14 @@
 @layer components {
   /* Vintage button - primary */
   .btn-primary {
-    @apply inline-flex items-center justify-center bg-merah text-kertas px-8 py-3 rounded-sm font-medium
-           transition-colors duration-200 hover:bg-marun active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2;
+    @apply inline-flex items-center justify-center bg-merah text-kertas px-6 py-3 rounded-btn font-sans font-medium text-[15px]
+           transition-colors duration-150 hover:bg-merah-hover active:bg-marun focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px];
   }
 
-  /* Vintage button - outline */
-  .btn-outline {
-    @apply inline-flex items-center justify-center border border-tinta/30 text-tinta px-8 py-3 rounded-sm font-medium
-           transition-colors duration-200 hover:bg-tinta hover:text-kertas active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta;
+  /* Vintage button - outline / secondary */
+  .btn-outline, .btn-secondary {
+    @apply inline-flex items-center justify-center border border-tinta/40 text-tinta bg-transparent px-6 py-3 rounded-btn font-sans font-medium text-[15px]
+           transition-colors duration-150 hover:bg-kertas-tua hover:border-tinta active:bg-kertas-tua/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2 focus-visible:ring-offset-kertas disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px];
   }
 
   /* Card style */
@@ -54,8 +54,8 @@
 
   /* Input style */
   .input {
-    @apply w-full px-4 py-3 rounded-sm border border-garis bg-kertas text-tinta text-base
-           focus:border-merah focus:ring-1 focus:ring-merah outline-none transition-colors duration-200;
+    @apply w-full px-4 py-3 rounded-input border border-garis bg-kertas text-tinta text-base
+           focus:border-merah focus:ring-1 focus:ring-merah outline-none transition-colors duration-150;
   }
 
   /* Label style */

@@ -33,6 +33,35 @@
   /* 4. Skala Spasi & Layout */
   --spasi-section: clamp(4rem, 9vw, 8rem);
   --lebar-maks: 1200px;
+
+  /* 5. Token Bentuk Sudut (Radius) */
+  /* Preset bawaan "Lembut": tombol 8px, chip 8px, input 8px, dialog/popup/panel 12px */
+  --radius-btn: 8px;
+  --radius-chip: 8px;
+  --radius-input: 8px;
+  --radius-panel: 12px;
+}
+
+/* Preset Radius Pembanding */
+:root[data-radius-preset="tajam"], .radius-preset-tajam {
+  --radius-btn: 2px;
+  --radius-chip: 2px;
+  --radius-input: 2px;
+  --radius-panel: 2px;
+}
+
+:root[data-radius-preset="lembut"], .radius-preset-lembut {
+  --radius-btn: 8px;
+  --radius-chip: 8px;
+  --radius-input: 8px;
+  --radius-panel: 12px;
+}
+
+:root[data-radius-preset="bulat"], .radius-preset-bulat {
+  --radius-btn: 9999px;
+  --radius-chip: 9999px;
+  --radius-input: 8px;
+  --radius-panel: 16px;
 }
 
 /* Tipografi Skala Token */

@@ -47,8 +47,8 @@ export default class ErrorBoundary extends Component<Props, State> {
                 by.<span className="text-merah">marryland</span>
               </span>
             </div>
-            <div className="bg-white rounded-[2px] border border-garis p-8">
-              <div className="w-14 h-14 bg-kertas-tua text-merah border border-garis rounded-[2px] flex items-center justify-center mx-auto mb-5">
+            <div className="bg-white rounded-panel border border-garis p-8">
+              <div className="w-14 h-14 bg-kertas-tua text-merah border border-garis rounded-panel flex items-center justify-center mx-auto mb-5">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -58,14 +58,14 @@ export default class ErrorBoundary extends Component<Props, State> {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => window.location.reload()}
-                  className="w-full py-2.5 px-4 bg-merah hover:bg-merah-hover text-white text-xs font-medium rounded-[2px] transition-colors"
+                  className="w-full py-2.5 px-4 bg-merah hover:bg-merah-hover text-white text-xs font-sans font-medium rounded-btn transition-colors min-h-[44px]"
                 >
                   Muat Ulang Halaman
                 </button>
                 {showHomeButton && (
                   <a
                     href="/"
-                    className="w-full py-2.5 px-4 border border-garis hover:border-merah text-tinta hover:text-merah text-xs font-medium rounded-[2px] transition-colors inline-block"
+                    className="w-full py-2.5 px-4 border border-garis hover:border-merah text-tinta hover:text-merah text-xs font-sans font-medium rounded-btn transition-colors min-h-[44px] flex items-center justify-center"
                   >
                     Kembali ke Beranda
                   </a>
@@ -76,7 +76,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                   <summary className="text-xs text-tinta-lembut cursor-pointer hover:text-tinta font-mono">
                     Detail teknis (development)
                   </summary>
-                  <pre className="mt-2 p-3 bg-kertas rounded-[2px] border border-garis text-[11px] font-mono text-merah overflow-auto max-h-40">
+                  <pre className="mt-2 p-3 bg-kertas rounded-input border border-garis text-[11px] font-mono text-merah overflow-auto max-h-40">
                     {this.state.error.toString()}
                     {this.state.errorInfo?.componentStack}
                   </pre>

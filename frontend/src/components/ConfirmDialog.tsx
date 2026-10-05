@@ -77,7 +77,7 @@ export default function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-desc"
-        className="relative w-full max-w-sm bg-white rounded-[2px] border border-garis shadow-xl p-6 font-sans text-tinta animate-slide-up"
+        className="relative w-full max-w-sm bg-white rounded-panel border border-garis shadow-xl p-6 font-sans text-tinta animate-slide-up"
         onKeyDown={handleKeyDown}
       >
         <h3
@@ -98,7 +98,7 @@ export default function ConfirmDialog({
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 py-2.5 px-3 border border-garis rounded-[2px] text-xs font-medium text-tinta hover:border-merah hover:text-merah transition-colors"
+            className="flex-1 py-2.5 px-4 border border-garis rounded-btn text-sm font-sans font-medium text-tinta hover:border-tinta hover:bg-kertas-tua transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
           >
             {cancelLabel}
           </button>
@@ -106,7 +106,7 @@ export default function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className="flex-1 inline-flex items-center justify-center text-xs py-2.5 px-3 rounded-[2px] font-medium transition-colors bg-merah hover:bg-merah-hover text-white disabled:opacity-50"
+            className="flex-1 inline-flex items-center justify-center text-sm py-2.5 px-4 rounded-btn font-sans font-medium transition-colors duration-150 bg-merah hover:bg-merah-hover active:bg-marun text-kertas disabled:opacity-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
           >
             {loading && (
               <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />

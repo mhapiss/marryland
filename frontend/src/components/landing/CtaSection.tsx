@@ -44,7 +44,7 @@ export function CtaSection({ data, demoSlug }: CtaSectionProps) {
             to="/register"
             onMouseEnter={() => prefetchRoute('/register')}
             onFocus={() => prefetchRoute('/register')}
-            className="inline-flex items-center gap-2 bg-kertas text-marun hover:bg-white px-8 py-4 text-xs font-semibold tracking-wider uppercase rounded-[2px] transition-colors min-h-[44px] shadow-sm"
+            className="inline-flex items-center gap-2 bg-kertas text-marun hover:bg-white px-7 py-3 text-[15px] font-sans font-medium normal-case tracking-normal rounded-btn transition-colors duration-150 min-h-[44px] shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kertas focus-visible:ring-offset-2 focus-visible:ring-offset-marun"
           >
             <span>{ctaPrimary}</span>
             <ArrowRight className="w-4 h-4" />
@@ -54,7 +54,7 @@ export function CtaSection({ data, demoSlug }: CtaSectionProps) {
             onClick={() => navigate(`/${demoSlug || 'demo'}`)}
             onMouseEnter={() => prefetchRoute(`/${demoSlug || 'demo'}`)}
             onFocus={() => prefetchRoute(`/${demoSlug || 'demo'}`)}
-            className="inline-flex items-center gap-2 border border-kertas/40 text-kertas hover:bg-kertas/10 px-7 py-4 text-xs font-semibold tracking-wider uppercase rounded-[2px] transition-colors min-h-[44px]"
+            className="inline-flex items-center gap-2 border border-kertas/40 text-kertas hover:bg-kertas/15 px-6 py-3 text-[15px] font-sans font-medium normal-case tracking-normal rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kertas focus-visible:ring-offset-2 focus-visible:ring-offset-marun"
           >
             <Eye className="w-4 h-4" />
             <span>{ctaSecondary}</span>

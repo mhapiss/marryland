@@ -55,20 +55,20 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-kertas flex flex-col items-center justify-center p-6 font-sans text-tinta">
-      <div className="w-full max-w-[420px] bg-white border border-garis rounded-[2px] p-8 sm:p-10 relative z-10">
+      <div className="w-full max-w-[420px] bg-white border border-garis rounded-panel p-8 sm:p-10 relative z-10">
         
         {/* Header */}
         <div className="flex flex-col items-center mb-8">
           <Link to="/" className="font-serif text-2xl tracking-tight mb-3 text-tinta">
             by.<span className="text-merah">marryland</span>
           </Link>
-          <div className="text-[10px] font-mono tracking-[0.2em] text-merah bg-kertas-tua/60 px-3 py-1 rounded-[2px] uppercase border border-garis">
+          <div className="text-[10px] font-mono tracking-[0.2em] text-merah bg-kertas-tua/60 px-3 py-1 rounded-chip uppercase border border-garis">
             Untuk Fotografer
           </div>
         </div>
 
         {message && (
-          <div className="bg-kertas-tua/40 border border-garis text-tinta p-3.5 rounded-[2px] text-xs mb-6 flex items-start gap-2.5">
+          <div className="bg-kertas-tua/40 border border-garis text-tinta p-3.5 rounded-chip text-xs mb-6 flex items-start gap-2.5">
             <svg className="w-4 h-4 shrink-0 mt-0.5 text-merah" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span>{message}</span>
           </div>
@@ -78,7 +78,7 @@ export default function LoginPage() {
         <button 
           type="button"
           onClick={signInWithGoogle}
-          className="w-full flex items-center justify-center gap-3 bg-white border border-garis rounded-[2px] py-2.5 px-4 text-sm font-medium text-tinta hover:bg-kertas transition-colors mb-6"
+          className="w-full flex items-center justify-center gap-3 bg-white border border-garis rounded-btn py-2.5 px-4 text-sm font-sans font-medium text-tinta hover:bg-kertas-tua hover:border-tinta transition-colors duration-150 min-h-[44px] mb-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2"
         >
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-4 h-4" alt="Google" />
           Masuk dengan Google
@@ -91,7 +91,7 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <div className="bg-merah/5 border border-merah/25 text-merah p-3.5 rounded-[2px] text-xs mb-6 flex items-start gap-2.5">
+          <div className="bg-merah/5 border border-merah/25 text-merah p-3.5 rounded-chip text-xs mb-6 flex items-start gap-2.5">
             <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span>{error}</span>
           </div>
@@ -106,7 +106,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
+              className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
               placeholder="nama@email.com"
             />
           </div>
@@ -119,13 +119,13 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-[2px] pr-16 focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-garis text-tinta text-sm rounded-input pr-16 focus:outline-none focus:border-merah focus:ring-1 focus:ring-merah transition-colors"
                 placeholder="Masukkan kata sandi"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-merah font-medium hover:text-merah-hover"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-merah font-sans font-medium hover:text-merah-hover min-h-[44px] px-2 flex items-center"
               >
                 {showPassword ? 'Tutup' : 'Lihat'}
               </button>
@@ -135,9 +135,9 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 bg-merah hover:bg-merah-hover text-white text-sm font-medium rounded-[2px] transition-colors disabled:opacity-50 mt-2"
+            className="w-full py-2.5 px-4 bg-merah hover:bg-merah-hover active:bg-marun text-kertas text-sm font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] disabled:opacity-50 mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2"
           >
-            {loading ? 'Sedang masuk...' : 'Masuk ke Dashboard'}
+            {loading ? 'Sedang masuk...' : 'Masuk ke dashboard'}
           </button>
         </form>
 

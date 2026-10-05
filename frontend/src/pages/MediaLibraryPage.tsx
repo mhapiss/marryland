@@ -119,13 +119,13 @@ export default function MediaLibraryPage() {
           <Link to="/" className="text-xl font-serif font-normal tracking-tight text-tinta">
             by.<span className="text-merah">marryland</span>
           </Link>
-          <span className="border border-garis text-merah bg-kertas-tua text-[10px] px-2.5 py-0.5 rounded-[2px] font-mono uppercase">
+          <span className="border border-garis text-merah bg-kertas-tua text-[10px] px-2.5 py-0.5 rounded-chip font-sans font-medium uppercase">
             PUSTAKA MEDIA TERSINKRON
           </span>
         </div>
 
         <div className="flex items-center gap-5">
-          <Link to="/admin" className="text-sm font-mono text-tinta-lembut hover:text-merah transition-colors">
+          <Link to="/admin" className="text-sm font-sans font-medium text-tinta-lembut hover:text-merah transition-colors">
             ← Dashboard Admin
           </Link>
         </div>
@@ -154,7 +154,7 @@ export default function MediaLibraryPage() {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="px-5 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-[2px] text-xs font-medium flex items-center gap-2 transition-colors min-h-[44px] shadow-sm disabled:opacity-50"
+              className="px-5 py-2.5 bg-merah hover:bg-merah-hover text-white rounded-btn text-xs font-sans font-medium flex items-center gap-2 transition-colors min-h-[44px] shadow-sm disabled:opacity-50"
             >
               <Upload className="w-4 h-4" />
               <span>{isUploading ? 'Memproses WebP...' : 'Unggah Foto'}</span>
@@ -163,7 +163,7 @@ export default function MediaLibraryPage() {
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 bg-white p-4 rounded-[2px] border border-garis">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 bg-white p-4 rounded-panel border border-garis">
           <div className="relative w-full sm:w-96">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-tinta-lembut" />
             <input
@@ -171,7 +171,7 @@ export default function MediaLibraryPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari foto berdasarkan alt text atau nama..."
-              className="w-full pl-9 pr-4 py-2 border border-garis rounded-[2px] text-xs bg-white text-tinta focus:outline-none focus:border-merah"
+              className="w-full pl-9 pr-4 py-2 border border-garis rounded-input text-xs bg-white text-tinta focus:outline-none focus:border-merah"
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function MediaLibraryPage() {
             <button
               type="button"
               onClick={() => setFilterMode('all')}
-              className={`px-4 py-2 text-xs font-mono rounded-[2px] transition-colors min-h-[44px] ${
+              className={`px-4 py-2 text-xs font-sans font-medium rounded-chip transition-colors min-h-[44px] ${
                 filterMode === 'all'
                   ? 'bg-merah text-white font-medium'
                   : 'bg-kertas-tua border border-garis text-tinta-lembut hover:text-tinta'
@@ -190,7 +190,7 @@ export default function MediaLibraryPage() {
             <button
               type="button"
               onClick={() => setFilterMode('used')}
-              className={`px-4 py-2 text-xs font-mono rounded-[2px] transition-colors min-h-[44px] ${
+              className={`px-4 py-2 text-xs font-sans font-medium rounded-chip transition-colors min-h-[44px] ${
                 filterMode === 'used'
                   ? 'bg-merah text-white font-medium'
                   : 'bg-kertas-tua border border-garis text-tinta-lembut hover:text-tinta'
@@ -201,7 +201,7 @@ export default function MediaLibraryPage() {
             <button
               type="button"
               onClick={() => setFilterMode('unused')}
-              className={`px-4 py-2 text-xs font-mono rounded-[2px] transition-colors min-h-[44px] ${
+              className={`px-4 py-2 text-xs font-sans font-medium rounded-chip transition-colors min-h-[44px] ${
                 filterMode === 'unused'
                   ? 'bg-merah text-white font-medium'
                   : 'bg-kertas-tua border border-garis text-tinta-lembut hover:text-tinta'
@@ -357,7 +357,7 @@ export default function MediaLibraryPage() {
                 <button
                   type="button"
                   onClick={() => replaceFileInputRef.current?.click()}
-                  className="w-full py-2.5 border border-merah text-merah hover:bg-merah/10 rounded-[2px] text-xs font-medium flex items-center justify-center gap-2 transition-colors min-h-[44px]"
+                  className="w-full py-2.5 border border-merah text-merah hover:bg-merah/10 rounded-btn text-xs font-sans font-medium flex items-center justify-center gap-2 transition-colors min-h-[44px]"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   <span>Ganti File di Semua Tempat</span>
@@ -366,7 +366,7 @@ export default function MediaLibraryPage() {
                 <button
                   type="button"
                   onClick={() => setDeleteTarget(selectedAsset)}
-                  className="w-full py-2.5 border border-garis text-merah hover:bg-kertas-tua rounded-[2px] text-xs font-medium flex items-center justify-center gap-2 transition-colors min-h-[44px]"
+                  className="w-full py-2.5 border border-garis text-merah hover:bg-kertas-tua rounded-btn text-xs font-sans font-medium flex items-center justify-center gap-2 transition-colors min-h-[44px]"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Hapus Aset Ini</span>

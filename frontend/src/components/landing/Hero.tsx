@@ -77,7 +77,7 @@ export function Hero({ data, demoSlug }: HeroProps) {
               to="/register"
               onMouseEnter={() => prefetchRoute('/register')}
               onFocus={() => prefetchRoute('/register')}
-              className="inline-flex items-center justify-center bg-merah hover:bg-marun text-kertas px-7 py-3.5 text-sm font-medium rounded-sm transition-colors min-h-[44px]"
+              className="inline-flex items-center justify-center bg-merah hover:bg-merah-hover active:bg-marun text-kertas px-7 py-3 text-[15px] font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
             >
               {ctaPrimary}
             </Link>
@@ -86,7 +86,7 @@ export function Hero({ data, demoSlug }: HeroProps) {
               onClick={() => navigate(`/${demoSlug || 'demo'}`)}
               onMouseEnter={() => prefetchRoute(`/${demoSlug || 'demo'}`)}
               onFocus={() => prefetchRoute(`/${demoSlug || 'demo'}`)}
-              className="inline-flex items-center justify-center border border-tinta/30 text-tinta hover:bg-tinta hover:text-kertas px-6 py-3.5 text-sm font-medium rounded-sm transition-colors min-h-[44px]"
+              className="inline-flex items-center justify-center border border-tinta/35 text-tinta hover:bg-kertas-tua hover:border-tinta active:bg-kertas-tua/80 px-6 py-3 text-[15px] font-sans font-medium rounded-btn transition-colors duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta focus-visible:ring-offset-2 focus-visible:ring-offset-kertas"
             >
               {ctaDemo}
             </button>
@@ -95,7 +95,7 @@ export function Hero({ data, demoSlug }: HeroProps) {
               to="/login"
               onMouseEnter={() => prefetchRoute('/login')}
               onFocus={() => prefetchRoute('/login')}
-              className="text-xs uppercase tracking-[0.14em] font-bold text-tinta hover:text-merah px-3 py-2 min-h-[44px] flex items-center transition-colors link-vintage"
+              className="text-sm font-sans font-medium normal-case tracking-normal text-tinta hover:text-merah px-3 py-2 min-h-[44px] flex items-center transition-colors duration-150 link-vintage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah focus-visible:ring-offset-2 focus-visible:ring-offset-kertas rounded-btn"
             >
               {ctaLogin}
             </Link>
@@ -106,7 +106,7 @@ export function Hero({ data, demoSlug }: HeroProps) {
             {facts.map((fact: any, index: number) => (
               <span
                 key={index}
-                className="inline-flex items-center text-xs text-tinta bg-kertas-tua/60 px-3 py-1.5 rounded-sm border border-garis"
+                className="inline-flex items-center text-xs text-tinta bg-kertas-tua/60 px-3 py-1.5 rounded-chip border border-garis"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 text-merah mr-2 shrink-0" />
                 {fact.text}
@@ -174,7 +174,7 @@ export function Hero({ data, demoSlug }: HeroProps) {
                 <p className="text-[10px] text-kertas/50">Tersimpan Otomatis</p>
               </div>
 
-              <div className="bg-merah text-kertas text-[11px] font-sans px-3 py-1.5 rounded-sm flex items-center gap-1.5">
+              <div className="bg-merah text-kertas text-[11px] font-sans px-3 py-1.5 rounded-btn flex items-center gap-1.5">
                 <span>Kirim Pilihan</span>
                 <ArrowRight className="w-3 h-3" />
               </div>
