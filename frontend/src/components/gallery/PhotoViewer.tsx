@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { copyToClipboard } from '../../lib/clipboard';
 import { toast } from 'sonner';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 export interface ViewerPhoto {
   id: string;
@@ -259,14 +260,21 @@ export default function PhotoViewer({
     }
   }, []);
 
+  // Trap keyboard focus inside modal and restore focus on close
+  useFocusTrap(isOpen, containerRef, {
+    returnFocus: true,
+  });
+
   // Keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') handleNext();
-      else if (e.key === 'ArrowLeft') handlePrev();
-      else if (e.key === 'Escape') {
+      if (e.key === 'ArrowRight') {
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      } else if (e.key === 'Escape') {
         if (gestureState.current.scale > 1) {
           resetZoom();
         } else if (isFullscreen) {
@@ -275,9 +283,13 @@ export default function PhotoViewer({
           onClose();
         }
       } else if (e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
-        if (!readOnly && onToggleSelection && currentPhoto) {
-          onToggleSelection(currentPhoto.id);
+        // If focus is currently on an interactive button or link, let the browser fire the click event
+        const activeTag = (document.activeElement?.tagName || '').toLowerCase();
+        if (activeTag !== 'button' && activeTag !== 'a') {
+          e.preventDefault();
+          if (!readOnly && onToggleSelection && currentPhoto) {
+            onToggleSelection(currentPhoto.id);
+          }
         }
       } else if (e.key === '+' || e.key === '=') {
         gestureState.current.scale = Math.min(4, gestureState.current.scale + 0.5);
@@ -552,7 +564,7 @@ export default function PhotoViewer({
             <button
               type="button"
               onClick={handleDownload}
-              className="p-2 text-white/70 hover:text-white transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="p-2 text-white/70 hover:text-white transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               title="Unduh foto"
               aria-label="Unduh foto"
             >
@@ -564,7 +576,7 @@ export default function PhotoViewer({
           <button
             type="button"
             onClick={toggleFullscreenMode}
-            className="p-2 text-white/70 hover:text-white transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-white/70 hover:text-white transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             title={isFullscreen ? 'Keluar Layar Penuh (F)' : 'Layar Penuh (F)'}
             aria-label={isFullscreen ? 'Keluar Layar Penuh' : 'Layar Penuh'}
           >
@@ -575,7 +587,7 @@ export default function PhotoViewer({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-white/70 hover:text-merah transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-white/70 hover:text-merah transition-colors duration-150 rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             title="Tutup (Esc)"
             aria-label="Tutup penampil foto"
           >
@@ -624,7 +636,7 @@ export default function PhotoViewer({
               e.stopPropagation();
               handlePrev();
             }}
-            className={`absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/60 hover:bg-black/85 text-white/80 hover:text-white flex items-center justify-center border border-white/15 transition-all duration-200 z-20 ${
+            className={`absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/60 hover:bg-black/85 text-white/80 hover:text-white flex items-center justify-center border border-white/15 transition-all duration-200 z-20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
               controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
             title="Foto sebelumnya (Panah Kiri)"
@@ -642,7 +654,7 @@ export default function PhotoViewer({
               e.stopPropagation();
               handleNext();
             }}
-            className={`absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/60 hover:bg-black/85 text-white/80 hover:text-white flex items-center justify-center border border-white/15 transition-all duration-200 z-20 ${
+            className={`absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/60 hover:bg-black/85 text-white/80 hover:text-white flex items-center justify-center border border-white/15 transition-all duration-200 z-20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
               controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
             title="Foto berikutnya (Panah Kanan)"

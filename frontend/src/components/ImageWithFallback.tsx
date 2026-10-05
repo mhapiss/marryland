@@ -2,11 +2,13 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { RotateCcw, ImageOff } from 'lucide-react';
 import { getOptimizedThumbnailUrl } from '../lib/justifiedLayout';
+import { loadImageWithBackoff, imageLoadQueue } from '../lib/imageQueue';
 
 interface Props extends React.ImgHTMLAttributes<HTMLImageElement> {
   fallbackClassName?: string;
   isMissing?: boolean;
   renderWidth?: number;
+  priority?: 'high' | 'normal';
   onDimensionDetected?: (naturalWidth: number, naturalHeight: number) => void;
 }
 
@@ -17,14 +19,12 @@ export default function ImageWithFallback({
   fallbackClassName = '',
   isMissing = false,
   renderWidth,
+  priority = 'normal',
   onDimensionDetected,
   ...props
 }: Props) {
-  const [retryCount, setRetryCount] = useState(0);
-  const [hasError, setHasError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentSrc, setCurrentSrc] = useState<string>('');
-  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cancelLoadRef = useRef<(() => void) | null>(null);
 
   // Compute optimized thumbnail URL according to target render width
   const baseSrc = useMemo(() => {
@@ -35,67 +35,146 @@ export default function ImageWithFallback({
     return src;
   }, [src, renderWidth]);
 
-  // Sync with baseSrc
+  // Determine if image is in view or already cached
+  const [isInView, setIsInView] = useState<boolean>(() => {
+    if (priority === 'high') return true;
+    if (baseSrc && imageLoadQueue.isLoaded(baseSrc)) return true;
+    if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) return true;
+    return false;
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (isMissing || !baseSrc) return false;
+    return !imageLoadQueue.isLoaded(baseSrc);
+  });
+  const [isLoaded, setIsLoaded] = useState<boolean>(() => {
+    if (isMissing || !baseSrc) return false;
+    return imageLoadQueue.isLoaded(baseSrc);
+  });
+  const [hasError, setHasError] = useState<boolean>(false);
+
+  // IntersectionObserver to schedule loading when approaching viewport (rootMargin: 350px)
   useEffect(() => {
-    setCurrentSrc(baseSrc);
-    setRetryCount(0);
-    setHasError(false);
-    setIsLoading(true);
+    if (isInView) return;
+    if (isMissing || !baseSrc) return;
+
+    if (imageLoadQueue.isLoaded(baseSrc)) {
+      setIsInView(true);
+      return;
+    }
+
+    const element = containerRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry && (entry.isIntersecting || entry.intersectionRatio > 0)) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: '350px',
+      }
+    );
+
+    observer.observe(element);
 
     return () => {
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
+      observer.disconnect();
     };
-  }, [baseSrc, isMissing]);
+  }, [isInView, isMissing, baseSrc]);
 
-  // Handle native image load success
-  const handleLoad = useCallback(
-    (e: React.SyntheticEvent<HTMLImageElement>) => {
+  // Load image via concurrency queue once in view
+  useEffect(() => {
+    // Cancel previous queued load if baseSrc or isMissing changes
+    if (cancelLoadRef.current) {
+      cancelLoadRef.current();
+      cancelLoadRef.current = null;
+    }
+
+    if (!isInView || isMissing || !baseSrc) {
+      return;
+    }
+
+    // Fast path: if already cached in current session
+    if (imageLoadQueue.isLoaded(baseSrc)) {
+      setIsLoaded(true);
       setIsLoading(false);
       setHasError(false);
-
-      const img = e.currentTarget;
-      if (img && img.naturalWidth > 0 && img.naturalHeight > 0 && onDimensionDetected) {
-        onDimensionDetected(img.naturalWidth, img.naturalHeight);
-      }
-    },
-    [onDimensionDetected]
-  );
-
-  // Handle native image load error with exponential backoff (max 3 retries)
-  const handleError = useCallback(() => {
-    if (retryCount < 3) {
-      const nextAttempt = retryCount + 1;
-      const delay = nextAttempt === 1 ? 500 : nextAttempt === 2 ? 1500 : 3000;
-
-      retryTimeoutRef.current = setTimeout(() => {
-        setRetryCount(nextAttempt);
-        if (baseSrc) {
-          // Append cache-busting retry parameter
-          const separator = baseSrc.includes('?') ? '&' : '?';
-          setCurrentSrc(`${baseSrc}${separator}_retry=${nextAttempt}&t=${Date.now()}`);
-        }
-      }, delay);
-    } else {
-      setIsLoading(false);
-      setHasError(true);
+      return;
     }
-  }, [retryCount, baseSrc]);
 
-  // Manual retry handler
+    setIsLoading(true);
+    setHasError(false);
+
+    cancelLoadRef.current = loadImageWithBackoff(
+      baseSrc,
+      (_loadedSrc, nw, nh) => {
+        setIsLoaded(true);
+        setIsLoading(false);
+        setHasError(false);
+        if (nw && nh && onDimensionDetected) {
+          onDimensionDetected(nw, nh);
+        }
+      },
+      () => {
+        setIsLoading(false);
+        setIsLoaded(false);
+        setHasError(true);
+      },
+      {
+        priority,
+        maxRetries: 3,
+        baseDelayMs: 1000,
+      }
+    );
+
+    return () => {
+      if (cancelLoadRef.current) {
+        cancelLoadRef.current();
+        cancelLoadRef.current = null;
+      }
+    };
+  }, [isInView, baseSrc, isMissing, priority, onDimensionDetected]);
+
+  // Manual retry handler (high priority, zero Date.now cache-busting)
   const handleManualRetry = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
+      if (!baseSrc) return;
+
+      if (cancelLoadRef.current) {
+        cancelLoadRef.current();
+      }
+
       setHasError(false);
       setIsLoading(true);
-      setRetryCount(0);
-      if (baseSrc) {
-        const separator = baseSrc.includes('?') ? '&' : '?';
-        setCurrentSrc(`${baseSrc}${separator}_t=${Date.now()}`);
-      }
+
+      cancelLoadRef.current = loadImageWithBackoff(
+        baseSrc,
+        (_loadedSrc, nw, nh) => {
+          setIsLoaded(true);
+          setIsLoading(false);
+          setHasError(false);
+          if (nw && nh && onDimensionDetected) {
+            onDimensionDetected(nw, nh);
+          }
+        },
+        () => {
+          setIsLoading(false);
+          setIsLoaded(false);
+          setHasError(true);
+        },
+        {
+          priority: 'high',
+          maxRetries: 3,
+          baseDelayMs: 1000,
+        }
+      );
     },
-    [baseSrc]
+    [baseSrc, onDimensionDetected]
   );
 
   // Missing from Drive state
@@ -114,7 +193,7 @@ export default function ImageWithFallback({
     );
   }
 
-  // Error after 3 backoff retries
+  // Error after retries exhausted
   if (hasError) {
     return (
       <div
@@ -140,7 +219,10 @@ export default function ImageWithFallback({
   }
 
   return (
-    <div className={`relative overflow-hidden ${fallbackClassName ? '' : 'w-full h-full'}`}>
+    <div
+      ref={containerRef}
+      className={`relative overflow-hidden ${fallbackClassName ? '' : 'w-full h-full'}`}
+    >
       {/* Neutral placeholder skeleton matching exact container dimensions */}
       {isLoading && (
         <div
@@ -153,9 +235,9 @@ export default function ImageWithFallback({
         </div>
       )}
 
-      {currentSrc && (
+      {isLoaded && (
         <img
-          src={currentSrc}
+          src={baseSrc}
           alt={alt || ''}
           className={`${className} transition-opacity duration-300 ${
             isLoading ? 'opacity-0' : 'opacity-100'
@@ -163,8 +245,6 @@ export default function ImageWithFallback({
           loading={props.loading || 'lazy'}
           decoding="async"
           referrerPolicy="no-referrer"
-          onLoad={handleLoad}
-          onError={handleError}
           {...props}
         />
       )}

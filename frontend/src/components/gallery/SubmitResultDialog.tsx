@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { copyToClipboard } from '../../lib/clipboard';
 import type { ViewerPhoto } from './PhotoViewer';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 export type SubmitResultState = 'submitting' | 'success' | 'error';
 
@@ -48,19 +49,13 @@ export default function SubmitResultDialog({
   const dialogRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
 
-  // Esc key handler (disabled while submitting)
-  useEffect(() => {
-    if (!open) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && state !== 'submitting') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, state, onClose]);
+  // Esc key and Tab focus trap
+  useFocusTrap(open, dialogRef, {
+    onEscape: () => {
+      if (state !== 'submitting') onClose();
+    },
+    returnFocus: true,
+  });
 
   if (!open) return null;
 

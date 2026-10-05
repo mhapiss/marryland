@@ -2,10 +2,10 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#9B2C24" />
-  <meta name="referrer" content="no-referrer" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="canonical" href="https://by-marryland.app/" />
   <title>by.marryland — Galeri Seleksi Foto Klien untuk Fotografer</title>
   <meta name="description" content="Platform kurasi dan seleksi foto klien yang cepat, elegan, dan terintegrasi langsung dengan Google Drive untuk fotografer pernikahan dan wisuda." />
   
@@ -15,13 +15,36 @@
   <meta property="og:title" content="by.marryland — Galeri Seleksi Foto Klien untuk Fotografer" />
   <meta property="og:description" content="Platform kurasi dan seleksi foto klien yang cepat, elegan, dan terintegrasi langsung dengan Google Drive untuk fotografer pernikahan dan wisuda." />
   <meta property="og:image" content="https://by-marryland.app/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/jpeg" />
   
   <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://by-marryland.app/" />
+  <meta name="twitter:title" content="by.marryland — Galeri Seleksi Foto Klien untuk Fotografer" />
+  <meta name="twitter:description" content="Platform kurasi dan seleksi foto klien yang cepat, elegan, dan terintegrasi langsung dengan Google Drive untuk fotografer pernikahan dan wisuda." />
+  <meta name="twitter:image" content="https://by-marryland.app/og-image.jpg" />
   <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="https://by-marryland.app/" />
-  <meta property="twitter:title" content="by.marryland — Galeri Seleksi Foto Klien untuk Fotografer" />
-  <meta property="twitter:description" content="Platform kurasi dan seleksi foto klien yang cepat, elegan, dan terintegrasi langsung dengan Google Drive untuk fotografer pernikahan dan wisuda." />
   <meta property="twitter:image" content="https://by-marryland.app/og-image.jpg" />
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "PhotographyBusiness",
+    "name": "by.marryland",
+    "url": "https://by-marryland.app/",
+    "logo": "https://by-marryland.app/og-image.jpg",
+    "image": "https://by-marryland.app/og-image.jpg",
+    "description": "Platform kurasi dan seleksi foto klien yang cepat, elegan, dan terintegrasi langsung dengan Google Drive untuk fotografer pernikahan dan wisuda.",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "ID"
+    }
+  }
+  </script>
 
   <!-- Koneksi awal: Supabase (data, auth, storage) dan origin gambar Google Drive / Unsplash -->
   <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />

@@ -10,19 +10,6 @@ import '@fontsource/hanken-grotesk/latin-500.css';
 import '@fontsource/hanken-grotesk/latin-600.css';
 import '@fontsource/hanken-grotesk/latin-700.css';
 
-// Pilihan font preset (hanya subset latin dan bobot yang dimuat)
-import '@fontsource/instrument-serif/latin-400.css';
-import '@fontsource/bodoni-moda/latin-400.css';
-import '@fontsource/bodoni-moda/latin-700.css';
-import '@fontsource/inter-tight/latin-400.css';
-import '@fontsource/inter-tight/latin-500.css';
-import '@fontsource/newsreader/latin-400.css';
-import '@fontsource/newsreader/latin-600.css';
-import '@fontsource/dm-sans/latin-400.css';
-import '@fontsource/dm-sans/latin-500.css';
-import '@fontsource/fraunces/latin-400.css';
-import '@fontsource/fraunces/latin-600.css';
-
 import './styles/tokens.css';
 import './index.css';
 

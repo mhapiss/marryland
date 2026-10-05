@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'sonner';
 import { TOAST } from '../constants/toastMessages';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 const AccountSettings: React.FC = () => {
   const { user } = useAuth();
+  const passwordModalRef = useRef<HTMLDivElement>(null);
 
   // Change email
   const [newEmail, setNewEmail] = useState('');
@@ -16,6 +18,11 @@ const AccountSettings: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
+
+  useFocusTrap(showPasswordModal, passwordModalRef, {
+    onEscape: () => setShowPasswordModal(false),
+    returnFocus: true,
+  });
 
   const handleChangeEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,10 +132,10 @@ const AccountSettings: React.FC = () => {
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowPasswordModal(false)} />
-          <div className="relative bg-white rounded-panel border border-garis shadow-xl p-8 w-full max-w-sm font-sans text-tinta animate-slide-up" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
+          <div ref={passwordModalRef} className="relative bg-white rounded-panel border border-garis shadow-xl p-8 w-full max-w-sm font-sans text-tinta animate-slide-up" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
             <div className="flex items-center justify-between mb-6">
               <h3 id="password-modal-title" className="font-serif text-xl font-normal text-tinta">Ubah Kata Sandi</h3>
-              <button onClick={() => setShowPasswordModal(false)} className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center">
+              <button onClick={() => setShowPasswordModal(false)} aria-label="Tutup dialog ubah kata sandi" className="p-2 text-tinta-lembut hover:text-merah transition-colors rounded-btn min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinta">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
             </div>

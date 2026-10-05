@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { rescanDriveFolder, generateAlbumToken } from '../lib/drive';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import {
   X,
   RefreshCw,
@@ -26,6 +27,13 @@ interface Props {
 }
 
 export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdated }: Props) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(Boolean(gallery), modalRef, {
+    onEscape: onClose,
+    returnFocus: true,
+  });
+
   if (!gallery) return null;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -160,6 +168,7 @@ export default function GallerySettingsModal({ gallery, onClose, onGalleryUpdate
 
   return (
     <div
+      ref={modalRef}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"

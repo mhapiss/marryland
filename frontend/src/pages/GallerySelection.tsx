@@ -230,6 +230,13 @@ export default function GallerySelection() {
       if (!rpcError && parsedRpc && parsedRpc.id && !parsedRpc.error) {
         galleryData = parsedRpc;
       } else {
+        const isFunctionMissing =
+          rpcError?.code === 'PGRST202' ||
+          Boolean(rpcError?.message?.toLowerCase().includes('function'));
+        if (!isFunctionMissing) {
+          throw new Error('Galeri tidak ditemukan atau tautan tidak valid.');
+        }
+
         const { data, error } = await supabase
           .from('galleries')
           .select('*')
@@ -254,9 +261,16 @@ export default function GallerySelection() {
         { p_slug: client_slug }
       );
 
-      if (!rpcPhotosError && Array.isArray(rpcPhotos) && rpcPhotos.length > 0) {
+      if (!rpcPhotosError && Array.isArray(rpcPhotos)) {
         photosData = rpcPhotos;
       } else {
+        const isFunctionMissing =
+          rpcPhotosError?.code === 'PGRST202' ||
+          Boolean(rpcPhotosError?.message?.toLowerCase().includes('function'));
+        if (!isFunctionMissing && rpcPhotosError) {
+          throw rpcPhotosError;
+        }
+
         const { data, error } = await supabase
           .from('gallery_photos')
           .select('*')
@@ -321,11 +335,23 @@ export default function GallerySelection() {
     },
   });
 
-  // SEO Meta
-  usePageMeta(
-    gallery ? `Galeri ${gallery.client_name}` : 'Galeri Kurasi Foto',
-    gallery?.highlight_description || 'Pilih foto momen terbaikmu dari sesi foto kami.'
-  );
+  // SEO Meta & Structured Data
+  usePageMeta({
+    title: gallery ? `Galeri ${gallery.client_name}` : 'Galeri Kurasi Foto',
+    description:
+      gallery?.highlight_description || 'Pilih foto momen terbaikmu dari sesi foto kami.',
+    jsonLd: gallery
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'ImageGallery',
+          name: `Galeri Foto ${gallery.client_name}`,
+          description:
+            gallery.highlight_description ||
+            `Galeri kurasi dan seleksi foto untuk ${gallery.client_name}`,
+          url: window.location.href.split('?')[0],
+        }
+      : undefined,
+  });
 
   // Subfolder options
   const subfolders = useMemo(() => {
@@ -1097,9 +1123,10 @@ export default function GallerySelection() {
                         {/* Image Thumbnail with dynamic DPR sizing and extreme-ratio containment */}
                         <ImageWithFallback
                           src={photo.thumbnail_url}
-                          alt={photo.filename}
+                          alt={`Foto ${gallery?.client_name ? `${gallery.client_name} - ` : ''}${photo.filename}`}
                           loading="lazy"
                           renderWidth={width}
+                          priority={globalIndex < 6 ? 'high' : 'normal'}
                           onDimensionDetected={(nw, nh) => handleDimensionDetected(photo.id, nw, nh)}
                           className={`w-full h-full select-none pointer-events-none transition-transform duration-300 group-hover:scale-[1.015] ${
                             isExtremeRatio ? 'object-contain' : 'object-cover'

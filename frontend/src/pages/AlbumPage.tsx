@@ -6,6 +6,7 @@ import ImageWithFallback from '../components/ImageWithFallback';
 import PhotoViewer from '../components/gallery/PhotoViewer';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
+import { usePageMeta } from '../hooks/usePageMeta';
 import {
   Lock,
   Share2,
@@ -64,6 +65,21 @@ export default function AlbumPage() {
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  usePageMeta({
+    title: album ? `${album.title || 'Album Kenangan'}` : 'Album Foto',
+    description: album?.highlight_description || 'Album foto kenangan eksklusif dari studio by.marryland.',
+    jsonLd: album
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'ImageGallery',
+          name: album.title || 'Album Keluarga',
+          description:
+            album.highlight_description || `Album foto resmi untuk ${album.title || 'keluarga'}`,
+          url: window.location.href.split('?')[0],
+        }
+      : undefined,
+  });
 
   // Fetch album via secure RPC function
   const fetchAlbum = useCallback(
@@ -420,8 +436,9 @@ export default function AlbumPage() {
                 <div className="w-full h-full overflow-hidden rounded-[1px] bg-kertas-tua/40 relative">
                   <ImageWithFallback
                     src={photo.thumbnail_url}
-                    alt={photo.filename}
+                    alt={`Foto album ${album?.title ? `${album.title} - ` : ''}${photo.filename}`}
                     isMissing={photo.is_missing}
+                    priority={index < 6 ? 'high' : 'normal'}
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   />

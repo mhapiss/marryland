@@ -1,8 +1,17 @@
 User-agent: *
 Allow: /
-Disallow: /dashboard/
-Disallow: /admin/
-Disallow: /g/
+Allow: /portofolio
+Allow: /portofolio/*
+Allow: /portfolio
+Disallow: /album/
 Disallow: /galeri/
+Disallow: /g/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /lupa-password
+Disallow: /reset-password
+Disallow: /api/
 
 Sitemap: https://by-marryland.app/sitemap.xml

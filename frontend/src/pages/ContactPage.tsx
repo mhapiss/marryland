@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useHomeData } from '../hooks/useHomeData';
 import { useSiteSettings, usePageContent } from '../hooks/useContent';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { Navbar } from '../components/landing/Navbar';
 import { Footer } from '../components/landing/Footer';
 import { PageHero } from '../components/common/PageHero';
@@ -18,6 +19,11 @@ export default function ContactPage() {
   const description =
     contactPageContent?.header?.description ||
     'Punya pertanyaan, kendala, atau ingin mendiskusikan dokumentasi acara? Kami siap membantu.';
+
+  usePageMeta({
+    title: 'Kontak Studio',
+    description,
+  });
   const address = contactPageContent?.location?.address || '';
   const hours = contactPageContent?.location?.hours || 'Senin - Sabtu: 09.00 - 18.00 WIB';
 

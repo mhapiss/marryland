@@ -1,6 +1,7 @@
 // src/components/gallery/SubmitConfirmDialog.tsx
-import React, { useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Send, AlertCircle, RefreshCw } from 'lucide-react';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 interface SubmitConfirmDialogProps {
   open: boolean;
@@ -21,17 +22,15 @@ export default function SubmitConfirmDialog({
   remainingQuota,
   isSubmitting = false,
 }: SubmitConfirmDialogProps) {
-  // Esc key closes confirm dialog
-  useEffect(() => {
-    if (!open) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isSubmitting) {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, isSubmitting, onClose]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Esc key and Tab focus trap
+  useFocusTrap(open, dialogRef, {
+    onEscape: () => {
+      if (!isSubmitting) onClose();
+    },
+    returnFocus: true,
+  });
 
   if (!open) return null;
 
@@ -40,6 +39,7 @@ export default function SubmitConfirmDialog({
 
   return (
     <div
+      ref={dialogRef}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"

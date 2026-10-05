@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import {
   formatClientMessage,
   DEFAULT_MAIN_TEMPLATE,
@@ -29,8 +30,14 @@ export default function SendClientMessageModal({
   mainTemplate = DEFAULT_MAIN_TEMPLATE,
   albumTemplate = DEFAULT_ALBUM_SECTION,
 }: Props) {
+  const modalRef = useRef<HTMLDivElement>(null);
   const [messageText, setMessageText] = useState('');
   const [copiedType, setCopiedType] = useState<string | null>(null);
+
+  useFocusTrap(Boolean(gallery), modalRef, {
+    onEscape: onClose,
+    returnFocus: true,
+  });
 
   useEffect(() => {
     if (!gallery) return;
@@ -100,6 +107,7 @@ export default function SendClientMessageModal({
 
   return (
     <div
+      ref={modalRef}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
